@@ -31,6 +31,12 @@ export function scheduleDay(s: GameState) {
   const taken: number[] = [];
   // Tree moves first (fixed beats of the storyline).
   for (const ev of scheduleTreeMoves(s)) { s.schedule.push(ev); taken.push(ev.at); }
+  // The once-per-run Blue Screen goes next so a short Judge-mode day can't crowd it out.
+  let bsodPlaced = false;
+  if (s.day === Number(s.flags.bsodDay)) {
+    const t = placeTimes(s, taken, 1, 3, D - 6)[0] ?? randRange(s, 3, D - 6);
+    s.schedule.push({ at: t, kind: 'bubble', data: 'bsod' }); taken.push(t); bsodPlaced = true;
+  }
   // Alerts (with optional foreshadowing 5–8 s earlier).
   const alertIds: string[] = [];
   if (s.day >= 2 && s.treeSignups - s.signups > T.rubberBand) alertIds.push('tree_stumble');
@@ -57,10 +63,7 @@ export function scheduleDay(s: GameState) {
   }
   // Bubbles.
   let bubbles = cfg.bubbles;
-  if (s.day === Number(s.flags.bsodDay)) {
-    const [t] = placeTimes(s, taken, 1, 3, D - 6);
-    if (t !== undefined) { s.schedule.push({ at: t, kind: 'bubble', data: 'bsod' }); taken.push(t); bubbles--; }
-  }
+  if (bsodPlaced) bubbles--;
   for (const t of placeTimes(s, taken, bubbles, 1, D - 1.5)) { s.schedule.push({ at: t, kind: 'bubble' }); taken.push(t); }
   s.schedule.sort((a, b) => a.at - b.at);
 }
@@ -136,7 +139,11 @@ export const BUBBLE_ICON: Record<BubbleType, string> = {
 };
 
 export function spawnBubble(s: GameState, type?: BubbleType, regionId?: RegionId) {
-  if (s.bubbles.length >= T.maxBubbles) return;
+  if (s.bubbles.length >= T.maxBubbles) {
+    // The once-per-run Blue Screen must not be lost to a crowded map: it bumps the oldest bubble.
+    if (type !== 'bsod') return;
+    s.bubbles.shift();
+  }
   let rid = regionId ?? rngPickRegion(s, { frat: 1.6 });
   const t = type ?? weighted(s, BUBBLE_WEIGHTS, ([bt, w]) => (bt === 'party' && rid === 'frat' ? w * 3 : w))[0];
   if (t === 'party' && !regionId && rand(s) < 0.5) rid = 'frat';

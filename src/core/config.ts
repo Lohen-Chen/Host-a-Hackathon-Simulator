@@ -7,11 +7,13 @@ export const DAYS = 7;
 export const TITLE = 'Host a Hackathon Simulator';
 export const OBJECTIVE = 'Get more hackers than Tree University.';
 
-export interface ModeConfig { daySec: number; bubbles: number; alerts: number; tickerSec: number; auctionSec: number; label: string }
+export interface ModeConfig { daySec: number; bubbles: number; alerts: number; tickerSec: number; auctionSec: number; label: string;
+  /** Tree's ambient posting multiplier: shorter days give the player fewer bubbles/alerts to fight back with. */
+  treePower: number }
 export const MODES: Record<Mode, ModeConfig> = {
-  judge: { daySec: 30, bubbles: 5, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)' },
-  standard: { daySec: 60, bubbles: 10, alerts: 2, tickerSec: 5, auctionSec: 10, label: 'Standard (~10 min)' },
-  full: { daySec: 120, bubbles: 20, alerts: 4, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)' },
+  judge: { daySec: 30, bubbles: 5, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8 },
+  standard: { daySec: 60, bubbles: 10, alerts: 2, tickerSec: 5, auctionSec: 10, label: 'Standard (~10 min)', treePower: 1 },
+  full: { daySec: 120, bubbles: 20, alerts: 4, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2 },
 };
 
 export const T = {
@@ -26,14 +28,14 @@ export const T = {
   endDayBonusTp: 1,
   // Hype map
   spread: 0.02,
-  decay: 0.006,
+  decay: 0.03, // proportional: share of awareness lost per step
   treeSpread: 0.02,
-  treeDecay: 0.004,
+  treeDecay: 0.02,
   treeControlPenalty: 0.6,
   signupLerp: 0.25,
   promoBonus: 0.15,
   /** Tree's own ambient posting: impulses per day, scaled by treeHype/50 */
-  treePostsPerDay: 3,
+  treePostsPerDay: 4.25,
   treePostPower: 0.11,
   treeHypeStart: 45,
   treeHypeDaily: 1.5,
@@ -57,6 +59,8 @@ export const T = {
   // Event day
   foodPerAttendee: 12,
   showRateBase: 0.62,
+  /** attendees needed for a full Attendance score */
+  attendanceFull: 480,
 };
 
 export const RESEARCH_TASKS = ['research', 'social', 'website', 'venue', 'sponsors', 'recruit'] as const;

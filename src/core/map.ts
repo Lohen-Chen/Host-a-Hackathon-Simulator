@@ -1,17 +1,17 @@
 // The hype map: per-step virus-style spread (Section 6.3). No DOM.
-import { T } from './config';
+import { MODES, STEPS_PER_DAY, T } from './config';
 import { addTicker, fx, hasTech, log } from './helpers';
 import { isTreeControlled, joke } from './jokes';
 import { clamp, chance, rand, weighted } from './rng';
 import type { GameState, RegionId } from './types';
 
 export function repFactor(rep: number) {
-  return clamp(0.5 + 0.003 * rep, 0, 0.95);
+  return clamp(0.66 + 0.003 * rep, 0, 0.95);
 }
 
 /** Tree's off-map hackers (its own campus mailing lists), scaled by hype. */
 export function treeBase(s: GameState) {
-  return 110 + s.treeHype * 1.6;
+  return 30 + s.treeHype * 1.0;
 }
 
 export function stepMap(s: GameState) {
@@ -30,14 +30,14 @@ export function stepMap(s: GameState) {
       inB += Math.max(0, n.bear - r.bear);
       inT += Math.max(0, n.tree - r.tree);
     }
-    nextBear.push(clamp(r.bear + spreadK * inB - decay, 0, 1));
-    nextTree.push(clamp(r.tree + treeK * inT - T.treeDecay, 0, 1));
+    nextBear.push(clamp(r.bear + spreadK * inB - decay * r.bear, 0, 1));
+    nextTree.push(clamp(r.tree + treeK * inT - T.treeDecay * r.tree, 0, 1));
   }
   const wasTree = rs.map((r) => isTreeControlled(r));
   rs.forEach((r, i) => { r.bear = nextBear[i]; r.tree = nextTree[i]; });
 
   // Tree's ambient posting.
-  if (chance(s, T.treePostsPerDay / 20)) {
+  if (chance(s, (T.treePostsPerDay * MODES[s.mode].treePower) / STEPS_PER_DAY)) {
     const target = weighted(s, rs, (r) => 0.3 + r.tree + (r.bear > r.tree ? 0.4 : 0));
     treeImpulse(s, target.id, T.treePostPower * (s.treeHype / 50) * (0.6 + rand(s) * 0.8));
   }

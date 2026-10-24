@@ -117,6 +117,15 @@ describe('simulation core', () => {
     }
   });
 
+  it('the Blue Screen appears exactly once in every run, in every mode', () => {
+    for (const mode of ['judge', 'standard', 'full'] as const) {
+      for (let seed = 0; seed < 150; seed++) {
+        const r = playGame(seed, mode, { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+        expect(r.state.log.filter((l) => l.kind === 'bsod').length, `${mode} seed ${seed}`).toBe(1);
+      }
+    }
+  });
+
   it('equity sold reduces later sponsor payments, capped at 28%', () => {
     const s = newGame(3);
     s.flags.equitySold = 35;

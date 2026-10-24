@@ -43,7 +43,7 @@ export function showRate(s: GameState) {
 }
 
 export function attendanceScore(attendees: number, expected: number, cap: number): number {
-  const abs = 100 * Math.min(1, attendees / 620);
+  const abs = 100 * Math.min(1, attendees / T.attendanceFull);
   const fill = expected / cap;
   const fit = fill < 0.45 ? 0.7 + 0.66 * fill : fill <= 1.05 ? 1 : Math.max(0.55, 1 - (fill - 1.05) * 0.9);
   return clamp(abs * fit, 0, 100);
@@ -79,20 +79,20 @@ export function scoreBear(s: GameState, f: EventFacts): ScoreBreakdown {
   const afterparty = s.flags.afterparty === 'official' ? 4 : 0;
 
   const attendance = attendanceScore(f.attendees, f.expected, f.cap);
-  const mood = clamp(46 + s.moodBank * 1.6 + (hasTech(s, 'snack') ? 8 : 0) + perkMood + v.ambience * 1.5 + Math.min(10, s.operations * 1.2)
+  const mood = clamp(38 + s.moodBank * 1.6 + (hasTech(s, 'snack') ? 8 : 0) + perkMood + v.ambience * 1.5 + Math.min(10, s.operations * 1.2)
     + traitMood + bsod + afterparty - (f.protest ? 15 : 0) - wifi * 2.5 - f.broken * 4 - (f.overflow > 0 ? 10 : 0) - (f.dumpster ? 15 : 0), 0, 100);
   const sponsor = s.sponsors.length
-    ? clamp(s.sponsors.reduce((a, x) => a + TIER_INFO[SPONSOR_BY_ID[x.id].tier].points * (x.premium ? 1 : 0.7), 0) + 8, 0, 100)
+    ? clamp(s.sponsors.reduce((a, x) => a + TIER_INFO[SPONSOR_BY_ID[x.id].tier].points * (x.premium ? 1 : 0.6), 0) * 0.7 + 8, 0, 100)
     : 8;
   const sponsormood = s.sponsors.length
     ? clamp(s.sponsors.reduce((a, x) => a + x.mood, 0) / s.sponsors.length - s.ignoredInvites * 3, 0, 100)
-    : clamp(38 - s.ignoredInvites * 3, 0, 100);
-  const amenities = clamp(30 + (hasTech(s, 'snack') ? 22 : 0) + Math.min(24, roleSkillSum(s, 'logistics') * 2.5) + Math.min(14, s.operations * 1.6)
+    : clamp(25 - s.ignoredInvites * 3, 0, 100);
+  const amenities = clamp(20 + (hasTech(s, 'snack') ? 22 : 0) + Math.min(24, roleSkillSum(s, 'logistics') * 2.5) + Math.min(14, s.operations * 1.6)
     + (f.dumpster ? -22 : 8) + allSp.filter((d) => d.id === 'doordish' || d.id === 'bubbletrouble').length * 7 - wifi * 4, 0, 100);
-  const promises = f.kept + f.broken ? (100 * f.kept) / (f.kept + f.broken) : 55;
-  const artistic = clamp(10 + s.websiteScore * 0.5 + v.ambience * 5 + Math.min(16, s.ambienceBonus * 2.2) + (s.flags.dog === 'rented' ? 3 : 0), 0, 100);
+  const promises = f.kept + f.broken ? (100 * f.kept) / (f.kept + f.broken) : 40;
+  const artistic = clamp(10 + s.websiteScore * 0.6 + v.ambience * 5 + Math.min(16, s.ambienceBonus * 2.2) + (s.flags.dog === 'rented' ? 3 : 0), 0, 100);
   const avgSkill = s.members.length ? s.members.reduce((a, m) => a + m.baseSkill, 0) / s.members.length : 3;
-  const quality = clamp(28 + perkQuality + s.qualityBonus + mood * 0.18 + avgSkill * 2.5 + (s.trainingMult - 1) * 18 + (hasTech(s, 'applications') ? 12 : 0), 0, 100);
+  const quality = clamp(20 + perkQuality + s.qualityBonus + mood * 0.18 + avgSkill * 2.5 + (s.trainingMult - 1) * 18 + (hasTech(s, 'applications') ? 12 : 0), 0, 100);
 
   const values: Record<string, number> = { attendance, mood, sponsor, sponsormood, amenities, promises, artistic, quality };
   const categories = CATEGORIES.map((c) => ({ ...c, value: Math.round(values[c.id]), line: line(s, c.id, values[c.id] >= 60) }));

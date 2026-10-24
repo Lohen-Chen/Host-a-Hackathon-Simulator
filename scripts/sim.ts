@@ -37,6 +37,7 @@ for (const [name, cfg] of BOTS) {
   const treeRegions: number[] = [];
   const cats: Record<string, number[]> = {};
   const usage: Record<string, number> = {};
+  const overall: Record<string, number> = {};
   let wins = 0;
   let stuck = 0;
   const top: { score: number; keys: string[] }[] = [];
@@ -57,16 +58,23 @@ for (const [name, cfg] of BOTS) {
       ...[...new Set(s.log.filter((l) => l.kind.startsWith('post:')).map((l) => `post:${l.text}`))],
       `venue:${s.venue}`,
     ];
+    for (const k of keys) overall[k] = (overall[k] ?? 0) + 1;
     top.push({ score: res.bear.total, keys });
   }
   top.sort((a, b) => b.score - a.score);
   const decile = top.slice(0, Math.max(1, Math.floor(top.length / 10)));
   for (const t of decile) for (const k of t.keys) usage[k] = (usage[k] ?? 0) + 1;
-  const dominant = Object.entries(usage).filter(([k, v]) => v / decile.length > 0.8 && !k.startsWith('tech:') && !k.startsWith('post:'))
-    .map(([k, v]) => `${k.replace(/^post:(.*)$/, (_, n) => `post:${Object.values(POST_BY_ID).find((p) => p.name === n)?.id ?? n}`)} ${(100 * v / decile.length).toFixed(0)}%`);
+  // Dominant = in >80% of top-decile runs AND noticeably more common there than overall (lift > 1.15).
+  // Guaranteed content (e.g. the scripted YSee invite every run) is ubiquitous, not dominant.
+  const label = (k: string) => k.replace(/^post:(.*)$/, (_, n) => `post:${Object.values(POST_BY_ID).find((p) => p.name === n)?.id ?? n}`);
+  const frequent = Object.entries(usage).filter(([k, v]) => v / decile.length > 0.8 && !k.startsWith('tech:') && !k.startsWith('post:'))
+    .map(([k, v]) => ({ k, top: v / decile.length, lift: (v / decile.length) / ((overall[k] ?? 1) / scores.length) }));
+  const dominant = frequent.filter((f) => f.lift > 1.15).map((f) => `${label(f.k)} ${(100 * f.top).toFixed(0)}% (×${f.lift.toFixed(2)})`);
+  const common = frequent.filter((f) => f.lift <= 1.15).map((f) => `${label(f.k)} ${(100 * f.top).toFixed(0)}%`);
   console.log(`■ ${name.padEnd(13)} score ${fmt(scores)} · beats Tree ${(100 * wins / Math.max(1, scores.length)).toFixed(0)}% · stuck ${stuck}`);
   console.log(`  signups ${fmt(signups)} · Tree signups med ${q(treeSign, 0.5).toFixed(0)} · Tree regions med ${q(treeRegions, 0.5)} (p10 ${q(treeRegions, 0.1)}, p90 ${q(treeRegions, 0.9)})`);
   console.log(`  ${Object.entries(cats).map(([k, v]) => `${k.split(' ')[0]} ${q(v, 0.5)}`).join(' · ')}`);
-  if (dominant.length) console.log(`  top-decile >80% (non-tech): ${dominant.join(', ')}`);
+  if (dominant.length) console.log(`  DOMINANT (top-decile >80%, lift >1.15): ${dominant.join(', ')}`);
+  if (common.length) console.log(`  common everywhere (not dominant): ${common.join(', ')}`);
   console.log('');
 }
