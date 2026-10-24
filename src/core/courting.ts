@@ -88,6 +88,20 @@ function settle(s: GameState, c: Courting): NonNullable<Courting['result']> {
   return { outcome: premium ? 'premium' : 'basic', money, promises: uniq.map((k) => PROMISES[k].text), text };
 }
 
+/** Add a signed sponsor: money, promises, perk side effects and fanfare. */
+export function signSponsor(s: GameState, id: string, money: number, premium: boolean, kinds: PromiseKind[]) {
+  const d = SPONSOR_BY_ID[id];
+  s.budget += money;
+  s.sponsors.push({ id: d.id, money, premium, mood: premium ? 60 : 50, day: s.day });
+  for (const k of kinds) s.promises.push({ uid: ++s.uid, sponsorId: d.id, kind: k, text: PROMISES[k].text });
+  if (premium && d.perkFx.rep) addRep(s, d.perkFx.rep);
+  addTicker(s, 'SPONSOR WIRE', fill(s, pick(s, SIGN_LINES), { sponsor: d.name }));
+  log(s, 'sponsor', d.name, money);
+  fx(s, { kind: 'banner', text: `${d.name} signed!`, tone: 'good' });
+  fx(s, { kind: 'sfx', sfx: 'levelup' });
+  if (premium && d.perk.startsWith('AI Credits')) aiCreditsNews(s);
+}
+
 /** Close the minigame and apply the deal. */
 export function finishCourting(s: GameState) {
   const c = s.courting;
@@ -98,16 +112,8 @@ export function finishCourting(s: GameState) {
   }
   const d = SPONSOR_BY_ID[c.sponsorId];
   if (c.result.outcome !== 'walk') {
-    s.budget += c.result.money;
-    s.sponsors.push({ id: d.id, money: c.result.money, premium: c.result.outcome === 'premium', mood: c.result.outcome === 'premium' ? 60 : 50, day: s.day });
     const kinds = Object.entries(PROMISES).filter(([, p]) => c.result!.promises.includes(p.text)).map(([k]) => k as PromiseKind);
-    for (const k of kinds) s.promises.push({ uid: ++s.uid, sponsorId: d.id, kind: k, text: PROMISES[k].text });
-    if (c.result.outcome === 'premium' && d.perkFx.rep) addRep(s, d.perkFx.rep);
-    addTicker(s, 'SPONSOR WIRE', fill(s, pick(s, SIGN_LINES), { sponsor: d.name }));
-    log(s, 'sponsor', d.name, c.result.money);
-    fx(s, { kind: 'banner', text: `${d.name} signed!`, tone: 'good' });
-    fx(s, { kind: 'sfx', sfx: 'levelup' });
-    if (c.result.outcome === 'premium' && d.perk.startsWith('AI Credits')) aiCreditsNews(s);
+    signSponsor(s, d.id, c.result.money, c.result.outcome === 'premium', kinds);
   } else {
     log(s, 'sponsorWalk', d.name);
     fx(s, { kind: 'sfx', sfx: 'trombone' });

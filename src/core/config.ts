@@ -14,7 +14,7 @@ export interface ModeConfig { daySec: number; bubbles: number; alerts: number; t
   popupsPerDay: number }
 export const MODES: Record<Mode, ModeConfig> = {
   judge: { daySec: 30, bubbles: 6, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8, popupsPerDay: 2 },
-  standard: { daySec: 60, bubbles: 10, alerts: 1, tickerSec: 5, auctionSec: 10, label: 'Standard (~10 min)', treePower: 1, popupsPerDay: 2 },
+  standard: { daySec: 60, bubbles: 10, alerts: 1, tickerSec: 5, auctionSec: 10, label: '~10 min', treePower: 1, popupsPerDay: 2 },
   full: { daySec: 120, bubbles: 20, alerts: 2, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2, popupsPerDay: 3 },
 };
 
@@ -22,7 +22,11 @@ export const T = {
   startBudget: 20000,
   startRep: 10,
   hireCost: 300,
-  rosterCap: 8,
+  hireStep: 150, // each hire beyond hireFree members costs this much more
+  hireFree: 4,
+  burnoutFree: 3, // crews this size or smaller never burn out
+  burnoutPerMember: 0.07,
+  burnoutMax: 0.6,
   // Tech points
   baseTpPerDay: 2,
   researchRate: 0.55, // organizer TP/day per effective skill point
@@ -53,8 +57,9 @@ export const T = {
   // Rumors (Plague Inc mutations): free random nodes per run, scheduled like world news
   maxRumors: 2,
   // Sponsors
-  inviteBase: 0.3,
-  invitePerCoord: 0.03,
+  inviteBase: 0.2,
+  invitePerCoord: 0.02,
+  balantirDay: 4,
   inviteCap: 0.8,
   equityCap: 28,
   // Confirming hackers: money turns interest into committed attendees (food, swag, travel)

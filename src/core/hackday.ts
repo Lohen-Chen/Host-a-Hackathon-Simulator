@@ -35,8 +35,8 @@ export function startHackday(s: GameState) {
     win,
     awards: awards(s, facts),
     headline: win
-      ? pick(s, ['BEAR WINS. Tree University is "pivoting to reflection."', 'More hackers than Tree! Chad Leland III put down his phone.', 'VICTORY. The bear suit still smells, but it smells like winning.'])
-      : pick(s, ['Tree wins this year. Chad Leland III called it "synergy."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. But the Blue Screen respects you.']),
+      ? pick(s, ['BEAR WINS. Tree University is "pivoting to reflection."', 'More hackers than Tree! Leland Sr. put down his phone.', 'VICTORY. The bear suit still smells, but it smells like winning.'])
+      : pick(s, ['Tree wins this year. Leland Sr. called it "synergy."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. But the Blue Screen respects you.']),
   };
   log(s, 'result', win ? 'win' : 'loss', bear.total);
 }
@@ -103,7 +103,7 @@ function buildBeats(s: GameState, f: EventFacts): Beat[] {
 
 const TREE_CHAOS = [
   'Their WiFi password is "synergy1." Their WiFi is also down.',
-  'A Tree hacker asked a mentor a question. The mentor was a cardboard cutout of Chad.',
+  'A Tree hacker asked a mentor a question. The mentor was a cardboard cutout of Leland Sr.',
   'Tree\'s swag bags contained one sticker and a QR code to a waitlist.',
   'Their catering boat drifted out to sea. Twice.',
 ];

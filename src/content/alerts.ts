@@ -2,6 +2,7 @@
 // mad-lib slots ({member}, {region}, {sponsor}, {food}, ...). Every choice's
 // outcome text contains a joke.
 import type { AlertDef } from '../core/effects';
+import { signSponsor } from '../core/courting';
 import { chance, pick } from '../core/rng';
 import {
   addTicker, hasRole, hasTech, memberById, pickInviteSponsor, removeMember, removeSponsor, roleSkillSum, startCourting,
@@ -211,6 +212,17 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
+    id: 'balantir_call', icon: '🕶️', title: 'Balantir Technologies is on line 1', weight: 0, max: 1, satire: true,
+    body: 'They want to sponsor Bear Hacks. A Very Large Check, a "Defense track," and a rep in sunglasses who will not blink.',
+    defaultChoice: 1,
+    choices: [
+      { label: 'Take the Very Large Check', hint: '+$30,000 · rep −8 · hackers will protest',
+        out: { text: 'The check arrived by drone. The drone is still watching. The group chat is already planning protest signs.', rep: -8 },
+        run: (s) => signSponsor(s, 'balantir', 30000, true, ['defense_track']) },
+      { label: 'Decline politely', out: { text: '"We\'ll be watching," they said. Hackers heard you said no. Rep up.', rep: 4, mood: 3 } },
+    ],
+  },
+  {
     id: 'ysee_afterparty', icon: '🎉', title: 'The YSee After-Party (Batch 2026)', weight: 0, max: 1, foreshadow: 'headline|fs_ysee', satire: true, seconds: 10,
     body: 'YSee is throwing an after-party in Frat Row. Every guest is "a founder." Nobody has a customer.',
     defaultChoice: 1, region: 'frat',
@@ -335,15 +347,6 @@ export const ALERTS: AlertDef[] = [
       { label: 'Pay', out: { text: 'Paid. The app still just says "Hello, World." Very expensive greeting.', budget: -4000 } },
       { label: 'Dispute', odds: { p: 0.5, win: { text: 'Disputed! The bill was for "a forgotten demo still running." Waived.' }, lose: { text: 'Dispute denied. They found the 47 replicas. Fair.', budget: -4000, rep: -2 } } },
       { label: 'Spin up more to "amortize"', out: { text: 'You spent $6,000 to save $4,000. The math is "cloud math."', budget: -6000, tp: 2 } },
-    ],
-  },
-  {
-    id: 'sticky_password', icon: '🗒️', title: 'The WiFi password is on a sticky note on the livestream', weight: 1.5, max: 1, tech: true,
-    body: "It's hackathon123. It was always hackathon123.", defaultChoice: 2,
-    choices: [
-      { label: 'Change it', out: { text: 'Changed to hackathon124. Security!', allIdleSteps: 1 } },
-      { label: 'Make it a contest', out: { text: 'First to guess the new password wins a hoodie. 400 entries: "hackathon124."', rep: 2, mood: 2 } },
-      { label: 'Leave it as a honeypot', odds: { p: 0.5, win: { text: 'The honeypot caught a Tree spy. He was checking his email.', treeHype: -2 }, lose: { text: 'The honeypot caught 300 neighbors streaming movies.', mood: -2, flagAdd: { wifiPain: 1 } } } },
     ],
   },
   {

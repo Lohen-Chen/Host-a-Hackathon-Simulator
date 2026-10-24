@@ -73,6 +73,8 @@ function manageCrew(s: GameState, style: Style, rng: BotRng) {
       if (!m.task || rng.next() < 0.1) assign(s, m.id, rng.pick(tasks.filter((t) => t !== 'website' || s.unlockedTech.includes('website'))));
       continue;
     }
+    // Burned out: give them the rest day so they don't quit.
+    if (m.burnout) { if (m.task) assign(s, m.id, null); continue; }
     let t = ROLE_TASK(s, m.role);
     // Two-plus organizers: once the tree is mostly bought, put extras on social.
     if (m.role === 'organizer' && s.unlockedTech.length >= 7 && s.members.filter((x) => x.role === 'organizer').indexOf(m) > 0) t = 'venue';

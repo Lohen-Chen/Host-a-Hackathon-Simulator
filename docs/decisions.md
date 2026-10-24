@@ -45,3 +45,16 @@ Other choices:
 - The bidding (venue auction) and courting minigames stay unchanged.
 - The AI-credits news fires when the player first unlocks AI Credits, either from the tech tree or as a premium sponsor perk. It brings in business majors (more signups, lower project quality).
 - Save version bumped to 2. Old saves are discarded rather than migrated.
+
+## Better flow round
+
+- **Burnout instead of random quitting.** With no team cap, the bigger the crew, the likelier someone burns out (7% per member over 3, up to 60% a night). A burned-out member who works the next day quits that night; a rest day (no task) brings them back. It's a visible choice, not a coin flip.
+- **No team cap, rising hire cost.** Hires cost $300, plus $150 for each member beyond 4. That keeps an unlimited crew from turning into unlimited tech points and soaks up money.
+- **Balantir is a scripted Day 4 call** with a catch: $30,000, reputation −8, and the hackathon-day protest. Declining gives +4 reputation. It never shows up as a random invite.
+- **Fewer decisions.** Random decision events only happen on even days, and never on a day that already has a scripted one. The screenshared WiFi password event is gone.
+- **Less money.** Sponsor invite chance is down (base 0.3 → 0.2, +0.02 per coordinator skill instead of 0.03).
+- **Tech tree pauses the world**, like Plague Inc's evolve screen.
+- **Nepo List is back** in Talent: +2 candidates a morning, and better ones.
+- **One 10-minute mode.** Judge and Full are gone from the title screen. The sim still supports them internally for tests.
+- **Rival CEO renamed** to Leland Sr.
+- **Desktop layout.** On wide windows the game is a centered panel, the map fills the middle, and Beary's hints sit at the bottom so they don't cover Twitter/X.

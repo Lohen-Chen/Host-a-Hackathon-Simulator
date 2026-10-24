@@ -20,7 +20,7 @@ export const jokeEngine = () => engine;
 export const jokeErrors = () => loadErrors;
 
 export const RIVAL = 'Tree University';
-export const RIVAL_CEO = 'Chad Leland III';
+export const RIVAL_CEO = 'Leland Sr.';
 
 /** Hand-written safe lines used whenever a render fails (Section 8.3). */
 const FALLBACK: Record<string, string> = {

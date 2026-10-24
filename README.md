@@ -8,9 +8,7 @@ Built with Vite, TypeScript and Preact. It is designed for phones first, runs of
 
 ## Play
 
-- **Judge**: about 5 minutes (30 s days)
-- **Standard**: about 10 minutes (60 s days)
-- **Full**: about 17 minutes (120 s days)
+One playthrough takes about 10 minutes (seven 60-second days, plus mornings, the venue auction and hackathon day). The world pauses for news popups and while the Evolve menu is open.
 
 The game saves at day boundaries in `localStorage`. Settings include mute and music.
 

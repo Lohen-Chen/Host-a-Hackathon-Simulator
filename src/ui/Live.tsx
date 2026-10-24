@@ -171,6 +171,12 @@ export function Live({ s }: { s: GameState }) {
     setInfo(info === id ? null : id);
   };
   const toggle = (id: SheetId) => setSheet(sheet === id ? null : id);
+  // Like Plague Inc, the world stops while you evolve.
+  useEffect(() => {
+    store.uiModal = sheet === 'tech' ? 'tech' : null;
+    store.emit();
+    return () => { store.uiModal = null; };
+  }, [sheet]);
   const r = info ? s.regions.find((x) => x.id === info) : null;
   return (
     <>

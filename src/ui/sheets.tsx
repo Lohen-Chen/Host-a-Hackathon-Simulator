@@ -26,6 +26,7 @@ export function MemberRow({ m, s, selected, onClick }: { m: Member; s: GameState
         <div class="name">{m.name}</div>
         <div class="tiny dim">{ROLE_INFO[m.role].icon} {ROLE_INFO[m.role].name} · skill {m.baseSkill}{m.dailyMod ? ` (${m.dailyMod > 0 ? '+' : ''}${m.dailyMod})` : ''} · {TRAITS[m.trait].name}</div>
         <div class="tiny">{status}</div>
+        {m.burnout && <div class="tiny burnout">🔥 Burned out: {m.task ? (m.burnoutWorked ? 'worked today, quits tonight' : 'unassign for a rest day or they quit') : 'resting today 😌'}</div>}
       </div>
     </button>
   );
@@ -37,7 +38,7 @@ export function CrewSheet({ s }: { s: GameState }) {
   const m = s.members.find((x) => x.id === sel);
   return (
     <div class="col">
-      <div class="sheet-head"><h3>👥 Crew ({s.members.length}/{s.rosterCap})</h3>
+      <div class="sheet-head"><h3>👥 Crew ({s.members.length})</h3>
         <button class="tab" onClick={() => setShowSite(!showSite)}>🌐 Website {Math.round(s.websiteScore)}</button></div>
       {showSite && <div class="row"><WebsitePreview score={s.websiteScore} /><div class="small dim">The website evolves with its score: GeoCities → template → parallax bear. {s.unlockedTech.includes('website') ? 'Assign a Designer to Website.' : 'Unlock the Website node in Tech.'}</div></div>}
       {s.members.map((x) => <MemberRow key={x.id} m={x} s={s} selected={x.id === sel} onClick={() => setSel(x.id === sel ? null : x.id)} />)}
@@ -103,7 +104,7 @@ export function TechSheet({ s }: { s: GameState }) {
   const st = n ? techState(s, n.id) : null;
   return (
     <div class="col">
-      <div class="sheet-head"><h3>🧬 Evolve</h3><span class="chip gold">🔬 {s.techPoints} TP</span></div>
+      <div class="sheet-head"><h3>🧬 Evolve</h3>{s.phase === 'live' && <span class="chip">⏸ World paused</span>}<span class="chip gold">🔬 {s.techPoints} TP</span></div>
       <div class="bars">
         {BRANCHES.map((b) => (
           <div key={b.id} class={`bar-row bar-${b.id}`} title={b.blurb}>
@@ -130,7 +131,7 @@ export function TechSheet({ s }: { s: GameState }) {
         <div class="card evo-detail">
           <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {k}</span>)}</div>
           <div class="small">{n.effect}{n.prereq ? ` (needs ${TECH.find((t) => t.id === n.prereq)?.name})` : ''}</div>
-          <div class="tiny dim">{flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
+          <div class="tiny dim">{n.desc ?? flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
           {st !== 'owned' && (
             <button class="btn btn-gold" disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
               {st === 'locked' ? 'Locked' : st === 'poor' ? `Need ${n.cost} TP` : `🧬 Evolve (${n.cost} TP)`}

@@ -6,6 +6,7 @@ import { resolveAlert, scheduleDay, tickEvents } from './events';
 import { addTicker, effectiveSkill, fx, hasTech } from './helpers';
 import { joke, treeRegionCount } from './jokes';
 import { stepMap } from './map';
+import { crewNight } from './crew';
 import { startHackday } from './hackday';
 import { prepareMorning } from './state';
 import type { GameState } from './types';
@@ -57,6 +58,7 @@ export function doStep(s: GameState) {
   s.tpAcc += T.baseTpPerDay / STEPS_PER_DAY;
   for (const m of s.members) {
     if (!m.task) continue;
+    if (m.burnout) m.burnoutWorked = true;
     const k = effectiveSkill(s, m);
     if (m.idleSteps > 0) { m.idleSteps--; continue; }
     if (k <= 0) continue;
@@ -110,6 +112,7 @@ export function endLiveDay(s: GameState, early: boolean) {
   s.schedule = [];
   s.armedPost = null;
   buildRecap(s);
+  s.recap.splice(s.recap.length - (s.day < DAYS ? 2 : 1), 0, ...crewNight(s));
   if (s.day === 3 && !s.venue) startAuction(s);
   else s.phase = 'night';
 }

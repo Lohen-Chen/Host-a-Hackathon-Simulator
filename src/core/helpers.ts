@@ -87,6 +87,7 @@ export function removeSponsor(s: GameState, id: string) {
 export function sponsorAvailable(s: GameState, d: SponsorDef): boolean {
   if (s.sponsors.some((x) => x.id === d.id)) return false;
   if (s.courting?.sponsorId === d.id) return false;
+  if (d.id === 'balantir') return false; // scripted Day 4 call, never a random invite
   switch (d.tier) {
     case 'partner': case 'bronze': return true;
     case 'silver': return s.reputation >= 20;

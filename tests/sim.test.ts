@@ -9,7 +9,7 @@ import { BIDDERS, VENUES } from '../src/content/venues';
 import { jokeEngine } from '../src/core';
 import {
   advance, bar, beginGame, buyTech, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
-  startLiveDay, startRumor, tickAuction, finishAuction, nextDay, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble,
+  startLiveDay, startRumor, tickAuction, finishAuction, nextDay, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
 } from '../src/core';
 import { NEWS } from '../src/content/news';
 import { conversionMult } from '../src/core/map';
@@ -17,6 +17,8 @@ import { startTreeMove } from '../src/core/tree';
 import { startAuction } from '../src/core/auction';
 import { courtingReply, startCourting } from '../src/core/courting';
 import { playGame } from '../scripts/bots';
+
+const beginAndStart = (seed: number) => { const s = newGame(seed); beginGame(s); startLiveDay(s); return s; };
 
 describe('simulation core', () => {
   it('day 1 starts with 3 members incl. ≥1 Organizer and ≥1 Social, for any seed', () => {
@@ -268,6 +270,52 @@ describe('simulation core', () => {
     s.techPoints = 99;
     buyTech(s, 'aicredits');
     expect(s.popups.some((p) => p.body.includes('increased the participation of business majors by 200%'))).toBe(true);
+  });
+
+  it('the screenshared-password event is gone and random decisions only come every other day', () => {
+    expect(ALERTS.some((a) => a.id === 'sticky_password')).toBe(false);
+    for (let seed = 0; seed < 40; seed++) {
+      const r = playGame(seed, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+      const scripted = ['sponsor_invite', 'tree_stumble', 'ysee_afterparty', 'balantir_call', 'bsod'];
+      const random = r.state.log.filter((l) => l.kind.startsWith('alert:') && !scripted.includes(l.kind.slice(6)));
+      expect(random.length, `seed ${seed}`).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('Balantir is a scripted Day 4 call, never a random invite', () => {
+    let calls = 0;
+    for (let seed = 0; seed < 30; seed++) {
+      const r = playGame(seed, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+      if (r.state.firedAlerts.includes('balantir_call')) calls++;
+    }
+    expect(calls).toBe(30);
+  });
+
+  it('Nepo List is back in Talent and adds better candidates', () => {
+    const n = TECH.find((t) => t.id === 'nepolist')!;
+    expect(n.branch).toBe('talent');
+    expect(n.desc).toContain('direct recruitment');
+    const s = newGame(31);
+    s.techPoints = 99;
+    const before = bar(s, 'talent');
+    buyTech(s, 'nepolist');
+    expect(bar(s, 'talent')).toBeGreaterThan(before);
+  });
+
+  it('the crew has no cap, hires get pricier, and a burned-out member who keeps working quits', () => {
+    const s = beginAndStart(32);
+    const c0 = hireCost(s);
+    for (let i = 0; i < 6; i++) s.members.push({ ...s.members[0], id: 1000 + i });
+    expect(s.members.length).toBeGreaterThan(8);
+    expect(hireCost(s)).toBeGreaterThan(c0);
+    const tired = s.members[1];
+    tired.burnout = true; tired.burnoutWorked = false;
+    const rested = s.members[2];
+    rested.burnout = true; rested.burnoutWorked = false; rested.task = null;
+    s.schedule = [];
+    endLiveDay(s, true);
+    expect(s.members.some((m) => m.id === tired.id)).toBe(false);
+    expect(s.members.find((m) => m.id === rested.id)?.burnout).toBe(false);
   });
 
   it('something interactive appears about every 6 s or faster in Standard mode', () => {

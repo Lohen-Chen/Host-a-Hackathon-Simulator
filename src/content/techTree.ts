@@ -11,6 +11,8 @@ export interface TechNode {
   bars: Partial<Record<TechBranch, number>>;
   /** joke category key in jokes.txt (techjoke|<key>) */
   joke: string;
+  /** optional flavor shown instead of a techjoke line */
+  desc?: string;
   /** news text when a rumor unlocks this node for free (Plague Inc "mutation") */
   rumor: string;
 }
@@ -54,6 +56,9 @@ export const TECH: TechNode[] = [
     rumor: 'A rumor says joining Bear Hacks "looks great on a resume." The applicant line wraps around Sproul.' },
   { id: 'snack', name: 'Snack Bar', branch: 'talent', cost: 4, bars: { talent: 8 }, effect: 'Participant mood +8 at the event.', joke: 'snack',
     rumor: 'A rumor started that Bear Hacks has a free pizza party. Now you have to have one. Snack Bar unlocked!' },
+  { id: 'nepolist', name: 'Nepo List', branch: 'talent', cost: 5, bars: { talent: 12 }, effect: '+2 candidates every morning, and they are better.', joke: 'stretch',
+    desc: 'We prefer the term "direct recruitment"...',
+    rumor: 'A rumor says Bear Hacks hires "only the best families." Three deans\' kids applied the same afternoon. Nepo List unlocked.' },
   // ── Conversion ──
   { id: 'applications', name: 'Application Portal', branch: 'conversion', cost: 3, bars: { conversion: 10 }, effect: 'More aware students apply.', joke: 'stretch',
     rumor: 'A rumor says Bear Hacks applications take "30 seconds." Someone rebuilt the form so they do.' },

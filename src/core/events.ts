@@ -63,8 +63,11 @@ export function scheduleDay(s: GameState) {
   const alertIds: string[] = [];
   if (s.day >= 2 && s.treeSignups - s.signups > T.rubberBand) alertIds.push('tree_stumble');
   if (s.day >= 3 && !s.firedAlerts.includes('ysee_afterparty') && s.sponsors.some((x) => x.id === 'ysee')) alertIds.push('ysee_afterparty');
+  if (s.day === T.balantirDay && !s.firedAlerts.includes('balantir_call')) alertIds.push('balantir_call');
   const forced = alertIds.length;
-  const room = Math.min(cfg.alerts, Math.max(0, cfg.popupsPerDay - treeMoves - specials - forced));
+  // Random decisions only every other day, and never on a day that already has a scripted one.
+  const decisionDay = s.day % 2 === 0 && forced === 0;
+  const room = decisionDay ? Math.min(cfg.alerts, Math.max(0, cfg.popupsPerDay - treeMoves - specials)) : 0;
   while (alertIds.length < room + forced) {
     const a = pickAlert(s, alertIds);
     if (!a) break;

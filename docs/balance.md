@@ -2,6 +2,23 @@
 
 All tunable constants live in `src/core/config.ts` (`T` and `MODES`), plus two formulas in `src/core/map.ts` (`repFactor`, `treeBase`) and the category formulas in `src/core/score.ts`. `npm run sim` plays 2,000 headless games per bot on the real sim core (`-- --mode judge|standard|full`, `-- --runs N`, `-- --bot name`).
 
+## Better flow round (Standard, 800 runs per bot)
+
+Lower sponsor invite odds, rising hire costs, burnout and the scripted Balantir call cut leftover cash again:
+
+| Bot | Median score | Beats Tree | Median leftover | p90 leftover |
+| --- | --- | --- | --- | --- |
+| Random | 46 | 16% | $408 | $26k |
+| Greedy-Money | 59 | 57% | $8.3k | $29k |
+| Greedy-Hype | 57 | 40% | $800 | $4.2k |
+| Balanced@40 | 63 | 52% | $1.3k | $11.8k |
+| Balanced@70 | 68 | 64% | $1.75k (was $5.4k) | $21k (was $37k) |
+| Balanced@95 | 70 | 66% | $2.4k | $25k |
+| Balanced@0 | 53 | 24% | $1.4k | $4.2k |
+| Perfect | 72 | 81% | $2.2k | $27k |
+
+Random rose from 40 to 46 because the random bot now hires without a cap; it still wins only 16% of the time.
+
 ## Results after the Plague Inc rework (Standard, 2,000 runs per bot)
 
 The rework moved the game to 10,000 students across 8 regions, so signups and attendees are now in the thousands. "Attendees" counts confirmed hackers times the show rate plus about 10% walk-ins, capped by the venue.
