@@ -1,6 +1,6 @@
 // New game, member generation and morning setup.
 import { INITIAL_AWARENESS, REGIONS, symmetricNeighbors } from '../content/regions';
-import { TRAITS } from '../content/members';
+import { ROLE_INFO, TRAITS } from '../content/members';
 import { POSTS } from '../content/posts';
 import { emptyHistory } from '../jokes/engine';
 import { MODES, STEPS_PER_DAY, T } from './config';
@@ -92,7 +92,11 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
   };
   // Day 1: three free members, guaranteed ≥1 Organizer and ≥1 Social.
   const roles: Role[] = shuffle(s, ['organizer', 'social', pick(s, ['organizer', 'social'] as Role[])]);
-  for (const r of roles) s.members.push(genMember(s, [r], 0));
+  for (const r of roles) {
+    const m = genMember(s, [r], 0);
+    m.task = defaultTask(s, m.role);
+    s.members.push(m);
+  }
   // Blue Screen bubble appears once per run on a random day (≤1 per run).
   s.flags.bsodDay = randInt(s, 3, 5);
   return s;
@@ -163,8 +167,15 @@ export function hire(s: GameState, idx: number): boolean {
   s.candidates.splice(idx, 1);
   if (c.trait === 'rust10') c.dailyMod = randInt(s, -3, 3);
   if (c.trait === 'trenchcoat') c.trenchTask = pick(s, ALL_TASKS);
+  c.task = defaultTask(s, c.role);
   s.members.push(c);
   return true;
+}
+
+/** New crew start on their specialty (Designers scout the venue until the Website node exists). */
+export function defaultTask(s: GameState, role: Role): Task {
+  const t = ROLE_INFO[role].task;
+  return canAssign(s, t) ? t : 'venue';
 }
 
 export function canAssign(s: GameState, task: Task | null): boolean {

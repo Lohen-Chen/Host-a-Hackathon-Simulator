@@ -99,7 +99,7 @@ caffeinate
 over-engineer
 whiteboard
 gatekeep
-monologue about
+monologue at
 manifest
 hard-code
 
@@ -158,19 +158,19 @@ thought leadership
 the metaverse
 Web3
 generative AI
-a flywheel
+flywheels
 platform play
 north star metric
 10x engineering
 hockey-stick growth
 disruption
 first principles
-a moat
+moats
 the creator economy
 vertical integration
 DevRel
-a data lake
-an LLM wrapper
+data lakes
+LLM wrappers
 agentic workflows
 going viral
 deep tech
@@ -236,29 +236,29 @@ red panda
 Tinder for Git branches
 Uber for Uber
 a CRM for houseplants
-an LLM that only says "it depends"
+an LLM that says "it depends"
 blockchain for lunch orders
-a smart toaster with a subscription
+a subscription toaster
 NFTs of the group chat
-an app that rates your WiFi's feelings
+an app that rates WiFi feelings
 a dating app for routers
-Airbnb for parking spots in the metaverse
+Airbnb for metaverse parking
 a calendar that cancels itself
 a to-do list that judges you
 an AI that writes more AI
 a social network for one person
 Venmo for apologies
-a fitness tracker for your keyboard
+a Fitbit for keyboards
 a LinkedIn for pets
-a startup that sells other startups
-a VR whiteboard nobody can see
-a chatbot that only speaks in memes
+a startup that sells startups
+an invisible VR whiteboard
+a chatbot that speaks in memes
 a microservice per emoji
 a DAO for the vending machine
 a smart fridge that tweets
-a browser extension for your browser extensions
+an extension for extensions
 a podcast about podcasts
-a dashboard for your dashboards
+a dashboard for dashboards
 
 [startup_name]
 Synergly
@@ -317,7 +317,7 @@ Tuesday
 [insult]
 a walking README
 a 404 in human form
-the human equivalent of a merge conflict
+a human merge conflict
 a pitch deck with legs
 a Kubernetes cluster for a to-do app
 a lanyard with opinions
@@ -353,11 +353,11 @@ Excel macros
 Fortran
 Elixir
 Clojure
-Whitespace (the language)
+Whitespace
 Lisp
 OCaml
 Scratch
-PowerPoint animations
+PowerPoint
 Bash
 Visual Basic
 Prolog
@@ -366,7 +366,7 @@ Ruby
 Kotlin
 Erlang
 Nim
-CSS (as a programming language)
+CSS (as a language)
 
 [codebase]
 website
@@ -402,7 +402,7 @@ VS Codeine
 Jiraffe
 Kubernetease
 Dockerer
-npm (no packages manager)
+nopm
 Postperson
 Figmentation
 Slackline
@@ -439,12 +439,12 @@ an API key in the README
 a lambda that never sleeps
 a CDN for one PNG
 a $900 log file
-a microservice that only says hi
-a backup of a backup of a backup
+a microservice that says hi
+a backup of a backup
 a cluster named "temporary"
-an outage caused by an outage page
+an outage caused by the status page
 a VPN to the vending machine
-a firewall that blocks the firewall
+a firewall blocking itself
 a forgotten demo still running
 a region nobody picked
 a container inside a container
@@ -511,24 +511,24 @@ on Day 3 of connecting
 buffering emotionally
 "technically connected"
 one bar, spiritually
-in airplane mode by choice
+in airplane mode
 loading the loading screen
 reconnecting to its past
-asking for the password again
+asking for the password
 behind a captive portal
 a suggestion
 on a coffee break
-self-hosted in the parking lot
+in the parking lot
 negotiating with the router
 a shared hallucination
-redirecting to a login page
-measured in carrier pigeons
-offline for its mental health
+stuck on a login page
+carrier-pigeon speed
+offline for self-care
 4G of feelings
 pending
 "almost there"
 in its quiet era
-a speed test that never ends
+a never-ending speed test
 
 [round]
 pre-seed
@@ -544,17 +544,17 @@ a vibes round
 a party round
 a SAFE note on a napkin
 a Series A-minus
-an extension of an extension
+a re-extension
 a down round
 a "strategic" round
 a rolling close
 a seed-plus
-a crowdfund from the group chat
-an angel round from one uncle
+a group-chat crowdfund
+an angel round (one uncle)
 a Series Z
 a pre-IPO teaser
-a seed round in Monopoly money
-a "we'll figure it out" round
+a Monopoly-money seed
+a figure-it-out round
 a round of applause
 
 [startup_claim]
@@ -589,24 +589,24 @@ I'm pleased to announce
 Humbled to share
 Thrilled to announce
 Some personal news
-After a lot of reflection, I'm excited to share
-I never thought I'd say this, but
+After much reflection
+I never thought I'd say
 Big news
 Grateful to announce
-Here's what nobody tells you
-I almost didn't post this, but
+Nobody tells you this
+I almost didn't post this
 Unpopular opinion
 Today I learned a lesson
-Excited to finally share
+Finally sharing
 Proud to say
-Can't believe I get to announce
-Reflecting on my journey
-Spent the weekend learning
+Can't believe I get to say
+On my journey
+Weekend lesson
 Quick story
-I was told not to post this, but
+Told not to post this
 Life update
 Let's talk about this
-This made me cry at a bus stop
+I cried at a bus stop
 Personal milestone
 After 3 years of silence
 Hot take
@@ -614,28 +614,33 @@ Hot take
 [larp_closer]
 Agree? 👇
 Thoughts?
-Repost if you've ever believed in yourself.
+Repost if you believe.
 Like if you cried.
-#Grateful #Hustle #Synergy
+#Grateful #Synergy
 Who else relates? 🙌
 Let that sink in.
-Comment "YES" if you agree.
+Comment "YES" 👇
 Onward.
-And that's the real lesson.
+That's the lesson.
 DMs are open.
-Follow for more leadership lessons.
+Follow for more.
 Proud of this team. 🚀
 The grind never stops.
-#OpenToWork #OpenToVibes
-Humbled. Grateful. Disrupting.
-What would you have done?
+#OpenToVibes
+Humbled. Disrupting.
+What would you do?
 More soon. 👀
 Tag someone who needs this.
-That's it. That's the post.
+That's the post.
 Let's connect!
 Stay hungry.
 #NoDaysOff
-Swipe for 11 more lessons. ➡️
+Peace. ✌️
+Go Bears. 🐻
+#Blessed
+New post soon.
+Keep building. 🔨
+Swipe for more ➡️
 The future is now.
 
 [percent]
@@ -662,7 +667,7 @@ an industry-standard 7%
 a rounding-error 7%
 7% and your weekends
 7% of future pizza
-7% and your firstborn spreadsheet
+7% and your spreadsheet
 7%, as a treat
 
 [first_name]
@@ -722,9 +727,9 @@ Async
 [department]
 Finance
 Marketing
-Accounts Payable
+Payroll
 the Group Chat
-Legal (allegedly)
+Legal
 the Basement
 Growth
 Operations
@@ -734,16 +739,16 @@ the Library
 HR
 Compliance
 Procurement
-the Snack Committee
+Snacks
 Facilities
 IT
 Brand Strategy
-Pizza Logistics
-the Dean's Office
+Pizza Ops
+the Dean
 Sales
 the Mailroom
 Partnerships
-Customer Success
+Support
 Product
 
 [place]
@@ -789,7 +794,7 @@ Raspberry Pi
 foldable phone
 Bluetooth toaster
 USB hub
-noise-cancelling headphones
+ANC headphones
 standing desk
 graphing calculator
 walkie-talkie
@@ -812,7 +817,7 @@ startup delusion
 caffeinated joy
 imposter syndrome
 pure spite
-second-hand embarrassment
+secondhand cringe
 burnout chic
 wholesome chaos
 competitive smugness
@@ -824,5 +829,5 @@ inexplicable hope
 fear of missing out
 post-demo euphoria
 tab-induced anxiety
-sleep-deprived wisdom
+sleepless wisdom
 cautious hype

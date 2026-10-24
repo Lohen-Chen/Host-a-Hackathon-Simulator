@@ -18,39 +18,39 @@
 [headline|bear needs=lead>50]   Bear U leads Tree by {lead}; club president practices humble face
 [headline|bear needs=lead<-50]   Bear U trails Tree by a lot; club pivots to "it's about the journey"
 [headline|bear]   Club meeting runs 3 hours; agenda item one was "what is {a:noun}"
-[headline|bear]   {member} {verb:past} the club {codebase}; nobody asked, everybody noticed
+[headline|bear]   {member} {verb:past} the club {codebase}; nobody asked
 [headline|bear]   Bear hackathon logo redesigned {number} times; now just a bear holding {a:noun}
 [headline|bear]   Bear U vows "the most {adj} hackathon in Bay Area history"
 [headline|bear]   Club group chat hits {number} unread messages; all of them are "+1"
-[headline|bear]   Bear crew spotted {verb:ing} flyers in {region}; flyers seen {verb:ing} back
-[headline|tree]   {rival} unveils {a:adj} {noun}; experts say "{buzzword}"
+[headline|bear]   Bear crew {verb:past} flyers all over {region}; flyers fought back
+[headline|tree]   Tree U unveils {a:adj} {noun}; experts say "{buzzword}"
 [headline|tree]   {rivalceo} announces "{buzzword}" on a call he took during a different call
-[headline|tree]   {rival} hackathon to feature {food} and a keynote about {buzzword}
+[headline|tree]   {rival} hackathon promises {food} and a keynote on {buzzword}
 [headline|tree]   {rival} migrates to {language}; productivity "temporarily" at zero
 [headline|tree]   {rival} closes {round}; {rivalceo} calls it "validation"
-[headline|tree]   {rivalceo} seen saying "synergy" to {a:animal}; the {animal#1} agreed
+[headline|tree]   {rivalceo} said "synergy" to {a:animal}; the {animal#1} agreed
 [headline|tree]   {rival} claims {treeRegions} of 8 campus regions; issues press release about it
 [headline|tree]   {rival} hires {number} interns to "manage the vibes"
 [headline|tree]   {rival} WiFi password leaked: "synergy{number}"
 [headline|tree]   {rivalceo} posts photo of his hackathon badge; caption: "humbled"
 [headline|tree needs=treesignups>300]   {rival} hits {treesignups} signups; {rivalceo} buys a second phone
-[headline|tree]   {rival} promises {food} "for every hacker who mentions {buzzword}"
-[headline|tree]   Tree hackathon swag bag leaked: one {gadget} and a QR code to {a:noun}
-[headline|sponsor]   {sponsor} announces {adj} {noun} for hackers who {verb:3s} too much
-[headline|sponsor]   {sponsor} pledges {food} and "a tasteful amount" of {buzzword}
+[headline|tree]   {rival} offers {food} to anyone who says "{buzzword}"
+[headline|tree]   Tree swag bag leaked: one {gadget} and a QR code to {a:noun}
+[headline|sponsor]   {sponsor} unveils {a:noun} for hackers who {verb} too much
+[headline|sponsor]   {sponsor} pledges {food} and a tasteful amount of {buzzword}
 [headline|sponsor]   {sponsor} denies rumor its CEO is three {animal:pl} in a blazer
 [headline|sponsor]   {sponsor} rebrands to "{sponsor} AI"; stock up 4%, product unchanged
 [headline|sponsor]   {sponsor} and {sponsor2} in bidding war over who gets the bigger banner
-[headline|sponsor]   {sponsor} recruiter seen handing out {a:gadget} to anyone who says "{buzzword}"
+[headline|sponsor]   {sponsor} hands {a:gadget} to anyone who says "{buzzword}"
 [headline|sponsor]   YSee Batch 2026: {number} founders, 0 customers, {startup_claim} and proud
 [headline|sponsor]   YSee Batch 2026 seen ordering 40 kegs and a pitch-deck printer
 [headline|sponsor]   {sponsor} swag now includes {a:noun} with its logo on {a:noun}
 [headline|sponsor]   {sponsor} demands booth "at least {number} feet from {sponsor2}"
 [headline|sponsor]   {sponsor} pivots to {buzzword}; nobody knows what they did before
-[headline|sponsor]   {sponsor} intern accidentally sponsors {a:animal}; the {animal#1} gets a lanyard
-[headline|campus]   Local founder raises {round} on {a:noun} and a dream; product "coming soon"
-[headline|campus]   {member} announces {codebase} rewrite in {language}; {noun} "not ready"
-[headline|campus]   BREAKING: Venue WiFi reported "{wifi_excuse}"; hackers {verb:past} to their phones
+[headline|sponsor]   {sponsor} accidentally sponsors {a:animal}; it gets a lanyard
+[headline|campus]   Local founder raises {round} on {a:noun}; product "coming soon"
+[headline|campus]   {member} announces {codebase} rewrite in {language}
+[headline|campus]   Venue WiFi reported "{wifi_excuse}"; hackers flee to their phones
 [headline|campus]   Campus {animal} elected to student senate on a platform of {food}
 [headline|campus]   {place} closed after someone tried to {verb} {a:noun}
 [headline|campus]   Study finds 9 in 10 students "would hack for {food}"
@@ -65,14 +65,14 @@
 [headline|breaking]   BREAKING: club printer prints only the word "{buzzword}"
 [headline|breaking]   BREAKING: someone said "{tech_excuse}" and the room went silent
 [headline|breaking]   BREAKING: {food} sighted in {region}; crowd forms instantly
-[headline|breaking]   BREAKING: {region} now "{emotion}"; officials urge calm and {food}
+[headline|breaking]   BREAKING: {region} reports {emotion}; officials urge {food}
 [headline|breaking]   BREAKING: {number} hackers stuck in an elevator; they're building {bad_idea}
 [headline|breaking]   BREAKING: club dog (which does not exist) spotted in {region}
 [headline|breaking]   BREAKING: pizza ordered for the hackathon will arrive at 11:59 AM tomorrow
 [headline|breaking]   BREAKING: Devpost deadline moved to 9:00; everyone still submits at 8:59
 [headline|breaking]   BREAKING: Dave from Sponsorship has sent another email
 [headline|breaking]   BREAKING: someone asked what the product is; the founder said "platform"
-[headline|breaking]   BREAKING: {member} has rewritten the {codebase} in {language} without telling anyone
+[headline|breaking]   {member} rewrote the {codebase} in {language}, told nobody
 
 # Foreshadowing headlines (alerts land 5–8 s later). Alert data points at these subtags.
 [headline|fs_bsod]       BREAKING: Club laptop reports "a problem has occurred" near {place}
@@ -92,7 +92,7 @@
 [comment|flop]   "this flyer gave me {emotion}"
 [comment|flop]   "I'd rather eat {food}"
 [comment|flop]   "bold of you to post this in {region}"
-[comment|flop]   "did a {animal} make this"
+[comment|flop]   "did {a:animal} make this"
 [comment|flop]   "the font is giving {wifi_excuse}"
 [comment|flop]   "seen"
 [comment|flop]   "my {gadget} has more hype than this"
@@ -107,7 +107,7 @@
 [comment|meh]   "saved to my 'maybe' folder with 300 other things"
 [comment|meh]   "the {animal} in the background is doing a lot"
 [comment|solid]   "ok I'm going. bringing my {gadget}"
-[comment|solid]   "finally, a {adj} hackathon"
+[comment|solid]   "finally, {a:adj} hackathon"
 [comment|solid]   "tagging my whole group project"
 [comment|solid]   "signed up. building {bad_idea}"
 [comment|solid]   "this is the {adj} content I signed up for"
@@ -120,7 +120,7 @@
 [comment|viral]   "{larp_opener} that this post is {adj}. {larp_closer}"
 [comment|viral]   "Tree University could never"
 [comment|viral]   "I'm skipping my {timeunit} for this"
-[comment|viral]   "{verb:ing} at the YSee party was the most {adj} thing I've done all {timeunit}"
+[comment|viral]   "{verb:ing} at the YSee party was {adj}. 10/10"
 [comment|viral]   "the {noun} at 0:03 changed my life"
 [comment|viral]   "this is my roman empire now"
 [comment|viral]   "signing up out of pure {emotion}"
@@ -130,7 +130,7 @@
 [comment|mega]   "I quit my {timeunit} to attend this"
 [comment|mega]   "historians will study this post"
 [comment|mega]   "{number} of my friends signed up while I typed this"
-[comment|mega]   "the {animal} in this video deserves a Series A"
+[comment|mega]   "the {animal} in this video deserves funding"
 [comment|mega]   "I have never {verb:past} so fast in my life"
 [comment|mega]   "printing this and framing it next to my {noun}"
 [comment|ratio]   "ratio"
@@ -154,7 +154,7 @@
 [outcome|good]   The plan worked. The {animal} that helped wants equity.
 [outcome|bad]   Everyone {verb:past} the {noun}. Nobody {verb:past} the {noun#1}.
 [outcome|bad]   The fix was "{tech_excuse}." It was always "{tech_excuse#1}."
-[outcome|bad]   {member} tried to {verb} it. Now there are two problems and {a:noun}.
+[outcome|bad]   {member} tried to {verb} it. Now there are two problems.
 [outcome|bad]   It went badly. {rivalceo} liked the post about it.
 [outcome|bad]   The {noun} caught fire. Metaphorically. Mostly.
 [outcome|bad]   That cost money and dignity. Mostly dignity.
@@ -166,17 +166,17 @@
 [outcome|weird]   The problem left on its own. It took our {food}.
 [outcome|weird]   It worked, but only in {region}.
 [outcome|weird]   Somehow this made the {codebase} {adj}.
-[outcome|tech]   {member} rewrote the {codebase} in {language}. It compiles in {number} minutes and does nothing.
+[outcome|tech]   Rewrote the {codebase} in {language}. Compiles in {number} minutes. Does nothing.
 [outcome|tech]   The fix was {tech_excuse}. It was always {tech_excuse#1}.
 [outcome|tech]   The WiFi is {wifi_excuse}. We are {verb:ing} on vibes alone.
-[outcome|tech]   We added {a:noun} to fix the {noun}. Now we have {cloud_horror}.
+[outcome|tech]   We added {a:noun} to fix it. Now we have {cloud_horror}.
 [outcome|tech]   The logs say "{tech_excuse}." The logs are lying.
-[outcome|tech]   {member} opened {devtool}. {member} has not been seen since.
-[outcome|tech]   The {codebase} is now {adj}. Nobody can explain the {noun} in it.
+[outcome|tech]   {member} opened {devtool}. They have not been seen since.
+[outcome|tech]   The {codebase} is now {adj}. Nobody can explain why.
 [outcome|tech]   Deployed on a Friday. The {codebase} is "fine." It is not fine.
 [outcome|tech]   We hired a consultant. They said "{buzzword}" and invoiced us.
 [outcome|tech]   The bug was {a:animal} sitting on the keyboard. Fixed. Promoted.
-[outcome|party]   The after-party ended when {member} {verb:past} the {noun} into the {noun}.
+[outcome|party]   Party over: {member} {verb:past} the {noun} into the pool.
 [outcome|party]   Networking was achieved: {number} founders, 0 customers, 1 cheese plate.
 [outcome|party]   Frat Row now refers to {member} as "the legend."
 [outcome|party]   Someone brought {a:gadget}. It is now the DJ.
@@ -261,7 +261,7 @@
 [bio]   Describes self as "{adj}." Has never been asked.
 [bio]   Previously {verb:past} at {startup_name} (seed, 3 weeks).
 [bio]   Owns {number} hoodies. All from hackathons. Shipped none.
-[bio]   Has a {animal} named after {a:buzzword}.
+[bio]   Has {a:animal} named after {buzzword}.
 [bio]   Believes {bad_idea} is the future.
 [bio]   Fluent in {devtool}, afraid of email.
 [bio]   Has never once said no to {food}.
@@ -298,14 +298,14 @@
 [toast]   The group chat is screaming.
 [toast]   {member} is crying happy tears into {a:noun}.
 [toast]   {rivalceo} just put down his phone. Briefly.
-[toast]   Somewhere, a {animal} is proud of you.
+[toast]   Somewhere, {a:animal} is proud of you.
 [toast]   The treasurer is calculating pizza math.
 [toast]   Even the club dog is impressed. (We don't have a dog.)
 [toast]   The projector applauded. That's new.
 [toast]   Facilities has been notified. They are "concerned."
 
 # ─────────────────────────────── ROASTS & PRAISE (results bars) ───────────────────────────────
-[roast|attendance]   Attendance was lower than a {codebase} uptime report.
+[roast|attendance]   Attendance was lower than the {codebase} uptime.
 [roast|attendance]   The echo had its own hackathon team.
 [roast|attendance]   More {animal:pl} showed up than hackers. We counted.
 [praise|attendance]   {signups} signups. Facilities is still counting chairs.
@@ -315,7 +315,7 @@
 [roast|mood]   Morale peaked at check-in and then pivoted.
 [roast|mood]   The hackers rated the mood "{adj}." Out of context, that's bad.
 [praise|mood]   The mood was immaculate. Someone hugged the router.
-[praise|mood]   Hackers left with {emotion} and a {noun}.
+[praise|mood]   Hackers left with {emotion} and {a:noun}.
 [praise|mood]   {Food} was served and everyone forgave everything.
 [roast|sponsor]   You sold {equitySold}% of a club with zero revenue. Founder energy.
 [roast|sponsor]   The sponsor wall had one logo and {a:noun}.
@@ -416,13 +416,13 @@
 [loading]   Counting extension cords… we need {number} more.
 
 # ─────────────────────────────── LINKEDIN LARP (card text & T23) ───────────────────────────────
-[linkedin]   {larp_opener} that {member} has been accepted to YSee Batch 2026. {larp_closer}
-[linkedin]   {larp_opener}: I took {a:noun} and turned it into {a:adj} {noun}. {larp_closer}
-[linkedin]   {larp_opener}: a {noun} taught me everything about B2B SaaS. {larp_closer}
-[linkedin]   {larp_opener} our hackathon. I got rejected {number} times. {larp_closer}
-[linkedin]   {larp_opener}: we're hosting a hackathon. Humbled. Grateful. {larp_closer}
-[linkedin]   {larp_opener} what {food} taught me about leadership. {larp_closer}
-[linkedin]   {larp_opener}: I {verb:past} {a:noun} today. Here are 12 lessons. {larp_closer}
+[linkedin]   {larp_opener}: I got into YSee Batch 2026. {larp_closer}
+[linkedin]   {larp_opener}: I made {a:noun} a startup. {larp_closer}
+[linkedin]   {larp_opener}: {a:noun} taught me B2B SaaS. {larp_closer}
+[linkedin]   {larp_opener}: rejected {number} times, now hosting. {larp_closer}
+[linkedin]   {larp_opener}: we're hosting a hackathon. Humbled. {larp_closer}
+[linkedin]   {larp_opener}: {food} taught me leadership. {larp_closer}
+[linkedin]   {larp_opener}: I {verb:past} {a:noun}. 12 lessons 👇
 
 # ─────────────────────────────── TREE TEASERS (morning) & RECAP KICKERS ───────────────────────────────
 [tease]   Tomorrow: {rival} plans something with puppies. Allegedly.

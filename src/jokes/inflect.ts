@@ -88,7 +88,7 @@ export function plural(noun: string): string {
 }
 
 // Words whose spelling lies about their first sound.
-const AN_EXCEPTIONS = /^(hour|honest|honou?r|heir|herb\b|mvp|mri|faq|llm|sql|html|http|ssd|nft|rsvp|seo|xml|f\b|h\b|l\b|m\b|n\b|r\b|s\b|x\b)/i;
+const AN_EXCEPTIONS = /^([fhlmnrsx]\d|hour|honest|honou?r|heir|herb\b|mvp|mri|faq|llm|sql|html|http|ssd|nft|rsvp|seo|xml|f\b|h\b|l\b|m\b|n\b|r\b|s\b|x\b)/i;
 const A_EXCEPTIONS = /^(uni[^n]|unicorn|universit|use|user|usu|uti|euro|eu|one\b|once|ubi|uk\b|url|ufo|u\b|ux\b|uber)/i;
 
 export function article(word: string): 'a' | 'an' {

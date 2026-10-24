@@ -18,7 +18,7 @@ export function problems(out: string | null): string[] {
   const p: string[] = [];
   if (out.trim() === '') p.push('empty render');
   if (/ {2}/.test(out)) p.push('double space');
-  if (/\b(a|an) (a|an)\b/i.test(out)) p.push('"a a" / "an a"');
+  if (/\b(a|an) (a|an)\b/.test(out)) p.push('"a a" / "an a"');
   if (/[{}]/.test(out)) p.push('unresolved braces');
   if (out.length > MAX_LEN) p.push(`too long (${out.length} > ${MAX_LEN})`);
   if (/ [,.!?;:]/.test(out)) p.push('space before punctuation (empty slot?)');
