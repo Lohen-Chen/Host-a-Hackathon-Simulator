@@ -1,0 +1,31 @@
+{
+  "name": "host-a-hackathon-simulator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && tsx scripts/build-sw.ts",
+    "build:single": "vite build --mode single --outDir dist-single",
+    "build:zip": "npm run build && npm run build:single && tsx scripts/zip-dist.ts",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "sim": "tsx scripts/sim.ts",
+    "jokes:preview": "tsx scripts/jokes-preview.ts",
+    "content:check": "tsx scripts/normalize-content.ts"
+  },
+  "dependencies": {
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.5",
+    "fflate": "^0.8.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^3.2.7"
+  }
+}

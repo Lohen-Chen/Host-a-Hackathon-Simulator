@@ -1,0 +1,11 @@
+{
+  "name": "Host a Hackathon Simulator",
+  "short_name": "Hackathon Sim",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1724",
+  "theme_color": "#0f1724",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
