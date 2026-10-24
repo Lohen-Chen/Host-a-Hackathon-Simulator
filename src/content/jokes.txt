@@ -362,7 +362,7 @@
 [techjoke|logistics]   People who own a label maker and use it.
 [techjoke|logistics]   Someone has to count the chairs. It won't be you.
 [techjoke|coordinator]   Professional emailers. Weaponized "per my last email."
-[techjoke|coordinator]   They speak fluent sponsor and conversational {buzzword}.
+[techjoke|coordinator]   We're pre-approval, pre-constitution, and pre-recruitment bro
 [techjoke|training1]   Mandatory workshop: "Git, and Why Everyone Is Afraid of It."
 [techjoke|training1]   Teaches the crew to {verb} like professionals.
 [techjoke|training2]   Advanced training: {devtool} and inner peace.
