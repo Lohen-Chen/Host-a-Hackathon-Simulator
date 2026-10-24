@@ -4,17 +4,21 @@ import type { JokeHistory } from '../jokes/engine';
 export type Mode = 'judge' | 'standard' | 'full';
 export type Role = 'organizer' | 'social' | 'recruiter' | 'designer' | 'logistics' | 'coordinator';
 export type Task = 'research' | 'social' | 'website' | 'venue' | 'sponsors' | 'recruit';
-export type RegionId = 'dorms' | 'frat' | 'quad' | 'sproul' | 'twitter' | 'career' | 'highschools' | 'treeu';
+export type RegionId = 'twitter' | 'frat' | 'highschools' | 'intl' | 'b1g' | 'sec' | 'uc' | 'acc';
 export type Phase = 'intro' | 'morning' | 'live' | 'night' | 'auction' | 'hackday' | 'results';
 export type TraitId =
   | 'caffeinated' | 'mole' | 'rust10' | 'nepo' | 'linkedin' | 'trenchcoat' | 'survivor'
   | 'pivoted' | 'veteran' | 'replyguy' | 'sleeper' | 'arts' | 'grass' | 'memer';
 export type TechId =
-  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'prestige2' | 'website'
-  | 'promo' | 'snack' | 'rep2' | 'training3' | 'prestige3' | 'reelposts' | 'rolodex' | 'billboard'
-  | 'rep3' | 'applications' | 'nepolist' | 'travel';
+  // Hype
+  | 'website' | 'promo' | 'reelposts' | 'memes' | 'billboard' | 'clapback'
+  // Talent
+  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack'
+  // Conversion
+  | 'applications' | 'discord' | 'travel' | 'aicredits' | 'swag' | 'rep2' | 'rep3';
+export type TechBranch = 'hype' | 'talent' | 'conversion';
 export type PostId = 'flyer' | 'meme_bear' | 'linkedin' | 'dance' | 'pizza' | 'reel' | 'influencer' | 'clapback' | 'countdown' | 'dog';
-export type BubbleType = 'donor' | 'idea' | 'buzz' | 'pizza' | 'lead' | 'fire' | 'spy' | 'party' | 'bsod';
+export type BubbleType = 'idea' | 'eureka' | 'bsod';
 export type Tier = 'flop' | 'meh' | 'solid' | 'viral' | 'mega' | 'ratio';
 export type Vibe = 'corporate' | 'techbro' | 'startup' | 'defense' | 'vc' | 'genz';
 export type SponsorTier = 'bronze' | 'silver' | 'golden' | 'partner';
@@ -67,9 +71,6 @@ export interface ActiveAlert {
   title: string;
   body: string;
   choices: ChoiceView[];
-  /** seconds remaining (sim time) */
-  remaining: number;
-  seconds: number;
   defaultChoice: number;
   ctx: AlertCtx;
   /** shown on the map as a marker, if any */
@@ -78,22 +79,19 @@ export interface ActiveAlert {
 
 export interface AlertCtx { memberId?: number; regionId?: RegionId; sponsorId?: string; filled: Record<string, string> }
 
-export type ScheduledKind = 'bubble' | 'alert' | 'treeMove' | 'foreshadow' | 'invite';
+export type ScheduledKind = 'bubble' | 'alert' | 'treeMove' | 'foreshadow' | 'invite' | 'news';
 export interface ScheduledEvent { at: number; kind: ScheduledKind; data?: string; done?: boolean }
 
-export interface TreeMoveLive {
+/** A Plague Inc-style news popup. It pauses the clock until dismissed. */
+export interface Popup {
   uid: number;
-  moveId: string;
-  name: string;
-  text: string;
-  regionId: RegionId;
-  targets: RegionId[];
-  impulse: number;
-  global: boolean;
-  treeHype: number;
-  remaining: number; // counter window seconds
-  mult: number;
-  responded: 'none' | 'counter' | 'clapback' | 'ignore';
+  kind: 'news' | 'tree' | 'rumor' | 'milestone';
+  icon: string;
+  title: string;
+  body: string;
+  /** one line describing the gameplay effect, if any */
+  effect?: string;
+  regionId?: RegionId;
 }
 
 export interface SignedSponsor { id: string; money: number; premium: boolean; mood: number; day: number }
@@ -165,10 +163,10 @@ export interface Results {
 
 export interface Settings { relaxed: boolean }
 
-export interface DaySnapshot { signups: number; budget: number; rep: number; treeRegions: number; treeSignups: number; tp: number }
+export interface DaySnapshot { signups: number; confirmed: number; budget: number; rep: number; treeRegions: number; treeSignups: number; tp: number }
 
 export interface GameState {
-  version: 1;
+  version: 2;
   mode: Mode;
   seed: number;
   rngState: number;
@@ -187,7 +185,10 @@ export interface GameState {
   repCap: number;
   regions: RegionNode[];
   treeHype: number;
+  /** interested hackers (the potential pool; tech raises it) */
   signups: number;
+  /** hackers you paid to confirm (food, swag, travel); these are who show up */
+  confirmed: number;
   treeSignups: number;
   bonusSignups: number;
   websiteScore: number;
@@ -219,7 +220,10 @@ export interface GameState {
   bubbles: Bubble[];
   alertQueue: ActiveAlert[];
   schedule: ScheduledEvent[];
-  treeMove: TreeMoveLive | null;
+  /** pausing popups (news, Tree moves, rumors); the clock stops while any are queued */
+  popups: Popup[];
+  /** popups shown today; over the daily budget, optional news goes to the ticker instead */
+  popupsToday: number;
   treeNextRevealed: boolean;
   moodBank: number;
   qualityBonus: number;

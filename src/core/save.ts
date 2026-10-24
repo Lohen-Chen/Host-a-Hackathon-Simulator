@@ -8,7 +8,7 @@ export function serialize(s: GameState): string {
 export function deserialize(json: string): GameState | null {
   try {
     const s = JSON.parse(json) as GameState;
-    if (!s || s.version !== 1 || !Array.isArray(s.regions)) return null;
+    if (!s || s.version !== 2 || !Array.isArray(s.regions)) return null;
     s.fx = [];
     return s;
   } catch {

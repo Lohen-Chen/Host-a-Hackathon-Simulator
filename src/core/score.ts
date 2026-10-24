@@ -6,6 +6,7 @@ import { T } from './config';
 import { hasRole, hasTech, roleSkillSum } from './helpers';
 import { joke, tryJoke } from './jokes';
 import { clamp, randRange } from './rng';
+import { bar } from './tech';
 import type { GameState, ScoreBreakdown } from './types';
 
 export const CATEGORIES = [
@@ -38,8 +39,14 @@ export function venueCap(s: GameState) {
   return VENUE_BY_ID[s.venue ?? 'lawn'].cap;
 }
 
+/** Share of confirmed hackers who actually show up. */
 export function showRate(s: GameState) {
-  return clamp(T.showRateBase + 0.0012 * s.reputation + s.moodBank * 0.004 + s.websiteScore / 1200, 0.5, 0.9);
+  return clamp(T.showRateBase + 0.0008 * s.reputation + s.moodBank * 0.003 + s.websiteScore / 2000, 0.6, 0.97);
+}
+
+/** Confirmed hackers × show rate, plus a trickle of unconfirmed walk-ins. */
+export function expectedAttendees(s: GameState) {
+  return s.confirmed * showRate(s) + Math.max(0, s.signups - s.confirmed) * T.walkInRate;
 }
 
 export function attendanceScore(attendees: number, expected: number, cap: number): number {
@@ -92,7 +99,7 @@ export function scoreBear(s: GameState, f: EventFacts): ScoreBreakdown {
   const promises = f.kept + f.broken ? (100 * f.kept) / (f.kept + f.broken) : 40;
   const artistic = clamp(10 + s.websiteScore * 0.6 + v.ambience * 5 + Math.min(16, s.ambienceBonus * 2.2) + (s.flags.dog === 'rented' ? 3 : 0), 0, 100);
   const avgSkill = s.members.length ? s.members.reduce((a, m) => a + m.baseSkill, 0) / s.members.length : 3;
-  const quality = clamp(20 + perkQuality + s.qualityBonus + mood * 0.18 + avgSkill * 2.5 + (s.trainingMult - 1) * 18 + (hasTech(s, 'applications') ? 12 : 0), 0, 100);
+  const quality = clamp(14 + perkQuality + s.qualityBonus + mood * 0.15 + avgSkill * 2.2 + (s.trainingMult - 1) * 14 + bar(s, 'talent') * 0.25, 0, 100);
 
   const values: Record<string, number> = { attendance, mood, sponsor, sponsormood, amenities, promises, artistic, quality };
   const categories = CATEGORIES.map((c) => ({ ...c, value: Math.round(values[c.id]), line: line(s, c.id, values[c.id] >= 60) }));
@@ -102,7 +109,8 @@ export function scoreBear(s: GameState, f: EventFacts): ScoreBreakdown {
 
 export function treeAttendees(s: GameState): { attendees: number; expected: number; cap: number } {
   const cap = s.treeVenue ? VENUE_BY_ID[s.treeVenue].cap : TREE_BACKUP.cap;
-  const expected = s.treeSignups * clamp(0.6 + s.treeHype * 0.0015, 0.5, 0.85);
+  // Tree is rich: it confirms everyone it can, so its show rate is its whole conversion.
+  const expected = s.treeSignups * clamp(0.72 + s.treeHype * 0.0015, 0.5, 0.9);
   return { attendees: Math.min(expected, cap), expected, cap };
 }
 

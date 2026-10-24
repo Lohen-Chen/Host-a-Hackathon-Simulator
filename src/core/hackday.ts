@@ -2,21 +2,18 @@
 import { PROMISES } from '../content/promises';
 import { SPONSOR_BY_ID } from '../content/sponsors';
 import { TREE_BACKUP, VENUE_BY_ID } from '../content/venues';
-import { T } from './config';
 import { log } from './helpers';
 import { RIVAL_CEO, joke, treeRegionCount } from './jokes';
-import { checkPromises, scoreBear, scoreTree, showRate, treeAttendees, venueCap, type EventFacts } from './score';
+import { checkPromises, expectedAttendees, scoreBear, scoreTree, treeAttendees, venueCap, type EventFacts } from './score';
 import { pick, shuffle } from './rng';
 import type { Beat, GameState } from './types';
 
 export function startHackday(s: GameState) {
   s.phase = 'hackday';
   const cap = venueCap(s);
-  const expected = s.signups * showRate(s);
+  const expected = expectedAttendees(s);
   const overflow = Math.max(0, expected - cap);
   const attendees = Math.round(Math.min(expected, cap));
-  const food = attendees * T.foodPerAttendee;
-  s.budget -= food;
   const dumpster = s.budget < 0;
   checkPromises(s, attendees);
   const kept = s.promises.filter((p) => p.kept).length;

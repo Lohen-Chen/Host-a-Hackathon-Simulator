@@ -16,7 +16,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
   const cfg = MODES[mode];
   const nb = symmetricNeighbors();
   const s: GameState = {
-    version: 1,
+    version: 2,
     mode,
     seed,
     rngState: seedState(seed),
@@ -34,6 +34,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     regions: REGIONS.map((r) => ({ ...r, neighbors: nb[r.id], bear: INITIAL_AWARENESS[r.id].bear, tree: INITIAL_AWARENESS[r.id].tree, signups: 0, treeSignups: 0 })),
     treeHype: T.treeHypeStart,
     signups: 0,
+    confirmed: 0,
     treeSignups: 0,
     bonusSignups: 0,
     websiteScore: 0,
@@ -61,7 +62,8 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     bubbles: [],
     alertQueue: [],
     schedule: [],
-    treeMove: null,
+    popups: [],
+    popupsToday: 0,
     treeNextRevealed: false,
     moodBank: 0,
     qualityBonus: 0,
@@ -83,7 +85,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     log: [],
     jokeHistory: emptyHistory(),
     milestones: [],
-    dayStart: { signups: 0, budget: T.startBudget, rep: T.startRep, treeRegions: 1, treeSignups: 0, tp: 0 },
+    dayStart: { signups: 0, confirmed: 0, budget: T.startBudget, rep: T.startRep, treeRegions: 1, treeSignups: 0, tp: 0 },
     recap: [],
     tutorialStep: 0,
     settings: { relaxed },
@@ -163,7 +165,7 @@ export function hire(s: GameState, idx: number): boolean {
   const c = s.candidates[idx];
   if (!c || s.budget < T.hireCost || s.members.length >= s.rosterCap) return false;
   s.budget -= T.hireCost;
-  if (c.trait === 'nepo') s.budget += 500;
+  if (c.trait === 'nepo') s.reputation = Math.min(s.repCap, s.reputation + 3);
   s.candidates.splice(idx, 1);
   if (c.trait === 'rust10') c.dailyMod = randInt(s, -3, 3);
   if (c.trait === 'trenchcoat') c.trenchTask = pick(s, ALL_TASKS);

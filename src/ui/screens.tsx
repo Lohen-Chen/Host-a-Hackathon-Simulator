@@ -7,7 +7,7 @@ import { sfx } from '../audio/sfx';
 import { Avatar, BearMascot, TreeMascot } from './art';
 import { CrewSheet } from './sheets';
 import { store } from './store';
-import { MuteButton, Ticker, TopBar } from './Live';
+import { ConfirmButton, MuteButton, Ticker, TopBar } from './Live';
 import { flavor } from './flavor';
 
 function loadingLine(): string {
@@ -40,7 +40,6 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
         ))}
       </div>
       <div class="toggles">
-        <button class="tab" onClick={() => store.setSettings({ relaxed: !store.settings.relaxed })}>⏱ Relaxed timers: {store.settings.relaxed ? 'on' : 'off'}</button>
         <button class="tab" onClick={() => store.setSettings({ music: !store.settings.music })}>🎵 Music: {store.settings.music ? 'on' : 'off'}</button>
         <MuteButton />
       </div>
@@ -55,7 +54,8 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
 const INTRO = [
   { icon: <BearMascot size={64} />, text: 'You are the president of a club at Bear University. You will host the greatest hackathon of all time.' },
   { icon: <TreeMascot size={64} />, text: 'Tree University is hosting one the SAME weekend. Their CEO, Chad Leland III, is on his phone. He says "synergy."' },
-  { icon: <span style={{ fontSize: '54px' }}>🗺️</span>, text: 'Hype spreads across campus like a virus. Fire posts at regions, tap bubbles, answer alerts. Seven days. Go.' },
+  { icon: <span style={{ fontSize: '54px' }}>🗺️</span>, text: 'Bear Hacks spreads across the country like a virus. 10,000 students. Fire posts at regions, tap 💡 bubbles for tech points, evolve your Hype, Talent and Conversion.' },
+  { icon: <span style={{ fontSize: '54px' }}>✅</span>, text: 'Interest is free. Attendance is not. Spend your budget (and sponsor money) to confirm hackers. Seven days. Go.' },
 ];
 
 export function Intro({ s }: { s: GameState }) {
@@ -97,6 +97,7 @@ export function Morning({ s }: { s: GameState }) {
           ))}
           {s.candidates.length === 0 && <div class="dim small">Nobody else applied. Unlock Club Prestige or put a Recruiter on Recruit.</div>}
         </div>
+        <ConfirmButton s={s} inline />
         <CrewSheet s={s} />
       </div>
  <div class="dock" style={{ gridTemplateColumns: '1fr' }}>
@@ -126,7 +127,6 @@ export function PauseMenu() {
         <h2>⏸ Paused</h2>
         <div class="small dim">The clock is stopped. Tree University is also, presumably, on a break.</div>
         <button class="btn btn-gold" onClick={() => { store.paused = false; store.emit(); }}>▶ Resume</button>
-        <button class="btn" onClick={() => store.setSettings({ relaxed: !store.settings.relaxed })}>⏱ Relaxed timers: {store.settings.relaxed ? 'on (alerts ×2)' : 'off'}</button>
         <button class="btn" onClick={() => store.setSettings({ music: !store.settings.music })}>🎵 Music: {store.settings.music ? 'on' : 'off'}</button>
         <button class="btn btn-red" onClick={() => { store.paused = false; store.save(); store.quit(); }}>Quit to title</button>
         <div class="tiny dim">Seed {store.state?.seed} · {store.state ? flavor(store.state, 'loading', 'pause') : ''}</div>

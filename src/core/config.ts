@@ -8,12 +8,14 @@ export const TITLE = 'Host a Hackathon Simulator';
 export const OBJECTIVE = 'Get more hackers than Tree University.';
 
 export interface ModeConfig { daySec: number; bubbles: number; alerts: number; tickerSec: number; auctionSec: number; label: string;
-  /** Tree's ambient posting multiplier: shorter days give the player fewer bubbles/alerts to fight back with. */
-  treePower: number }
+  /** Tree's ambient posting multiplier: shorter days give the player fewer bubbles to fight back with. */
+  treePower: number;
+  /** pausing popups per day before optional news is demoted to the ticker */
+  popupsPerDay: number }
 export const MODES: Record<Mode, ModeConfig> = {
-  judge: { daySec: 30, bubbles: 5, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8 },
-  standard: { daySec: 60, bubbles: 10, alerts: 2, tickerSec: 5, auctionSec: 10, label: 'Standard (~10 min)', treePower: 1 },
-  full: { daySec: 120, bubbles: 20, alerts: 4, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2 },
+  judge: { daySec: 30, bubbles: 6, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8, popupsPerDay: 2 },
+  standard: { daySec: 60, bubbles: 10, alerts: 1, tickerSec: 5, auctionSec: 10, label: 'Standard (~10 min)', treePower: 1, popupsPerDay: 2 },
+  full: { daySec: 120, bubbles: 20, alerts: 2, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2, popupsPerDay: 3 },
 };
 
 export const T = {
@@ -33,7 +35,6 @@ export const T = {
   treeDecay: 0.02,
   treeControlPenalty: 0.6,
   signupLerp: 0.25,
-  promoBonus: 0.15,
   /** Tree's own ambient posting: impulses per day, scaled by treeHype/50 */
   treePostsPerDay: 4.25,
   treePostPower: 0.11,
@@ -45,22 +46,32 @@ export const T = {
   bubbleTtl: 6,
   maxBubbles: 4,
   minGap: 3,
-  // Alerts
-  alertSeconds: 9,
   // Tree moves
-  treeWindow: 6,
-  counterCost: 500,
-  rubberBand: 200,
+  rubberBand: 1600,
+  /** Tree moves land at this strength once the Clapback Team node is owned */
+  clapbackMult: 0.6,
+  // Rumors (Plague Inc mutations): free random nodes per run, scheduled like world news
+  maxRumors: 2,
   // Sponsors
   inviteBase: 0.3,
   invitePerCoord: 0.03,
   inviteCap: 0.8,
   equityCap: 28,
+  // Confirming hackers: money turns interest into committed attendees (food, swag, travel)
+  confirmBatch: 250,
+  confirmCost: 14,
+  confirmCostMin: 9,
+  /** share of interested-but-unconfirmed hackers who show up anyway */
+  walkInRate: 0.1,
   // Event day
-  foodPerAttendee: 12,
-  showRateBase: 0.62,
+  showRateBase: 0.8,
   /** attendees needed for a full Attendance score */
-  attendanceFull: 480,
+  attendanceFull: 4000,
+  /** Tree's off-map campus hackers: base + per point of Tree hype */
+  treeBase: 900,
+  treeBasePerHype: 12,
+  /** interest effects in alerts are written at the old 1,200-hacker scale */
+  signupScale: 8,
 };
 
 export const RESEARCH_TASKS = ['research', 'social', 'website', 'venue', 'sponsors', 'recruit'] as const;

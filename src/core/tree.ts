@@ -1,10 +1,13 @@
-// Tree University, the live rival (Section 6.10).
+// Tree University, the live rival (Section 6.10). Tree moves are Plague Inc-style news:
+// they pause the world with a popup and land immediately. There is no quick-time response;
+// the counterplay is the Clapback Team node in the Hype branch.
 import { TREE_CATCHUP, TREE_MOVES, type TreeMoveDef } from '../content/treeMoves';
 import { T } from './config';
-import { addTicker, chargesLeft, fx, log } from './helpers';
+import { addTicker, fx, hasTech, log } from './helpers';
 import { fill, regionName } from './jokes';
 import { treeImpulse } from './map';
-import { chance, pick, randRange } from './rng';
+import { showPopup } from './popups';
+import { chance, randRange } from './rng';
 import type { GameState, RegionId, ScheduledEvent } from './types';
 import { queueAlert } from './events';
 
@@ -18,9 +21,9 @@ export function scheduleTreeMoves(s: GameState): ScheduledEvent[] {
   const move = TREE_MOVES.find((m) => m.day === s.day);
   if (move) out.push({ at: D * randRange(s, 0.35, 0.6), kind: 'treeMove', data: move.id });
   // Rubber-banding: a big Bear lead buys Tree a catch-up move.
-  if (s.day >= 2 && s.signups - s.treeSignups > T.rubberBand) out.push({ at: D * randRange(s, 0.72, 0.85), kind: 'treeMove', data: 'catchup' });
+  else if (s.day >= 2 && s.signups - s.treeSignups > T.rubberBand) out.push({ at: D * randRange(s, 0.5, 0.8), kind: 'treeMove', data: 'catchup' });
   if (s.treeNextRevealed || s.members.some((m) => m.trait === 'mole')) {
-    if (move) addTicker(s, 'TREE TIMES', `INTEL: Tree plans "${move.name}" today. Have a counter ready.`);
+    if (move) addTicker(s, 'TREE TIMES', `INTEL: Tree plans "${move.name}" today.`);
     s.treeNextRevealed = false;
   }
   // Ex-Tree Mole: 10% a day to leak your plans back.
@@ -29,12 +32,6 @@ export function scheduleTreeMoves(s: GameState): ScheduledEvent[] {
     addTicker(s, 'TREE TIMES', 'LEAK: Tree University obtained the Bear U group chat. It is mostly pizza polls.');
   }
   return out;
-}
-
-export function revealNextMove(s: GameState) {
-  const next = TREE_MOVES.find((m) => m.day === s.day + 1) ?? TREE_MOVES.find((m) => m.day === s.day);
-  if (next) addTicker(s, 'TREE TIMES', `INTEL: spy says Tree's next move is "${next.name}."`);
-  s.treeNextRevealed = true;
 }
 
 export function startTreeMove(s: GameState, id: string) {
@@ -51,84 +48,16 @@ export function startTreeMove(s: GameState, id: string) {
     log(s, 'treeStumble', 'Tree stumbled');
     return;
   }
-  const text = fill(s, def.text);
-  s.treeMove = {
-    uid: ++s.uid,
-    moveId: id,
-    name: def.name,
-    text,
-    regionId: targets[0],
-    targets,
-    impulse: def.impulse,
-    global: !!def.global,
-    treeHype: def.treeHype,
-    remaining: T.treeWindow * (s.settings.relaxed ? 2 : 1),
-    mult: 1,
-    responded: 'none',
-  };
-  if (id === 'aggro') s.flags.treeAggro = 1;
-  addTicker(s, 'TREE TIMES', `TREE MOVE: ${def.name} in ${regionName(s, targets[0])}`);
-  fx(s, { kind: 'sfx', sfx: 'siren' });
-  s.lastInteractiveAt = s.t;
-}
-
-export type TreeResponse = 'counter' | 'clapback' | 'ignore';
-
-export function canRespond(s: GameState, r: TreeResponse): boolean {
-  if (!s.treeMove || s.treeMove.responded !== 'none') return false;
-  if (r === 'counter') return s.budget >= T.counterCost;
-  if (r === 'clapback') return chargesLeft(s) > 0;
-  return true;
-}
-
-export function respondTreeMove(s: GameState, r: TreeResponse) {
-  const m = s.treeMove;
-  if (!m || !canRespond(s, r)) return;
-  m.responded = r;
-  if (r === 'counter') {
-    s.budget -= T.counterCost;
-    m.mult = 0.5;
-    fx(s, { kind: 'toast', text: pick(s, COUNTER_LINES), tone: 'good' });
-    if (m.moveId === 'aggro') s.flags.treeAggro = 0.5;
-  } else if (r === 'clapback') {
-    s.chargesUsed++;
-    const k = s.members.some((x) => x.trait === 'replyguy') ? 1.5 : 1;
-    s.treeHype = Math.max(0, s.treeHype - 6 * k);
-    m.mult = 0.75;
-    fx(s, { kind: 'toast', text: pick(s, CLAPBACK_LINES), tone: 'good' });
-  } else {
-    fx(s, { kind: 'toast', text: 'Ignored. Bold. Tree is posting about how you "had no response."', tone: 'neutral' });
+  const mult = hasTech(s, 'clapback') ? T.clapbackMult : 1;
+  for (const r of targets) {
+    treeImpulse(s, r, def.impulse * mult, def.global ? 0.2 : T.spillFactor);
+    fx(s, { kind: 'pulse', regionId: r, tone: 'bad' });
   }
-  fx(s, { kind: 'sfx', sfx: 'tap' });
-  landTreeMove(s);
+  s.treeHype = Math.min(100, s.treeHype + def.treeHype * mult);
+  const where = def.global ? 'everywhere' : targets.map((r) => regionName(s, r)).join(' and ');
+  showPopup(s, {
+    kind: 'tree', icon: '🌲', title: `Tree University: ${def.name}`, body: fill(s, def.text),
+    effect: `Tree hype grows in ${where}${mult < 1 ? ' (your Clapback Team took the edge off)' : ''}`, regionId: targets[0],
+  }, false, 'TREE TIMES');
+  log(s, 'treeMove', def.name, mult);
 }
-
-export function tickTreeMove(s: GameState, dt: number) {
-  const m = s.treeMove;
-  if (!m) return;
-  m.remaining -= dt;
-  if (m.remaining <= 0) landTreeMove(s);
-}
-
-function landTreeMove(s: GameState) {
-  const m = s.treeMove;
-  if (!m) return;
-  for (const id of m.targets) {
-    treeImpulse(s, id, m.impulse * m.mult, m.global ? 0.2 : T.spillFactor);
-    fx(s, { kind: 'pulse', regionId: id, tone: 'bad' });
-  }
-  s.treeHype = Math.min(100, s.treeHype + m.treeHype * m.mult);
-  log(s, 'treeMove', `${m.name}:${m.responded}`, m.mult);
-  s.treeMove = null;
-}
-
-const COUNTER_LINES = [
-  'Counter-programming: you booked a bigger puppy. Impulse halved.',
-  'You scheduled "Free Pizza Hour" at the same time. Tree is furious.',
-  'Counter-programmed with a better meme. Tree\'s move landed at half strength.',
-];
-const CLAPBACK_LINES = [
-  'Clapback posted: "ok but where\'s your WiFi password, Tree." Devastating.',
-  'Clapback: "Synergy isn\'t a personality, Chad." 4,000 likes.',
-  'Clapback landed. Tree University has turned off replies.',
-];

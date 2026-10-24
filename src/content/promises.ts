@@ -12,11 +12,11 @@ export interface PromiseDef {
 // Each promise is checked on hackathon day (opening and closing ceremonies).
 export const PROMISES: Record<PromiseKind, PromiseDef> = {
   logo_site: { text: 'Logo on the website', check: (c) => c.s.websiteScore >= 30, kept: 'Logo on the website. Above the fold, even.', broken: "Their logo is on the website's 404 page. Only there." },
-  attendees200: { text: '200+ attendees', check: (c) => c.attendees >= 200, kept: '200+ hackers. The sponsor counted twice.', broken: 'Promised 200 hackers. Delivered a nice small dinner party.' },
-  attendees500: { text: '500+ attendees', check: (c) => c.attendees >= 500, kept: '500 hackers. The blimp was not needed.', broken: 'Promised 500. The other 380 were "on the waitlist in spirit."' },
+  attendees200: { text: '2,000+ attendees', check: (c) => c.attendees >= 2000, kept: '2,000+ hackers. The sponsor counted twice.', broken: 'Promised 2,000 hackers. Delivered a nice medium dinner party.' },
+  attendees500: { text: '4,000+ attendees', check: (c) => c.attendees >= 4000, kept: '4,000 hackers. The blimp was not needed.', broken: 'Promised 4,000. The rest were "on the waitlist in spirit."' },
   agi: { text: 'Mention "AGI" at the opening ceremony', check: (c) => c.s.reputation >= 30, kept: 'You said "AGI" at the opening. A GPU somewhere shed a tear.', broken: 'You forgot to say "AGI." ClosedAI\'s rep said it for you. Eleven times.' },
   drink_station: { text: 'Drink station at every table', check: (c) => c.s.unlockedTech.includes('snack') || c.hasRole('logistics'), kept: 'Drink station at every table. Nobody has slept since.', broken: 'One drink station. Forty tables. A line to the parking lot.' },
-  tournament: { text: 'Side tournament', check: (c) => c.venueCap >= 400, kept: 'The side tournament ended in a 3 AM upset. Legends were born.', broken: 'No room for the tournament. It was held in a stairwell.' },
+  tournament: { text: 'Side tournament', check: (c) => c.venueCap >= 3200, kept: 'The side tournament ended in a 3 AM upset. Legends were born.', broken: 'No room for the tournament. It was held in a stairwell.' },
   livestream: { text: 'Livestream a "launch" of a hackathon project', check: (c) => c.s.websiteScore >= 50, kept: 'A to-do app was "launched" on a livestream. 12,000 viewers.', broken: 'The launch livestream buffered. The rocket emoji never left the pad.' },
   defense_track: { text: '"Defense track" prize', check: () => true, kept: 'The "Defense track" happened. So did the protest.', broken: '' },
   vc_slot: { text: '3-minute VC pitch slot', check: () => true, kept: 'The VC pitched for 3 minutes. It felt like 3 years.', broken: '' },

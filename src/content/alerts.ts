@@ -71,7 +71,7 @@ export const ALERTS: AlertDef[] = [
     id: 'budget_hole', icon: '🧾', title: 'The treasurer lost the receipts', weight: 2, max: 1,
     body: 'All of them. Possibly in a pizza box. Possibly eaten.', defaultChoice: 1,
     choices: [
-      { label: 'Audit', cost: 400, out: { text: 'The audit found $600 in a hoodie pocket. Net profit!', budget: 600 } },
+      { label: 'Audit', cost: 400, out: { text: 'The audit found $600 in a hoodie pocket. It belongs to the treasurer. Respect restored, though.', rep: 2 } },
       { label: 'Blame the intern', out: { text: 'The intern has been blamed. The intern does not exist. Still blamed.', budget: -500 } },
       { label: 'Blame the Blue Screen', out: { text: 'The laptop took the fall. It was already sad. Now it\'s sadder.', budget: -200, rep: -1 } },
     ],
@@ -89,8 +89,8 @@ export const ALERTS: AlertDef[] = [
     id: 'blockchain_boys', icon: '🪙', title: 'The Blockchain Boys want to pay in DogeToken', weight: 1.5, max: 1, satire: true,
     body: 'A token with a dog on it. "It\'s going to the moon, bro."', defaultChoice: 1,
     choices: [
-      { label: 'Accept the token', odds: { p: 0.25, win: { text: 'It went to the moon! +$3,000. The dog is smug.', budget: 3000 }, lose: { text: 'It went to the moon. Without you. Worth $4 now.', budget: 4 } } },
-      { label: 'Ask for actual money', out: { text: 'They paid in "actual money": a gift card to a place that closed in 2019.', budget: 100 } },
+      { label: 'Accept the token', odds: { p: 0.25, win: { text: 'It went to the moon! You can\'t sell it, but crypto Twitter now loves Bear Hacks.', impulse: { target: 'twitter', amount: 0.2 } }, lose: { text: 'It went to the moon. Without you. Worth $4 now. The dog is smug.', rep: -1 } } },
+      { label: 'Ask for actual money', out: { text: 'They paid in "actual money": a gift card to a place that closed in 2019. Framed it.', mood: 1 } },
       { label: 'Ask them to leave', out: { text: 'They left. They minted an NFT of you asking them to leave.', rep: 1 } },
     ],
   },
@@ -101,7 +101,7 @@ export const ALERTS: AlertDef[] = [
     choices: [
       { label: 'Let them go', out: { text: '{member} left. Their LinkedIn now says "Founder." Their mom is so proud.' }, run: (s, c) => { if (c.memberId !== undefined) removeMember(s, c.memberId); } },
       { label: 'Counter-offer', cost: 500, out: { text: '{member} stayed for $500 and a title: "Chief Uber Officer."' } },
-      { label: 'Invest in it', cost: 300, odds: { p: 0.05, win: { text: 'Uber for Uber got acquired by Uber. You made $4,000!', budget: 4000 }, lose: { text: 'You own 2% of Uber for Uber. It has pivoted to Lyft for Lyft.' } },
+      { label: 'Invest in it', cost: 300, odds: { p: 0.05, win: { text: 'Uber for Uber got acquired by Uber. You were paid in ride vouchers. Hackers ride free!', mood: 4 }, lose: { text: 'You own 2% of Uber for Uber. It has pivoted to Lyft for Lyft.' } },
         run: (s, c) => { if (c.memberId !== undefined) removeMember(s, c.memberId); } },
     ],
   },
@@ -127,9 +127,9 @@ export const ALERTS: AlertDef[] = [
     id: 'tree_puppies', icon: '🐶', title: 'Tree announces free puppies', weight: (s) => (s.day >= 2 ? 2 : 0), max: 1,
     body: 'Every Tree hackathon attendee gets to pet a puppy. {rivalceo}: "Synergy."', defaultChoice: 2,
     choices: [
-      { label: 'Counter with "free adult dogs"', cost: 600, out: { text: 'Adult dogs: calmer, wiser, great at code review. Hackers love them.', impulse: { target: 'dorms', amount: 0.2 }, mood: 3 } },
-      { label: 'Post a photo of the club dog', out: { text: 'You do not have a club dog. The photo is of a mop. It\'s doing numbers.', impulse: { target: 'sproul', amount: 0.12 } } },
-      { label: 'Concede the puppy war', out: { text: 'Tree wins the puppy war. History will not forget.', treeHype: 6, treeImpulse: { target: 'dorms', amount: 0.15 } } },
+      { label: 'Counter with "free adult dogs"', cost: 600, out: { text: 'Adult dogs: calmer, wiser, great at code review. Hackers love them.', impulse: { target: 'uc', amount: 0.2 }, mood: 3 } },
+      { label: 'Post a photo of the club dog', out: { text: 'You do not have a club dog. The photo is of a mop. It\'s doing numbers.', impulse: { target: 'uc', amount: 0.12 } } },
+      { label: 'Concede the puppy war', out: { text: 'Tree wins the puppy war. History will not forget.', treeHype: 6, treeImpulse: { target: 'uc', amount: 0.15 } } },
     ],
   },
   {
@@ -198,7 +198,7 @@ export const ALERTS: AlertDef[] = [
     body: 'Subject: "your ceremony conflict." She has a bride. She has a spreadsheet.', defaultChoice: 0,
     choices: [
       { label: 'Apologize', out: { text: 'Tammy accepted. Tammy will remember this. Tammy remembers everything.', flags: { tammy: 'calm' } } },
-      { label: 'Invite her bride to hack', out: { text: 'The bride registered. She\'s building a seating-chart optimizer.', impulse: { target: 'career', amount: 0.1 } } },
+      { label: 'Invite her bride to hack', out: { text: 'The bride registered. She\'s building a seating-chart optimizer.', impulse: { target: 'b1g', amount: 0.1 } } },
       { label: 'Reply "per my last email"', out: { text: 'Tammy has declared war. She will bid on everything.', flags: { tammy: 'angry' } } },
     ],
   },
@@ -380,7 +380,7 @@ export const ALERTS: AlertDef[] = [
     choices: [
       { label: 'Keep pirate mode', out: { text: 'Registration is now "walking the plank." It is more popular.', rep: 4, mood: 2, flags: { pirate: true } } },
       { label: 'Patch it', out: { text: 'Patched. The bot says "arr" once a day anyway. Out of spite.', tp: -1 } },
-      { label: 'Ask it for a refund', run: (s) => { const p = pick(s, [0, 1, 2]); if (p === 0) { s.budget += 300; return 'The bot gave you $300 in "doubloons." The bank accepted them?!'; } if (p === 1) { s.reputation += 2; return 'The bot wrote you a sea shanty about refunds. It slaps.'; } return 'The bot said "no refunds on the high seas." Fair.'; } },
+      { label: 'Ask it for a refund', run: (s) => { const p = pick(s, [0, 1, 2]); if (p === 0) { s.websiteScore = Math.min(100, s.websiteScore + 5); return 'The bot gave you 300 "doubloons." The bank declined. They look great on the website.'; } if (p === 1) { s.reputation += 2; return 'The bot wrote you a sea shanty about refunds. It slaps.'; } return 'The bot said "no refunds on the high seas." Fair.'; } },
     ],
   },
   {
@@ -434,7 +434,7 @@ export const ALERTS: AlertDef[] = [
     id: 'linkedin_larp', icon: '💼', title: 'Your president posted a 600-word LinkedIn story', tech: false, satire: true, max: 1, weight: 1.5,
     body: 'About a club meeting. 14 line breaks and a lesson. Opens: "I\'m pleased to announce…"', defaultChoice: 2,
     choices: [
-      { label: 'Boost it', cost: 100, out: { text: '"Here\'s what a pizza taught me about B2B SaaS." 4,000 recruiters reacted 💡.', impulse: { target: 'career', amount: 0.2 }, inviteBonus: 0.05 } },
+      { label: 'Boost it', cost: 100, out: { text: '"Here\'s what a pizza taught me about B2B SaaS." 4,000 recruiters reacted 💡.', impulse: { target: 'b1g', amount: 0.2 }, inviteBonus: 0.05 } },
       { label: 'Comment "Congrats! 🎉"', out: { text: 'Humbled. Grateful. Disrupting. The president replied "thank you king."', rep: 1 } },
       { label: 'Quietly mute it', out: { text: 'Muted. It still appears in your dreams. "Agree? 👇"' } },
     ],
@@ -448,16 +448,16 @@ export const ALERTS: AlertDef[] = [
     choices: [
       { label: 'Congratulate them on LinkedIn', out: { text: '"Our TAM is vibes," they replied. Cringe achieved.', rep: 1, flagAdd: { founderRound: 1 } } },
       { label: 'Ask what the product is', out: { text: '"It\'s a platform." What kind? "A platform for platforms."', tp: -1, flagAdd: { founderRound: 1 } } },
-      { label: 'Invest $500', cost: 500, odds: { p: 0.05, win: { text: 'EXIT! Acquired for "strategic reasons." You made $3,000!', budget: 3000, flagAdd: { founderRound: 1 } },
+      { label: 'Invest $500', cost: 500, odds: { p: 0.05, win: { text: 'EXIT! Acquired for "strategic reasons." You were paid in acquirer stock (worthless) and clout (priceless).', rep: 6, flagAdd: { founderRound: 1 } },
         lose: { text: 'You own 0.001% of a Figma file and a dream.', flagAdd: { founderRound: 1 } } } },
     ],
   },
   {
-    id: 'equity_offer', icon: '📈', title: 'A "strategic advisor" offers $800 for 7% of the club', satire: true, max: 1, weight: 1.5,
+    id: 'equity_offer', icon: '📈', title: 'A "strategic advisor" wants 7% of the club for "intros"', satire: true, max: 1, weight: 1.5,
     body: 'Their only advice so far: "pivot."', defaultChoice: 0,
     choices: [
-      { label: 'Accept', out: { text: 'You now own 93% of a club with no revenue. Founder energy.', budget: 800, flagAdd: { equitySold: 7 } } },
-      { label: 'Counter at 6.9%', odds: { p: 0.5, win: { text: 'They accepted 6.9%. The lawyers are involved. Nice.', budget: 800, flagAdd: { equitySold: 7 } }, lose: { text: 'The lawyers are involved. The advisor left to "circle back."' } } },
+      { label: 'Accept', out: { text: 'You now own 93% of a club with no revenue. The intros are real, though. Sponsors are calling.', inviteBonus: 0.2, flagAdd: { equitySold: 7 } } },
+      { label: 'Counter at 6.9%', odds: { p: 0.5, win: { text: 'They accepted 6.9%. The lawyers are involved. Nice. The intros start tomorrow.', inviteBonus: 0.2, flagAdd: { equitySold: 7 } }, lose: { text: 'The lawyers are involved. The advisor left to "circle back."' } } },
       { label: 'Decline', out: { text: 'The advisor leaves to "circle back." They will never circle back.' } },
     ],
   },
@@ -466,7 +466,7 @@ export const ALERTS: AlertDef[] = [
     body: 'Tree University is stumbling. {rivalceo} is still on his phone. Opportunity?', defaultChoice: 0,
     choices: [
       { label: 'Screenshot it (ethically)', out: { text: 'You did not log in. You did post the screenshot. Tree hype dropped.', treeHype: -8, rep: 1 } },
-      { label: 'Send a get-well card', out: { text: 'The card said "synergy." Tree U is deeply confused. Their fans switched sides.', treeHype: -4, impulse: { target: 'sproul', amount: 0.15 } } },
+      { label: 'Send a get-well card', out: { text: 'The card said "synergy." Tree U is deeply confused. Their fans switched sides.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
     ],
   },
   {
@@ -474,7 +474,7 @@ export const ALERTS: AlertDef[] = [
     body: '300 boba teas are melting in the lobby of {place}.', defaultChoice: 0,
     choices: [
       { label: 'Give them away', out: { text: 'Free boba in {region}. You are now a local legend. Tapioca everywhere.', impulse: { target: 'random', amount: 0.15 }, mood: 2 } },
-      { label: 'Sell them', out: { text: 'Sold for $2 each. A tiny business was born. It already has a waitlist.', budget: 450 } },
+      { label: 'Sell them', out: { text: 'You tried to sell free boba. The hackers organized a boycott. You gave it away anyway, angrily.', rep: -1, mood: 1 } },
     ],
     region: 'random',
   },
@@ -490,7 +490,7 @@ export const ALERTS: AlertDef[] = [
     id: 'club_dog', icon: '🐕', title: 'Fans want to meet the club dog', weight: (s) => (s.postsFired > 1 ? 1.3 : 0.4), max: 1,
     body: 'You do not have a club dog. You have never had a club dog.', defaultChoice: 2,
     choices: [
-      { label: 'Rent a dog', cost: 400, out: { text: 'Rented a golden retriever named "Synergy." 400 photos taken. Worth it.', impulse: { target: 'dorms', amount: 0.2 }, flags: { dog: 'rented' } } },
+      { label: 'Rent a dog', cost: 400, out: { text: 'Rented a golden retriever named "Synergy." 400 photos taken. Worth it.', impulse: { target: 'uc', amount: 0.2 }, flags: { dog: 'rented' } } },
       { label: 'Admit there is no dog', out: { text: '"The club dog was the friends we made along the way." Nobody accepted this.', rep: -2, flags: { dog: 'admitted' } } },
       { label: 'Say the dog is "remote"', out: { text: 'The club dog is "working remote." It has a LinkedIn now.', rep: 1, flags: { dog: 'remote' } } },
     ],

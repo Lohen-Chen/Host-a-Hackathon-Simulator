@@ -6,20 +6,21 @@ import { joke } from './jokes';
 import { bearImpulse, milestone } from './map';
 import { dealHand } from './state';
 import { rand } from './rng';
+import { bar } from './tech';
 import type { GameState, PostId, RegionId, Tier } from './types';
 import { spawnBubble } from './events';
 
 /** Regions where a card lands badly (affinity ×0.5). */
 const MISMATCH: Partial<Record<PostId, RegionId[]>> = {
-  flyer: ['twitter'],
-  meme_bear: ['career'],
-  linkedin: ['dorms', 'highschools', 'twitter'],
-  dance: ['career', 'quad'],
-  pizza: ['career'],
-  reel: ['career'],
-  influencer: ['career', 'treeu'],
-  clapback: ['highschools', 'career'],
-  dog: ['career'],
+  flyer: ['twitter', 'intl'],
+  meme_bear: ['intl'],
+  linkedin: ['frat', 'highschools', 'twitter'],
+  dance: ['intl', 'acc'],
+  pizza: ['twitter'],
+  reel: ['frat'],
+  influencer: ['intl'],
+  clapback: ['highschools', 'intl'],
+  dog: ['acc'],
 };
 
 export function affinity(card: PostCard, region: RegionId): number {
@@ -39,6 +40,7 @@ export function viralChance(s: GameState, card: PostCard): number {
   let p = card.viralBase + 0.02 * sss;
   if (s.sponsors.some((x) => x.id === 'wrinkle')) p += SPONSOR_BY_ID.wrinkle.perkFx.viral ?? 0;
   if (s.members.some((m) => m.task === 'social' && m.trait === 'memer') && card.id !== 'linkedin') p += 0.04;
+  if (s.unlockedTech.includes('memes')) p += 0.06;
   return Math.min(0.85, p);
 }
 
@@ -91,10 +93,10 @@ export function firePost(s: GameState, handIdx: number, regionId: RegionId): Tie
   const tier = rollTier(s, card);
   const sss = socialSkillSum(s);
   const lunatic = s.members.some((m) => m.task === 'social' && m.trait === 'linkedin') ? 1.2 : 1;
-  const impulse = card.power * TIER_MULT[tier] * affinity(card, regionId) * (1 + 0.1 * sss) * partyMult(card, regionId) * lunatic * IMPULSE_SCALE;
+  const impulse = card.power * TIER_MULT[tier] * affinity(card, regionId) * (1 + 0.1 * sss) * partyMult(card, regionId) * lunatic * (1 + bar(s, 'hype') / 200) * IMPULSE_SCALE;
   const r = s.regions.find((x) => x.id === regionId)!;
   if (card.fullSpill) bearImpulse(s, regionId, impulse, 1);
-  else if (card.party && regionId === 'frat') bearImpulse(s, regionId, impulse, 0.5, ['dorms', 'sproul']);
+  else if (card.party && regionId === 'frat') bearImpulse(s, regionId, impulse, 1);
   else bearImpulse(s, regionId, impulse);
 
   if (tier === 'ratio') addRep(s, -3);
@@ -114,7 +116,7 @@ export function firePost(s: GameState, handIdx: number, regionId: RegionId): Tie
     fx(s, { kind: 'sfx', sfx: 'viral' });
     milestone(s, 'firstViral', 'First viral post!');
     addTicker(s, 'BEAR BEAT', `Bear U post "${card.name}" goes ${tier === 'mega' ? 'MEGA-viral' : 'viral'} in ${r.name}`);
-    if (rand(s) < 0.5) spawnBubble(s, 'buzz', regionId);
+    if (rand(s) < 0.5) spawnBubble(s, 'idea', regionId);
   } else if (tier === 'flop' || tier === 'ratio') {
     fx(s, { kind: 'shake' });
     fx(s, { kind: 'sfx', sfx: tier === 'ratio' ? 'error' : 'flop' });

@@ -5,18 +5,22 @@ import { store, type UiFx } from './store';
 const W = 360;
 const H = 300;
 
-export function regionRadius(pop: number) { return 15 + Math.sqrt(pop) * 0.9; }
+export function regionRadius(pop: number) { return 10 + Math.sqrt(pop) * 0.5; }
+
+/** A very rough continental-US silhouette behind the nodes, Plague Inc world-map style. */
+const US_PATH = 'M18 92 L40 64 L70 52 L120 48 L170 44 L230 46 L262 58 L300 60 L332 70 L346 92 L336 120 L344 150 L330 182 L306 210 L284 238 L262 250 L238 268 L214 262 L188 246 L150 244 L118 232 L84 222 L56 204 L30 178 L20 140 Z';
 
 export function MapSvg({ s, onRegion, armed, pulses }: { s: GameState; onRegion?: (id: RegionId) => void; armed?: boolean; pulses?: UiFx[] }) {
   const pos = new Map(s.regions.map((r) => [r.id, r]));
   const edges: [RegionId, RegionId][] = [];
   for (const r of s.regions) for (const n of r.neighbors) if (r.id < n) edges.push([r.id, n]);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} class={armed ? 'armed' : ''} role="group" aria-label="Campus hype map">
+    <svg viewBox={`0 0 ${W} ${H}`} class={armed ? 'armed' : ''} role="group" aria-label="Hype map">
       <defs>
         <pattern id="grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#1a2740" stroke-width="1" /></pattern>
       </defs>
       <rect width={W} height={H} fill="url(#grid)" />
+      <path d={US_PATH} fill="#16243c" stroke="#2b3f62" stroke-width="2" stroke-linejoin="round" />
       {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round" />; })}
       {s.regions.map((r) => {
         const rad = regionRadius(r.pop);
@@ -29,7 +33,7 @@ export function MapSvg({ s, onRegion, armed, pulses }: { s: GameState; onRegion?
             <circle class="region-ring" cx={r.x} cy={r.y} r={rad - 1} fill="none" stroke="var(--tree-hi)" stroke-opacity={Math.min(1, r.tree * 1.1)} stroke-width={2 + r.tree * 6} />
             {pulse && <circle key={pulse.id} class="pulse" cx={r.x} cy={r.y} r={rad} fill="none" stroke={pulse.tone === 'bad' ? 'var(--tree-hi)' : 'var(--gold)'} stroke-width="4" />}
             <text class="region-label" x={r.x} y={r.y - 1} text-anchor="middle">{short(r.name)}</text>
-            <text class="region-sub" x={r.x} y={r.y + 11} text-anchor="middle">{Math.round(r.signups)}{treeOwned ? ' 🌲' : ''}</text>
+            <text class="region-sub" x={r.x} y={r.y + 11} text-anchor="middle">{compact(r.signups)}{treeOwned ? ' 🌲' : ''}</text>
             <rect x={r.x - 16} y={r.y + rad + 2} width="32" height="4" fill="#0b1220" />
             <rect x={r.x - 16} y={r.y + rad + 2} width={32 * r.bear} height="2" fill="var(--bear-hi)" />
             <rect x={r.x - 16} y={r.y + rad + 4} width={32 * r.tree} height="2" fill="var(--tree-hi)" />
@@ -41,7 +45,12 @@ export function MapSvg({ s, onRegion, armed, pulses }: { s: GameState; onRegion?
 }
 
 function short(name: string) {
-  return ({ 'Engineering Quad': 'Eng Quad', 'Local High Schools': 'High Schools', 'Tree University': 'Tree U', 'Career Center': 'Careers', 'Sproul Plaza': 'Sproul' } as Record<string, string>)[name] ?? name;
+  return ({ 'Local High Schools': 'High Schools', 'International Students': 'Intl', 'UC Schools': 'UC', 'B1G Schools': 'B1G', 'SEC Schools': 'SEC', 'ACC Schools': 'ACC' } as Record<string, string>)[name] ?? name;
+}
+
+function compact(v: number) {
+  const a = Math.round(v);
+  return a >= 1000 ? `${(a / 1000).toFixed(1)}k` : String(a);
 }
 
 export function pct(r: { x: number; y: number }) {
@@ -60,7 +69,7 @@ export function HypeMap({ s, onRegion }: { s: GameState; onRegion: (id: RegionId
         {s.bubbles.map((b) => {
           const r = regionOf(b.regionId)!;
           const left = Math.max(0, b.ttl - (s.t - b.spawnedAt));
-          const hazard = b.type === 'fire' || b.type === 'spy' || b.type === 'bsod';
+          const hazard = b.type === 'bsod';
           const jitter = ((b.id * 37) % 30) - 15;
           return (
             <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
@@ -71,8 +80,8 @@ export function HypeMap({ s, onRegion }: { s: GameState; onRegion: (id: RegionId
             </button>
           );
         })}
-        {s.treeMove && (() => {
-          const r = regionOf(s.treeMove.regionId)!;
+        {s.popups[0]?.kind === 'tree' && s.popups[0].regionId && (() => {
+          const r = regionOf(s.popups[0].regionId)!;
           return <div class="tree-marker" style={pct(r)} aria-hidden="true">🌲</div>;
         })()}
         {s.alertQueue[0]?.regionId && (() => {
