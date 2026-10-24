@@ -4,7 +4,7 @@ A real-time comedy tycoon game in the spirit of Plague Inc. You run Bear Hacks f
 
 Interest is free, but attendance is not. Tap **Confirm** to pay for hackers in batches; your money comes only from the starting budget and sponsors. World news, rumors and Tree University's moves arrive as newspaper popups that pause the world, about twice a day. Court sponsors, win the venue auction, and survive hackathon day.
 
-Built with Vite, TypeScript and Preact. It is designed for phones first, runs offline after the first visit, and the whole build is under 2 MB.
+Built with Vite, TypeScript and Preact. It is designed for phones first, runs offline after the first visit, and the whole build (including about 1.7 MB of music) is under 2 MB.
 
 ## Play
 
@@ -35,7 +35,7 @@ src/jokes    mad-lib engine (parser, inflector, validators)
 src/content  jokes.txt, wordbank.txt and structured data (sponsors, alerts, tech tree…)
 src/ui       Preact UI, store and real-time loop
 src/scenes   courting, auction, hackathon day, results
-src/audio    WebAudio placeholder SFX and chiptune
+src/audio    music tracks (menu + in-game) and WebAudio placeholder SFX
 scripts      balance sim, content tools, service worker and zip builders
 docs         decisions.md, balance.md, CREDITS.md
 ```

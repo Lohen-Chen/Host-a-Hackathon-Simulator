@@ -5,7 +5,7 @@ Choices made where the spec left room, or where the human answered a question.
 ## From the human
 
 - **Content:** jokes.txt and wordbank.txt were written from scratch for this build.
-- **Assets:** SFX, music and drawings are placeholders. Sounds are synthesized with WebAudio, and the art is procedural SVG. Both are meant to be replaced.
+- **Assets:** SFX and drawings are placeholders; the music tracks were supplied by the owner (menu loop on the title screen, game loop everywhere else). Sounds are synthesized with WebAudio, and the art is procedural SVG. Both are meant to be replaced.
 - **Scope:** built through M4. QR code and other M5 polish are not included. The optional AI feature stretch is skipped.
 - **"Bay Area FurCon"** stays as the venue auction's rival bidder.
 - **Playtesting** with real people was skipped. Balance relies on the headless sim.

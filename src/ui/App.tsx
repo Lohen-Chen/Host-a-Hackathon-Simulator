@@ -8,12 +8,20 @@ import { Live, Toasts } from './Live';
 import { Intro, Morning, Night, PauseMenu, Title } from './screens';
 import { store, useStore } from './store';
 import { offlineReady, onOfflineReady } from './sw';
+import { sfx } from '../audio/sfx';
 
 export function App() {
   const st = useStore();
   const [ready, setReady] = useState(offlineReady());
   useEffect(() => onOfflineReady(() => setReady(true)), []);
+  // Browsers only allow audio after a gesture: the first tap anywhere starts the music.
+  useEffect(() => {
+    const go = () => sfx.unlock();
+    window.addEventListener('pointerdown', go, { once: true });
+    return () => window.removeEventListener('pointerdown', go);
+  }, []);
   const s = st.state;
+  sfx.setTrack(!s || s.phase === 'intro' ? 'menu' : 'game');
   let screen;
   if (!s) screen = <Title offlineReady={ready} />;
   else {

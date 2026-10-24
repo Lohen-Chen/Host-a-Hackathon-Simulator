@@ -1,5 +1,11 @@
-// Placeholder audio: every SFX and the music loop are synthesized with WebAudio,
-// so the bundle ships zero audio files. Swap in CC0 samples later (docs/CREDITS.md).
+// Audio: SFX are synthesized with WebAudio placeholders (swap in CC0 samples later, docs/CREDITS.md).
+// Music is two looping tracks: one for the title screen, one for the game.
+import gameUrl from './BG_Music.mp3';
+import menuUrl from './Menu_Screen_Music.mp3';
+
+export type Track = 'menu' | 'game';
+const TRACKS: Record<Track, string> = { menu: menuUrl, game: gameUrl };
+const MUSIC_VOL = 0.35;
 type Voice = { f: number; t: number; d: number; type?: OscillatorType; slide?: number; vol?: number };
 
 const PATCHES: Record<string, Voice[]> = {
@@ -18,18 +24,20 @@ const PATCHES: Record<string, Voice[]> = {
   confetti: [{ f: 1200, t: 0, d: 0.05, type: 'triangle' }, { f: 1500, t: 0.05, d: 0.05, type: 'triangle' }, { f: 1800, t: 0.1, d: 0.08, type: 'triangle' }],
 };
 
-const MELODY = [0, 4, 7, 12, 7, 4, 2, 5, 9, 14, 9, 5, 0, 4, 7, 11];
-
 class Sfx {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private muted = false;
   private musicOn = true;
-  private musicTimer = 0;
-  private beat = 0;
+  private track: Track = 'menu';
+  private audio: Partial<Record<Track, HTMLAudioElement>> = {};
+  private unlocked = false;
 
   /** Must be called from a user gesture (first tap). */
   unlock() {
+    if (!this.unlocked) document.addEventListener('visibilitychange', () => this.syncMusic());
+    this.unlocked = true;
+    this.syncMusic();
     if (this.ctx) { void this.ctx.resume(); return; }
     try {
       const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -37,7 +45,6 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : 0.6;
       this.master.connect(this.ctx.destination);
-      this.syncMusic();
     } catch { this.ctx = null; }
   }
 
@@ -48,6 +55,13 @@ class Sfx {
   }
 
   setMusic(on: boolean) { this.musicOn = on; this.syncMusic(); }
+
+  /** Which loop should be playing (title screen vs. in-game). */
+  setTrack(t: Track) {
+    if (t === this.track) return;
+    this.track = t;
+    this.syncMusic();
+  }
 
   play(name: string) {
     const ctx = this.ctx;
@@ -75,17 +89,18 @@ class Sfx {
   }
 
   private syncMusic() {
-    if (typeof window === 'undefined') return;
-    window.clearInterval(this.musicTimer);
-    if (!this.ctx || this.muted || !this.musicOn) return;
-    // A tiny chiptune arpeggio (placeholder for a CC0 loop).
-    this.musicTimer = window.setInterval(() => {
-      if (!this.ctx || document.visibilityState === 'hidden') return;
-      const n = MELODY[this.beat++ % MELODY.length];
-      const bass = this.beat % 4 === 1;
-      this.voice({ f: 262 * Math.pow(2, n / 12), t: 0, d: 0.14, type: 'triangle', vol: 0.035 }, this.ctx.currentTime);
-      if (bass) this.voice({ f: 65.4 * Math.pow(2, MELODY[(this.beat >> 2) * 4 % MELODY.length] / 12), t: 0, d: 0.3, type: 'square', vol: 0.025 }, this.ctx.currentTime);
-    }, 190);
+    if (typeof window === 'undefined' || typeof Audio === 'undefined') return;
+    const want = this.unlocked && !this.muted && this.musicOn && document.visibilityState !== 'hidden' ? this.track : null;
+    for (const [t, el] of Object.entries(this.audio) as [Track, HTMLAudioElement][]) if (t !== want) el.pause();
+    if (!want) return;
+    let el = this.audio[want];
+    if (!el) {
+      el = new Audio(TRACKS[want]);
+      el.loop = true;
+      el.volume = MUSIC_VOL;
+      this.audio[want] = el;
+    }
+    if (el.paused) void el.play().catch(() => { /* blocked until the next tap */ });
   }
 }
 
