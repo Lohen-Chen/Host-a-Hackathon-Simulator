@@ -1,0 +1,828 @@
+# Host a Hackathon Simulator — word bank
+#
+# [category] starts a list. One entry per line.
+# Verbs may spell their forms: base|3s|past|ing  (otherwise the inflector guesses).
+# Nouns may spell their plural: singular|plural.
+# Every [category] here is usable as a slot in jokes.txt, e.g. {food}, {a:adj}, {verb:past}.
+# Keep it PG-13. Punch up at culture, never at real people or real small businesses.
+
+[noun]
+load balancer
+Kubernetes cluster
+pitch deck
+beanbag chair
+group chat
+lanyard
+whiteboard
+extension cord
+swag bag
+standing desk
+energy drink
+spreadsheet
+hoodie
+pull request
+landing page
+waitlist
+mission statement
+mascot suit
+projector
+router
+fog machine
+sticker
+QR code
+org chart
+cap table
+demo
+dashboard
+microservice
+chatbot
+Gantt chart
+keynote
+podium
+vending machine
+group project
+smoke detector
+trophy
+laptop
+folding chair
+pizza box
+bubble tea
+napkin
+sign-up form
+sprint
+roadmap
+mood board
+breakout room
+ring light
+air fryer
+
+[verb]
+pivot|pivots|pivoted|pivoting
+disrupt
+refactor
+deploy
+monetize
+gamify
+livestream
+rebrand
+tokenize
+overthink
+ship|ships|shipped|shipping
+benchmark
+yeet|yeets|yeeted|yeeting
+containerize
+microwave
+unionize
+fork
+rebase
+crowdfund
+microdose
+open-source
+upsell
+A/B test|A/B tests|A/B tested|A/B testing
+hydrate
+optimize
+outsource
+pitch
+email
+sticker-bomb
+retweet
+merge
+debug
+reboot
+laminate
+hot-swap
+power-nap
+speedrun
+doomscroll
+caffeinate
+over-engineer
+whiteboard
+gatekeep
+monologue about
+manifest
+hard-code
+
+[adj]
+disruptive
+serverless
+artisanal
+blockchain-enabled
+AI-powered
+gluten-free
+mission-critical
+web-scale
+cursed
+bespoke
+emotionally unavailable
+pre-revenue
+deeply unserious
+venture-backed
+legally distinct
+slightly haunted
+overclocked
+GPU-hungry
+cloud-native
+synergistic
+handcrafted
+low-code
+no-code
+hyper-local
+agile
+lukewarm
+immutable
+memory-safe
+deprecated
+on-brand
+vibe-coded
+backwards-compatible
+award-adjacent
+suspiciously moist
+enterprise-grade
+crypto-curious
+quantum-ready
+LinkedIn-optimized
+lightly sentient
+mildly flammable
+extremely online
+ironically sincere
+
+[buzzword]
+synergy
+the blockchain
+AGI
+paradigm shift
+growth hacking
+product-market fit
+thought leadership
+the metaverse
+Web3
+generative AI
+a flywheel
+platform play
+north star metric
+10x engineering
+hockey-stick growth
+disruption
+first principles
+a moat
+the creator economy
+vertical integration
+DevRel
+a data lake
+an LLM wrapper
+agentic workflows
+going viral
+deep tech
+"the vibes"
+operational excellence
+
+[food]
+cold pizza
+lukewarm boba
+a single sad bagel
+energy drinks
+discount sushi
+vending-machine ramen
+an entire sheet cake
+burrito-shaped regret
+dry granola bars
+Costco muffins
+garlic fries
+three dozen donuts
+a cheese plate
+gas-station sushi
+nacho cheese
+artisanal toast
+microwave popcorn
+leftover pad thai
+a crate of bananas
+free croissants
+mystery casserole
+cold brew
+oat milk
+a lone celery stick
+a rotisserie chicken
+pizza from 11:59 AM
+
+[animal]
+golden retriever
+emotional support goose
+campus squirrel
+bear cub
+seagull
+pigeon
+corgi
+llama
+capybara
+ferret
+hamster
+labradoodle
+tortoise
+duck
+alpaca
+octopus
+otter
+axolotl
+parrot
+cat
+hedgehog
+goat
+iguana
+pug
+red panda
+
+[bad_idea]
+Tinder for Git branches
+Uber for Uber
+a CRM for houseplants
+an LLM that only says "it depends"
+blockchain for lunch orders
+a smart toaster with a subscription
+NFTs of the group chat
+an app that rates your WiFi's feelings
+a dating app for routers
+Airbnb for parking spots in the metaverse
+a calendar that cancels itself
+a to-do list that judges you
+an AI that writes more AI
+a social network for one person
+Venmo for apologies
+a fitness tracker for your keyboard
+a LinkedIn for pets
+a startup that sells other startups
+a VR whiteboard nobody can see
+a chatbot that only speaks in memes
+a microservice per emoji
+a DAO for the vending machine
+a smart fridge that tweets
+a browser extension for your browser extensions
+a podcast about podcasts
+a dashboard for your dashboards
+
+[startup_name]
+Synergly
+Pivotr
+Disruptify
+Vibely
+Hustlr
+DataLakeHouse.ai
+Mergr
+ByteMe Labs
+Stealth Mode Inc.
+Uberish
+PromptCraft
+CloudyCloud
+NapScale
+Snackchain
+YeetOps
+FlowState.io
+Bandwidthless
+Deckard Decks
+OmniSyn
+Laminatr
+PizzaGPT
+QuantumToast
+Hypothetical Labs
+Meetingly
+FrontEndOfDays
+
+[timeunit]
+week
+semester
+sprint
+lifetime
+fiscal quarter
+hackathon
+midterm season
+finals week
+group project
+startup cycle
+hype cycle
+news cycle
+decade
+weekend
+lunch break
+all-nighter
+standup
+commit history
+academic year
+gap year
+deploy window
+board meeting
+merge window
+spring break
+Tuesday
+
+[insult]
+a walking README
+a 404 in human form
+the human equivalent of a merge conflict
+a pitch deck with legs
+a Kubernetes cluster for a to-do app
+a lanyard with opinions
+the reply-all of people
+a deprecated API
+an unpaid internship
+a loading spinner in a hoodie
+a 47-tab browser window
+a group project's fourth member
+a LinkedIn post that says "Agree?"
+a printer that says "PC LOAD LETTER"
+a meeting that could have been an email
+a semicolon in Python
+a monorepo with feelings
+a captcha nobody can solve
+a TODO comment from 2019
+a "quick sync"
+a demo that works on one machine
+a beta that never left beta
+a Series A with no product
+a cold email with three typos
+a calendar invite titled "chat"
+
+[language]
+Rust
+Go
+Zig
+Haskell
+Perl
+COBOL
+assembly
+Excel macros
+Fortran
+Elixir
+Clojure
+Whitespace (the language)
+Lisp
+OCaml
+Scratch
+PowerPoint animations
+Bash
+Visual Basic
+Prolog
+Lua
+Ruby
+Kotlin
+Erlang
+Nim
+CSS (as a programming language)
+
+[codebase]
+website
+signup form
+flyer generator
+club spreadsheet
+Twitter/X bot
+WiFi
+event calendar
+sponsor portal
+judging app
+group-chat bot
+check-in kiosk
+swag tracker
+pizza-order script
+badge printer
+countdown timer
+volunteer schedule
+QR scanner
+mailing list
+FAQ page
+waitlist form
+livestream overlay
+prize wheel
+leaderboard
+schedule page
+club wiki
+
+[devtool]
+GitLoaf
+StackOverflown
+VS Codeine
+Jiraffe
+Kubernetease
+Dockerer
+npm (no packages manager)
+Postperson
+Figmentation
+Slackline
+Herokuish
+Vercelery
+Gitlabyrinth
+TerraFormal
+Ansiblish
+Jenkinsonian
+Bitbuckets
+ChatBTW
+Copilot-ish
+Notioned
+Lintervention
+Prettierer
+Webpackage
+Babeled
+Grafanatic
+
+[cloud_horror]
+a $4,000 hello-world
+47 replicas of a button
+a bill itemized in kilowatts
+a load balancer for one user
+a 3 AM auto-scaling event
+a database that bills by vibe
+a server named "do-not-delete"
+an S3 bucket full of memes
+a cron job nobody wrote
+a staging environment in production
+a free tier that wasn't
+a GPU running a calculator
+an API key in the README
+a lambda that never sleeps
+a CDN for one PNG
+a $900 log file
+a microservice that only says hi
+a backup of a backup of a backup
+a cluster named "temporary"
+an outage caused by an outage page
+a VPN to the vending machine
+a firewall that blocks the firewall
+a forgotten demo still running
+a region nobody picked
+a container inside a container
+
+[tech_excuse]
+works on my machine
+it's DNS
+that's a feature
+it's cached
+the intern did it
+it's a known issue
+it passed CI
+it's a race condition
+Mercury is in retrograde
+it's a browser thing
+it worked in staging
+the docs are outdated
+someone force-pushed
+it's a timezone bug
+the WiFi did it
+it's an upstream bug
+we're rate limited
+it's eventual consistency
+it's a cosmic ray
+the cache is warm-ish
+it's a "temporary" fix
+the build is flaky
+it's off by one
+that's legacy code
+it's someone else's microservice
+
+[number]
+7
+14
+45
+47
+90
+3
+12
+40
+400
+9,000
+2
+17
+404
+500
+42
+11
+99
+1,200
+6
+300
+8
+64
+128
+1,000
+31
+
+[wifi_excuse]
+thinking about it
+a rumor
+vibes
+on Day 3 of connecting
+buffering emotionally
+"technically connected"
+one bar, spiritually
+in airplane mode by choice
+loading the loading screen
+reconnecting to its past
+asking for the password again
+behind a captive portal
+a suggestion
+on a coffee break
+self-hosted in the parking lot
+negotiating with the router
+a shared hallucination
+redirecting to a login page
+measured in carrier pigeons
+offline for its mental health
+4G of feelings
+pending
+"almost there"
+in its quiet era
+a speed test that never ends
+
+[round]
+pre-seed
+seed
+Series A
+Series B
+Series C
+a bridge round
+"Series D, for the vibes"
+pre-pre-seed
+a friends-and-family round
+a vibes round
+a party round
+a SAFE note on a napkin
+a Series A-minus
+an extension of an extension
+a down round
+a "strategic" round
+a rolling close
+a seed-plus
+a crowdfund from the group chat
+an angel round from one uncle
+a Series Z
+a pre-IPO teaser
+a seed round in Monopoly money
+a "we'll figure it out" round
+a round of applause
+
+[startup_claim]
+pre-idea
+pre-product
+pre-revenue
+pre-shower
+post-hype
+pre-customer
+pre-website
+pre-name
+post-pivot
+pre-team
+pre-coffee
+pre-logic
+pre-demo
+post-truth
+pre-launch since 2019
+pre-plan
+pre-sanity
+pre-pitch
+post-vibes
+pre-everything
+pre-business-model
+post-burnout
+pre-onboarding
+pre-mission
+pre-question
+
+[larp_opener]
+I'm pleased to announce
+Humbled to share
+Thrilled to announce
+Some personal news
+After a lot of reflection, I'm excited to share
+I never thought I'd say this, but
+Big news
+Grateful to announce
+Here's what nobody tells you
+I almost didn't post this, but
+Unpopular opinion
+Today I learned a lesson
+Excited to finally share
+Proud to say
+Can't believe I get to announce
+Reflecting on my journey
+Spent the weekend learning
+Quick story
+I was told not to post this, but
+Life update
+Let's talk about this
+This made me cry at a bus stop
+Personal milestone
+After 3 years of silence
+Hot take
+
+[larp_closer]
+Agree? 👇
+Thoughts?
+Repost if you've ever believed in yourself.
+Like if you cried.
+#Grateful #Hustle #Synergy
+Who else relates? 🙌
+Let that sink in.
+Comment "YES" if you agree.
+Onward.
+And that's the real lesson.
+DMs are open.
+Follow for more leadership lessons.
+Proud of this team. 🚀
+The grind never stops.
+#OpenToWork #OpenToVibes
+Humbled. Grateful. Disrupting.
+What would you have done?
+More soon. 👀
+Tag someone who needs this.
+That's it. That's the post.
+Let's connect!
+Stay hungry.
+#NoDaysOff
+Swipe for 11 more lessons. ➡️
+The future is now.
+
+[percent]
+7%
+7.0001%
+a small 7%
+standard 7%
+a "tiny" 7%
+7% plus a hoodie
+7%, but spiritually 30%
+7% (non-negotiable)
+seven-ish percent
+7% and a board seat
+7% and naming rights
+7%, pre-money
+7% of the vibes
+7% for the brand
+a modest 7%
+7% plus "advisory"
+7% of the club dog
+an industry-standard 7%
+7% (founder-friendly)
+7% with a vesting cliff
+a rounding-error 7%
+7% and your weekends
+7% of future pizza
+7% and your firstborn spreadsheet
+7%, as a treat
+
+[first_name]
+Brayden
+Mei
+Gavin
+Priya
+Jaden
+Sofia
+Tyler
+Aisha
+Dmitri
+Kai
+Ellie
+Marcus
+Hana
+Diego
+Zoe
+Rohan
+Lily
+Omar
+Grace
+Felix
+Nadia
+Leo
+Ruby
+Sam
+Ava
+
+[surname]
+Pivot
+Linux
+Kernel
+Hashmap
+Vimsworth
+Overclock
+Stacktrace
+Bytesmith
+Gitman
+Sudo
+Lambda
+Cachefield
+Shipwright
+Mergewell
+Debugsky
+Lintley
+Pingston
+Nullman
+Commitson
+Hotfix
+Fork
+Blockchainz
+Deploy
+Synergé
+Async
+
+[department]
+Finance
+Marketing
+Accounts Payable
+the Group Chat
+Legal (allegedly)
+the Basement
+Growth
+Operations
+DevRel
+Vibes
+the Library
+HR
+Compliance
+Procurement
+the Snack Committee
+Facilities
+IT
+Brand Strategy
+Pizza Logistics
+the Dean's Office
+Sales
+the Mailroom
+Partnerships
+Customer Success
+Product
+
+[place]
+Soda Hall
+the Main Stacks
+Sproul Plaza
+the Campanile
+the Engineering Quad
+a laundromat
+the bus stop
+Memorial Glade
+the dining hall
+a 24-hour diner
+the parking structure
+the Bay Bridge
+a coffee shop with no outlets
+the dorm lounge
+the library basement
+the rooftop
+the stairwell
+the student union
+a vending machine alcove
+the career fair
+the ASUC office
+the Faculty Glade
+a lecture hall
+a group study room
+a broom closet
+
+[gadget]
+smart fridge
+VR headset
+mechanical keyboard
+drone
+fidget spinner
+label maker
+ring light
+smartwatch
+e-scooter
+air purifier
+3D printer
+Raspberry Pi
+foldable phone
+Bluetooth toaster
+USB hub
+noise-cancelling headphones
+standing desk
+graphing calculator
+walkie-talkie
+karaoke machine
+robot vacuum
+laser pointer
+espresso machine
+hoverboard
+pager
+
+[emotion]
+existential dread
+quiet confidence
+unearned swagger
+main-character energy
+mild panic
+chaotic optimism
+deep regret
+startup delusion
+caffeinated joy
+imposter syndrome
+pure spite
+second-hand embarrassment
+burnout chic
+wholesome chaos
+competitive smugness
+loud humility
+Sunday scaries
+founder energy
+group-project trauma
+inexplicable hope
+fear of missing out
+post-demo euphoria
+tab-induced anxiety
+sleep-deprived wisdom
+cautious hype
