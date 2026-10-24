@@ -37,8 +37,29 @@ self.addEventListener('message', async (e) => {
   const have = await c.keys();
   if (have.length >= URLS.length && e.source) e.source.postMessage('precached');
 });
+// Audio/video ask for byte ranges. Safari refuses to play media from a plain 200, so slice
+// the cached file into a proper 206 Partial Content response.
+async function ranged(req) {
+  const hit = await caches.match(req, { ignoreSearch: true, ignoreVary: true });
+  if (!hit) return fetch(req);
+  const buf = await hit.arrayBuffer();
+  const size = buf.byteLength;
+  const m = /bytes=(\\d*)-(\\d*)/.exec(req.headers.get('range') || '');
+  let start = 0;
+  let end = size - 1;
+  if (m && m[1]) { start = Number(m[1]); if (m[2]) end = Math.min(size - 1, Number(m[2])); }
+  else if (m && m[2]) start = Math.max(0, size - Number(m[2]));
+  if (start >= size) return new Response(null, { status: 416, headers: { 'Content-Range': 'bytes */' + size } });
+  return new Response(buf.slice(start, end + 1), { status: 206, headers: {
+    'Content-Type': hit.headers.get('Content-Type') || 'audio/mpeg',
+    'Content-Range': 'bytes ' + start + '-' + end + '/' + size,
+    'Content-Length': String(end - start + 1),
+    'Accept-Ranges': 'bytes',
+  } });
+}
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  if (e.request.headers.has('range')) { e.respondWith(ranged(e.request)); return; }
   e.respondWith(caches.match(e.request, { ignoreSearch: true, ignoreVary: true }).then((hit) => hit || fetch(e.request).catch(() => caches.match('./'))));
 });
 `;
