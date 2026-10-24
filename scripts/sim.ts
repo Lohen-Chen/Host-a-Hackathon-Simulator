@@ -35,6 +35,13 @@ for (const [name, cfg] of BOTS) {
   const signups: number[] = [];
   const treeSign: number[] = [];
   const treeRegions: number[] = [];
+  const confirmed: number[] = [];
+  const endBudget: number[] = [];
+  const attendees: number[] = [];
+  const treeAtt: number[] = [];
+  const pausesPerDay: number[] = [];
+  const rumors: number[] = [];
+  const venues: Record<string, number> = {};
   const cats: Record<string, number[]> = {};
   const usage: Record<string, number> = {};
   const overall: Record<string, number> = {};
@@ -50,6 +57,13 @@ for (const [name, cfg] of BOTS) {
     signups.push(s.signups);
     treeSign.push(s.treeSignups);
     treeRegions.push(treeRegionCount(s));
+    confirmed.push(s.confirmed);
+    endBudget.push(s.budget);
+    attendees.push(res.attendees);
+    treeAtt.push(res.treeAttendees);
+    pausesPerDay.push(s.log.filter((l) => l.kind === 'popup' || (l.kind.startsWith('alert:') && l.kind !== 'alert:sponsor_invite')).length / 7);
+    rumors.push(s.log.filter((l) => l.kind === 'rumor').length);
+    venues[s.venue ?? 'lawn'] = (venues[s.venue ?? 'lawn'] ?? 0) + 1;
     if (res.win) wins++;
     for (const c of res.bear.categories) (cats[c.name] = cats[c.name] ?? []).push(c.value);
     const keys = [
@@ -73,6 +87,8 @@ for (const [name, cfg] of BOTS) {
   const common = frequent.filter((f) => f.lift <= 1.15).map((f) => `${label(f.k)} ${(100 * f.top).toFixed(0)}%`);
   console.log(`■ ${name.padEnd(13)} score ${fmt(scores)} · beats Tree ${(100 * wins / Math.max(1, scores.length)).toFixed(0)}% · stuck ${stuck}`);
   console.log(`  signups ${fmt(signups)} · Tree signups med ${q(treeSign, 0.5).toFixed(0)} · Tree regions med ${q(treeRegions, 0.5)} (p10 ${q(treeRegions, 0.1)}, p90 ${q(treeRegions, 0.9)})`);
+  console.log(`  confirmed ${fmt(confirmed)} · attendees med ${q(attendees, 0.5).toFixed(0)} vs Tree ${q(treeAtt, 0.5).toFixed(0)} · end budget ${fmt(endBudget)} · pauses/day ${q(pausesPerDay, 0.5).toFixed(1)} · rumors ${q(rumors, 0.5)}`);
+  console.log(`  venues ${Object.entries(venues).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round((100 * v) / scores.length)}%`).join(' · ')}`);
   console.log(`  ${Object.entries(cats).map(([k, v]) => `${k.split(' ')[0]} ${q(v, 0.5)}`).join(' · ')}`);
   if (dominant.length) console.log(`  DOMINANT (top-decile >80%, lift >1.15): ${dominant.join(', ')}`);
   if (common.length) console.log(`  common everywhere (not dominant): ${common.join(', ')}`);

@@ -35,7 +35,7 @@ function setupLot(s: GameState) {
   const scout = Math.min(0.15, s.scoutPoints * 0.025);
   a.bidders = BIDDERS.filter((b) => !(b.id === 'tree' && s.treeVenue)).map((b) => {
     let th = randRange(s, b.fold[0], b.fold[1]) + (b.venueBias?.[v.id] ?? 0);
-    if (b.id === 'tree') th += 0.25 * Number(s.flags.treeAggro ?? 0);
+    if (b.id === 'tree') th += 0.25 * (s.unlockedTech.includes('clapback') ? 0.5 : 1); // Tree always bids aggressively
     if (b.id === 'tammy' && s.flags.tammy === 'angry') th += 0.25;
     if (b.id === 'tammy' && s.flags.tammy === 'calm') th -= 0.1;
     th *= 1 - scout;

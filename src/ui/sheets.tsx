@@ -4,10 +4,10 @@ import { MISMATCH_TOOLTIPS, ROLE_INFO, TASK_INFO, TRAITS } from '../content/memb
 import { POST_BY_ID } from '../content/posts';
 import { PROMISES } from '../content/promises';
 import { SPONSOR_BY_ID, TIER_INFO } from '../content/sponsors';
-import { TECH, type TechNode } from '../content/techTree';
+import { BRANCHES, TECH } from '../content/techTree';
 import {
-  armPost, assign, buyTech, canAssign, canFire, chargesLeft, effectiveSkill, equityCut, inviteChance, isMatch,
-  maxCharges, reroll, techState, viralChance, type GameState, type Member, type Task,
+  armPost, assign, bar, buyTech, canAssign, canFire, chargesLeft, effectiveSkill, equityCut, inviteChance, isMatch,
+  maxCharges, reroll, techState, viralChance, type GameState, type Member, type Task, type TechBranch, type TechId,
 } from '../core';
 import { Avatar } from './art';
 import { store } from './store';
@@ -89,29 +89,56 @@ export function PostsSheet({ s, close }: { s: GameState; close: () => void }) {
           </button>
         );
       })}
-      <div class="tiny dim">Tap a card to arm it, then tap a region on the map. Each Social member on the Social task adds a charge (max 3). Frat Row loves 🎉 party posts (×2) and leaves everything else on read (×0.5).</div>
+      <div class="tiny dim">Tap a card to arm it, then tap a region on the map. Each Social member on the Social task adds a charge (max 3). Frat Row loves 🎉 party posts (×2, spilling to every neighbor) and leaves everything else on read (×0.5).</div>
     </div>
   );
 }
 
+/** Plague Inc-style evolution menu: three bars on top, branch tabs, a grid of nodes, detail + Evolve. */
 export function TechSheet({ s }: { s: GameState }) {
-  const [tab, setTab] = useState<TechNode['branch']>('Organization');
-  const nodes = TECH.filter((t) => t.mvp && t.branch === tab);
+  const [tab, setTab] = useState<TechBranch>('hype');
+  const [sel, setSel] = useState<TechId | null>(null);
+  const nodes = TECH.filter((t) => t.branch === tab);
+  const n = sel ? TECH.find((t) => t.id === sel) : null;
+  const st = n ? techState(s, n.id) : null;
   return (
     <div class="col">
-      <div class="sheet-head"><h3>🔬 Tech · {s.techPoints} TP</h3>
-        <div class="tabs">{(['Organization', 'Advertisement', 'Talent'] as const).map((b) => <button key={b} class={`tab ${tab === b ? 'active' : ''}`} onClick={() => setTab(b)}>{b.slice(0, 5)}</button>)}</div></div>
-      {nodes.map((n) => {
-        const st = techState(s, n.id);
-        return (
-          <button key={n.id} class={`tech-node ${st}`} disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
-            <div class="row"><b class="grow">{n.name}</b><span class={st === 'owned' ? 'good' : 'gold'}>{st === 'owned' ? '✓ owned' : `${n.cost} TP`}</span></div>
-            <div class="tiny">{n.effect}{n.prereq ? ` (needs ${TECH.find((t) => t.id === n.prereq)?.name})` : ''}</div>
-            <div class="tiny dim">{flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
-          </button>
-        );
-      })}
-      <div class="tiny dim">Organizers on Research make TP. +2 TP/day free. Ending the day early gives +1 TP.</div>
+      <div class="sheet-head"><h3>🧬 Evolve</h3><span class="chip gold">🔬 {s.techPoints} TP</span></div>
+      <div class="bars">
+        {BRANCHES.map((b) => (
+          <div key={b.id} class={`bar-row bar-${b.id}`} title={b.blurb}>
+            <span class="bar-label">{b.icon} {b.name}</span>
+            <span class="bar-track"><span class="bar-fill" style={{ width: `${bar(s, b.id)}%` }} /></span>
+            <span class="bar-val">{bar(s, b.id)}</span>
+          </div>
+        ))}
+      </div>
+      <div class="tabs evo-tabs">{BRANCHES.map((b) => <button key={b.id} class={`tab ${tab === b.id ? 'active' : ''}`} onClick={() => { setTab(b.id); setSel(null); }}>{b.icon} {b.name}</button>)}</div>
+      <div class="tiny dim">{BRANCHES.find((b) => b.id === tab)!.blurb}</div>
+      <div class="evo-grid">
+        {nodes.map((t) => {
+          const ts = techState(s, t.id);
+          return (
+            <button key={t.id} class={`evo-node ${ts} ${sel === t.id ? 'sel' : ''}`} onClick={() => setSel(sel === t.id ? null : t.id)} aria-label={`${t.name}, ${ts}`}>
+              <span class="evo-name">{t.name}</span>
+              <span class="evo-cost">{ts === 'owned' ? '✓' : ts === 'locked' ? '🔒' : `${t.cost} TP`}</span>
+            </button>
+          );
+        })}
+      </div>
+      {n && st && (
+        <div class="card evo-detail">
+          <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {k}</span>)}</div>
+          <div class="small">{n.effect}{n.prereq ? ` (needs ${TECH.find((t) => t.id === n.prereq)?.name})` : ''}</div>
+          <div class="tiny dim">{flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
+          {st !== 'owned' && (
+            <button class="btn btn-gold" disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
+              {st === 'locked' ? 'Locked' : st === 'poor' ? `Need ${n.cost} TP` : `🧬 Evolve (${n.cost} TP)`}
+            </button>
+          )}
+        </div>
+      )}
+      <div class="tiny dim">Earn TP from 💡 bubbles and Organizers on Research. Rumors can unlock nodes for free. Every node also grows your interested pool a little.</div>
     </div>
   );
 }
@@ -122,7 +149,7 @@ export function SponsorsSheet({ s }: { s: GameState }) {
     <div class="col">
       <div class="sheet-head"><h3>💼 Sponsors</h3><span class="chip">Invite chance {Math.round(inviteChance(s) * 100)}%/roll</span></div>
       <div class="chip" style={{ alignSelf: 'flex-start' }}>📊 Cap Table: You {100 - eq}% · Your club 0% · {eq ? `YSee/advisors ${eq}% · ` : ''}The hoodie 7%{equityCut(s) ? ` · sponsor payments −${equityCut(s)}%` : ''}</div>
-      {s.sponsors.length === 0 && <div class="small dim">No sponsors yet. Put a Coordinator on Sponsors, post on LinkedIn at the Career Center, and catch 🎁 bubbles.</div>}
+      {s.sponsors.length === 0 && <div class="small dim">No sponsors yet. Sponsors are your only income after the starting budget. Put a Coordinator on Sponsors and post on LinkedIn.</div>}
       {s.sponsors.map((x) => {
         const d = SPONSOR_BY_ID[x.id];
         const ps = s.promises.filter((p) => p.sponsorId === x.id);

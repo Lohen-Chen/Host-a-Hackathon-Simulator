@@ -13,10 +13,10 @@
 [headline|bear]   Bear club president seen {verb:ing} {a:noun} at 2 AM; "for the culture"
 [headline|bear]   {member} named Chief {Noun} Officer; duties unclear, title laminated
 [headline|bear]   Bear hackathon hits {signups} signups; club treasurer faints into {a:noun}
-[headline|bear needs=signups>250]   {signups} hackers signed up; club now needs {number} more extension cords
-[headline|bear needs=signups>500]   Bear U passes {signups} signups; Facilities asks "how many is that in pizzas"
-[headline|bear needs=lead>50]   Bear U leads Tree by {lead}; club president practices humble face
-[headline|bear needs=lead<-50]   Bear U trails Tree by a lot; club pivots to "it's about the journey"
+[headline|bear needs=signups>2000]   {signups} hackers signed up; club now needs {number} more extension cords
+[headline|bear needs=signups>4000]   Bear U passes {signups} signups; Facilities asks "how many is that in pizzas"
+[headline|bear needs=lead>400]   Bear U leads Tree by {lead}; club president practices humble face
+[headline|bear needs=lead<-400]   Bear U trails Tree by a lot; club pivots to "it's about the journey"
 [headline|bear]   Club meeting runs 3 hours; agenda item one was "what is {a:noun}"
 [headline|bear]   {member} {verb:past} the club {codebase}; nobody asked
 [headline|bear]   Bear hackathon logo redesigned {number} times; now just a bear holding {a:noun}
@@ -33,7 +33,7 @@
 [headline|tree]   {rival} hires {number} interns to "manage the vibes"
 [headline|tree]   {rival} WiFi password leaked: "synergy{number}"
 [headline|tree]   {rivalceo} posts photo of his hackathon badge; caption: "humbled"
-[headline|tree needs=treesignups>300]   {rival} hits {treesignups} signups; {rivalceo} buys a second phone
+[headline|tree needs=treesignups>2500]   {rival} hits {treesignups} signups; {rivalceo} buys a second phone
 [headline|tree]   {rival} offers {food} to anyone who says "{buzzword}"
 [headline|tree]   Tree swag bag leaked: one {gadget} and a QR code to {a:noun}
 [headline|sponsor]   {sponsor} unveils {a:noun} for hackers who {verb} too much
@@ -182,25 +182,25 @@
 [outcome|party]   Someone brought {a:gadget}. It is now the DJ.
 
 # ─────────────────────────────── BUBBLES (one-liner on pop) ───────────────────────────────
-[bubble|donor]   An alum paid you to stop emailing them.
-[bubble|donor]   A donor sent money "for {food}, specifically."
-[bubble|donor]   A parent Venmo'd you with the memo "{buzzword}?"
-[bubble|donor]   Found cash in an old {noun}. Finders keepers.
 [bubble|idea]   Shower thought: what if {bad_idea}?
 [bubble|idea]   {member} had an idea. It's {a:adj} idea.
 [bubble|idea]   A {animal} gave you a business idea. You took notes.
-[bubble|buzz]   Someone in {region} said "wait, there's {food}?"
-[bubble|buzz]   Word is spreading in {region} like {food} on a hot day.
-[bubble|pizza]   Pizza secured. It arrived at 11:59 AM, as foretold.
-[bubble|pizza]   {Food} acquired. Morale +1. Cholesterol +2.
-[bubble|lead]   {sponsor} slid into the club's DMs.
-[bubble|lead]   A recruiter left a business card shaped like {a:noun}.
-[bubble|fire]   Fire out. It was {a:noun} and a dream.
-[bubble|fire]   Extinguished. The {noun} will be missed.
-[bubble|spy]   Caught a Tree spy wearing a fake mustache and a lanyard.
-[bubble|spy]   The spy confessed everything, then asked for {food}.
-[bubble|party]   Frat Row heard "free {food}" and RSVP'd immediately.
-[bubble|party]   Party invite accepted. {member} is already dancing.
+[bubble|idea]   Someone in {region} asked a good question. You wrote it down.
+[bubble|idea]   Eureka! It was {a:noun} the whole time.
+[bubble|idea]   {member} read the docs. Everyone is stunned.
+[bubble|idea]   A whiteboard in {region} was full of genius. You took a photo.
+[bubble|idea]   Research note: hackers will do anything for {food}.
+[bubble|idea]   {member} taught {buzzword} to {a:animal}.
+[bubble|idea]   Found a napkin sketch in {region}. It's a whole roadmap.
+[bubble|idea]   A Stack Overflow answer from 2011 changed everything.
+[bubble|idea]   {member} stared at a wall for an hour. The wall had answers.
+[bubble|idea]   Overheard in {region}: "wait, what if {bad_idea}?" Stolen.
+[bubble|idea]   A sleep-deprived epiphany. Mostly about {food}. Still counts.
+[bubble|idea]   The intern asked "why?" five times. Root cause found.
+[bubble|idea]   {member} drew a diagram with too many arrows. It works, though.
+[bubble|idea]   A survey in {region} came back. People want {food}.
+[bubble|idea]   Insight: nobody reads emails, but everybody reads memes.
+[bubble|idea]   Tree's slide deck leaked. It's mostly synergy. Noted.
 [bubble|bsod]   Have you tried turning it off and on again? It worked. It always works.
 
 # ─────────────────────────────── TAUNTS (venue auction & Tree) ───────────────────────────────

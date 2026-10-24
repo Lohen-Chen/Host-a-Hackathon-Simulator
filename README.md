@@ -1,6 +1,8 @@
 # Host a Hackathon Simulator
 
-A real-time comedy tycoon game. You run the Golden Bear hackathon for one chaotic week and try to get more hackers than Tree University. Hire a crew, fire posts at regions on a live hype map, pop bubbles, and answer timed alerts before they time out ("Someone suggested we rewrite it in Rust"). Court sponsors, win the venue auction, and survive hackathon day.
+A real-time comedy tycoon game in the spirit of Plague Inc. You run Bear Hacks for one chaotic week and try to get more hackers than Tree University. Hype spreads across a map of 10,000 students in eight regions (Twitter, Frat Row, Local Highschool, International students, B1G, SEC, UC and ACC). Pop bubbles for tech points and spend them in the Evolve menu on three bars: Hype, Talent and Conversion. Rumors can mutate your tech tree for free ("rumor started of free pizza party").
+
+Interest is free, but attendance is not. Tap **Confirm** to pay for hackers in batches; your money comes only from the starting budget and sponsors. World news, rumors and Tree University's moves arrive as newspaper popups that pause the world, about twice a day. Court sponsors, win the venue auction, and survive hackathon day.
 
 Built with Vite, TypeScript and Preact. It is designed for phones first, runs offline after the first visit, and the whole build is under 2 MB.
 
@@ -10,7 +12,7 @@ Built with Vite, TypeScript and Preact. It is designed for phones first, runs of
 - **Standard**: about 10 minutes (60 s days)
 - **Full**: about 17 minutes (120 s days)
 
-The game saves at day boundaries in `localStorage`. Settings include mute, music and a relaxed mode with longer alert timers.
+The game saves at day boundaries in `localStorage`. Settings include mute and music.
 
 ## Develop
 

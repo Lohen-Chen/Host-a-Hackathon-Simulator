@@ -1,14 +1,17 @@
 // The real-time event layer (Section 6.5): scheduling, bubbles, ticker, alerts.
 import { ALERTS, ALERT_BY_ID } from '../content/alerts';
 import { ROLE_INFO } from '../content/members';
+import { NEWS, NEWS_BY_ID } from '../content/news';
 import { SPONSOR_BY_ID } from '../content/sponsors';
 import { MODES, T } from './config';
 import type { AlertDef, Effects, Outcome } from './effects';
 import { addRep, addTicker, chargesLeft, fx, log, memberById, pickInviteSponsor, rngPickRegion, taskSkillSum } from './helpers';
 import { fill, joke, regionName, type SlotOverrides } from './jokes';
 import { bearImpulse, treeImpulse } from './map';
+import { showPopup } from './popups';
 import { chance, clamp, pick, rand, randInt, randRange, weighted } from './rng';
-import { revealNextMove, scheduleTreeMoves, startTreeMove } from './tree';
+import { startRumor } from './tech';
+import { scheduleTreeMoves, startTreeMove } from './tree';
 import type { ActiveAlert, AlertCtx, BubbleType, GameState, RegionId, TickerCat } from './types';
 
 // ─────────────────────────────── scheduling ───────────────────────────────
@@ -37,12 +40,32 @@ export function scheduleDay(s: GameState) {
     const t = placeTimes(s, taken, 1, 3, D - 6)[0] ?? randRange(s, 3, D - 6);
     s.schedule.push({ at: t, kind: 'bubble', data: 'bsod' }); taken.push(t); bsodPlaced = true;
   }
-  // Alerts (with optional foreshadowing 5–8 s earlier).
+  // Each day from Day 2 gets exactly one "special": a world-news headline or a rumor (tech mutation),
+  // drawn from what's left. Decisions fill the rest of the day's pause budget, so the world stops
+  // about twice a day.
+  let specials = 0;
+  if (s.day >= 2) {
+    const pool: string[] = NEWS.filter((n) => !s.firedAlerts.includes(`news:${n.id}`)).map((n) => n.id);
+    const rumorsLeft = T.maxRumors - Number(s.flags.rumors ?? 0) - Number(s.flags.rumorsPlanned ?? 0);
+    for (let i = 0; i < rumorsLeft; i++) pool.push('rumor');
+    if (pool.length) {
+      const id = pick(s, pool);
+      if (id === 'rumor') s.flags.rumorsPlanned = Number(s.flags.rumorsPlanned ?? 0) + 1;
+      else s.firedAlerts.push(`news:${id}`);
+      const [t] = placeTimes(s, taken, 1, D * 0.2, D * 0.8);
+      s.schedule.push({ at: t ?? randRange(s, D * 0.2, D * 0.8), kind: 'news', data: id });
+      if (t !== undefined) taken.push(t);
+      specials = 1;
+    }
+  }
+  const treeMoves = s.schedule.filter((e) => e.kind === 'treeMove').length;
+  // Alerts: decisions that pause the world (with optional foreshadowing 5–8 s earlier).
   const alertIds: string[] = [];
   if (s.day >= 2 && s.treeSignups - s.signups > T.rubberBand) alertIds.push('tree_stumble');
   if (s.day >= 3 && !s.firedAlerts.includes('ysee_afterparty') && s.sponsors.some((x) => x.id === 'ysee')) alertIds.push('ysee_afterparty');
   const forced = alertIds.length;
-  while (alertIds.length < cfg.alerts + forced) {
+  const room = Math.min(cfg.alerts, Math.max(0, cfg.popupsPerDay - treeMoves - specials - forced));
+  while (alertIds.length < room + forced) {
     const a = pickAlert(s, alertIds);
     if (!a) break;
     alertIds.push(a.id);
@@ -96,17 +119,12 @@ export function tickEvents(s: GameState, dt: number) {
       case 'foreshadow': addTicker(s, ev.data === 'headline|fs_tree' ? 'TREE TIMES' : 'BREAKING', joke(s, ev.data!)); break;
       case 'invite': rollInvite(s, ev.data); break;
       case 'treeMove': startTreeMove(s, ev.data!); break;
+      case 'news': fireNews(s, ev.data!); break;
     }
   }
   // Bubbles expire.
   for (const b of [...s.bubbles]) {
     if (s.t - b.spawnedAt >= b.ttl) expireBubble(s, b.id);
-  }
-  // Active alert countdown.
-  const a = s.alertQueue[0];
-  if (a) {
-    a.remaining -= dt;
-    if (a.remaining <= 0) resolveAlert(s, a.defaultChoice, true);
   }
   // Ticker.
   s.tickerT += dt;
@@ -129,14 +147,25 @@ export function tickerHeadline(s: GameState) {
   addTicker(s, cat, joke(s, key));
 }
 
+// ─────────────────────────────── world news ───────────────────────────────
+
+export function fireNews(s: GameState, id: string) {
+  if (id === 'rumor') {
+    s.flags.rumorsPlanned = Math.max(0, Number(s.flags.rumorsPlanned ?? 0) - 1);
+    if (Number(s.flags.rumors ?? 0) < T.maxRumors) startRumor(s);
+    return;
+  }
+  const n = NEWS_BY_ID[id];
+  if (!n) return;
+  applyEffects(s, n.fx, { filled: {} });
+  showPopup(s, { kind: 'news', icon: n.icon, title: n.title, body: n.body, effect: n.effect, regionId: 'b1g' }, false);
+  log(s, 'news', id);
+}
+
 // ─────────────────────────────── bubbles ───────────────────────────────
 
-const BUBBLE_WEIGHTS: [BubbleType, number][] = [
-  ['donor', 18], ['idea', 14], ['buzz', 16], ['pizza', 11], ['lead', 8], ['fire', 11], ['spy', 8], ['party', 8],
-];
-export const BUBBLE_ICON: Record<BubbleType, string> = {
-  donor: '💵', idea: '💡', buzz: '📈', pizza: '🍕', lead: '🎁', fire: '🔥', spy: '🕵️', party: '🎉', bsod: '🟦',
-};
+// Bubbles are Plague Inc DNA: they only ever give tech points.
+export const BUBBLE_ICON: Record<BubbleType, string> = { idea: '💡', eureka: '🧬', bsod: '🟦' };
 
 export function spawnBubble(s: GameState, type?: BubbleType, regionId?: RegionId) {
   if (s.bubbles.length >= T.maxBubbles) {
@@ -144,9 +173,9 @@ export function spawnBubble(s: GameState, type?: BubbleType, regionId?: RegionId
     if (type !== 'bsod') return;
     s.bubbles.shift();
   }
-  let rid = regionId ?? rngPickRegion(s, { frat: 1.6 });
-  const t = type ?? weighted(s, BUBBLE_WEIGHTS, ([bt, w]) => (bt === 'party' && rid === 'frat' ? w * 3 : w))[0];
-  if (t === 'party' && !regionId && rand(s) < 0.5) rid = 'frat';
+  // Bubbles pop up where Bear Hacks is known, like DNA bubbles over infected countries.
+  const rid = regionId ?? weighted(s, s.regions, (r) => 0.15 + r.bear).id;
+  const t: BubbleType = type ?? (rand(s) < 0.15 ? 'eureka' : 'idea');
   s.bubbles.push({ id: ++s.uid, type: t, regionId: rid, spawnedAt: s.t, ttl: T.bubbleTtl });
   s.lastInteractiveAt = s.t;
 }
@@ -156,21 +185,12 @@ export function tapBubble(s: GameState, id: number): boolean {
   if (!b) return false;
   s.bubbles = s.bubbles.filter((x) => x.id !== id);
   const o: SlotOverrides = { region: regionName(s, b.regionId) };
-  let pop = '';
-  switch (b.type) {
-    case 'donor': { const v = Math.round((randInt(s, 200, 800) * (1 + s.reputation / 200)) / 10) * 10; s.budget += v; pop = `+$${v}`; break; }
-    case 'idea': { const v = randInt(s, 1, 3); s.techPoints += v; pop = `+${v} TP`; break; }
-    case 'buzz': bearImpulse(s, b.regionId, 0.07); pop = '+hype'; break;
-    case 'pizza': s.moodBank += 1; pop = '+mood'; break;
-    case 'lead': { const sp = pickInviteSponsor(s); if (sp) queueAlert(s, 'sponsor_invite', { sponsorId: sp }, 8); pop = 'Sponsor lead!'; break; }
-    case 'fire': pop = 'Extinguished!'; break;
-    case 'spy': s.treeHype = Math.max(0, s.treeHype - 3); revealNextMove(s); pop = 'Spy caught! −3 Tree hype'; break;
-    case 'party': bearImpulse(s, 'frat', 0.07 * 2, 0.5, ['dorms', 'sproul']); s.moodBank += 1; pop = '🎉 party hype'; break;
-    case 'bsod': s.flags.bsod = 'rebooted'; pop = 'Rebooted!'; log(s, 'bsod', 'rebooted'); break;
-  }
-  fx(s, { kind: 'pop', regionId: b.regionId, text: pop, tone: 'good' });
-  fx(s, { kind: 'toast', text: joke(s, `bubble|${b.type === 'lead' ? 'lead' : b.type}`, o), tone: 'neutral' });
-  fx(s, { kind: 'sfx', sfx: b.type === 'donor' ? 'cash' : b.type === 'fire' ? 'pop' : 'pop' });
+  const tp = b.type === 'eureka' ? 3 : b.type === 'bsod' ? 2 : randInt(s, 1, 2);
+  s.techPoints += tp;
+  if (b.type === 'bsod') { s.flags.bsod = 'rebooted'; log(s, 'bsod', 'rebooted'); }
+  fx(s, { kind: 'pop', regionId: b.regionId, text: `+${tp} TP`, tone: 'good' });
+  fx(s, { kind: 'toast', text: joke(s, `bubble|${b.type === 'bsod' ? 'bsod' : 'idea'}`, o), tone: 'neutral' });
+  fx(s, { kind: 'sfx', sfx: 'pop' });
   log(s, `bubble:${b.type}`, 'tap');
   if (s.tutorialStep === 0) s.tutorialStep = 1;
   return true;
@@ -180,11 +200,7 @@ function expireBubble(s: GameState, id: number) {
   const b = s.bubbles.find((x) => x.id === id);
   if (!b) return;
   s.bubbles = s.bubbles.filter((x) => x.id !== id);
-  switch (b.type) {
-    case 'fire': addRep(s, -5); s.moodBank -= 1; fx(s, { kind: 'pop', regionId: b.regionId, text: '🔥 −5 rep', tone: 'bad' }); fx(s, { kind: 'sfx', sfx: 'fire' }); addTicker(s, 'BREAKING', `BREAKING: Dumpster fire in ${regionName(s, b.regionId)} "mostly metaphorical," says Bear U`); break;
-    case 'spy': s.treeHype += 2; fx(s, { kind: 'pop', regionId: b.regionId, text: 'Spy escaped. +2 Tree hype', tone: 'bad' }); break;
-    case 'bsod': s.flags.bsod = 'haunted'; log(s, 'bsod', 'haunted'); fx(s, { kind: 'toast', text: 'The Blue Screen faded away… for now. 👻', tone: 'bad' }); break;
-  }
+  if (b.type === 'bsod') { s.flags.bsod = 'haunted'; log(s, 'bsod', 'haunted'); fx(s, { kind: 'toast', text: 'The Blue Screen faded away… for now. 👻', tone: 'bad' }); }
   log(s, `bubble:${b.type}`, 'miss');
 }
 
@@ -192,8 +208,7 @@ function expireBubble(s: GameState, id: number) {
 
 export function inviteChance(s: GameState): number {
   const coord = taskSkillSum(s, 'sponsors', 'coordinator');
-  const careerBonus = s.regions.find((r) => r.id === 'career')!.bear * 0.1;
-  return clamp(T.inviteBase + T.invitePerCoord * coord + s.inviteBonus + careerBonus, 0, T.inviteCap);
+  return clamp(T.inviteBase + T.invitePerCoord * coord + s.inviteBonus, 0, T.inviteCap);
 }
 
 function rollInvite(s: GameState, forced?: string) {
@@ -231,15 +246,12 @@ export function queueAlert(s: GameState, id: string, ctxIn: Partial<AlertCtx> = 
   if (id === 'sponsor_invite' && interestBonus) ctx.filled.bonus = String(interestBonus);
   const title = typeof def.title === 'function' ? def.title(s) : def.title;
   const body = typeof def.body === 'function' ? def.body(s) : def.body;
-  const seconds = (def.seconds ?? T.alertSeconds) * (s.settings.relaxed ? 2 : 1);
   const alert: ActiveAlert = {
     uid: ++s.uid,
     templateId: id,
     title: fill(s, title, ctx.filled),
     body: fill(s, body, ctx.filled),
     choices: def.choices.map((c) => ({ label: c.label, cost: c.cost, hint: c.hint })),
-    remaining: seconds,
-    seconds,
     defaultChoice: def.defaultChoice,
     ctx,
     regionId: ctx.regionId,
@@ -247,6 +259,8 @@ export function queueAlert(s: GameState, id: string, ctxIn: Partial<AlertCtx> = 
   refreshChoices(s, alert);
   s.alertQueue.push(alert);
   s.firedAlerts.push(id);
+  // Decisions count toward the day's pause budget (sponsor invites are opportunities, not events).
+  if (id !== 'sponsor_invite') s.popupsToday++;
   s.lastInteractiveAt = s.t;
   if (s.alertQueue.length === 1) fx(s, { kind: 'sfx', sfx: 'alert' });
 }
@@ -299,7 +313,7 @@ export function resolveAlert(s: GameState, choiceIdx: number, timedOut = false) 
 export function applyEffects(s: GameState, e: Effects, ctx: AlertCtx) {
   if (e.budget) s.budget += e.budget;
   if (e.rep) addRep(s, e.rep);
-  if (e.signups) s.bonusSignups += e.signups;
+  if (e.signups) s.bonusSignups += e.signups * T.signupScale;
   if (e.mood) s.moodBank += e.mood;
   if (e.tp) s.techPoints = Math.max(0, s.techPoints + e.tp);
   if (e.treeHype) s.treeHype = clamp(s.treeHype + e.treeHype, 0, 100);
@@ -313,7 +327,7 @@ export function applyEffects(s: GameState, e: Effects, ctx: AlertCtx) {
   if (e.charges) s.chargesUsed = Math.max(0, s.chargesUsed - e.charges);
   if (e.impulse) {
     for (const id of targets(s, e.impulse.target, ctx)) {
-      if (e.impulse.party && id === 'frat') bearImpulse(s, id, e.impulse.amount * 2, 0.5, ['dorms', 'sproul']);
+      if (e.impulse.party && id === 'frat') bearImpulse(s, id, e.impulse.amount * 2, 1);
       else if (e.impulse.amount < 0) { const r = s.regions.find((x) => x.id === id)!; r.bear = clamp(r.bear + e.impulse.amount, 0, 1); }
       else bearImpulse(s, id, e.impulse.amount);
       fx(s, { kind: 'pulse', regionId: id, tone: e.impulse.amount >= 0 ? 'good' : 'bad' });

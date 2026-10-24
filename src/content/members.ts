@@ -38,7 +38,7 @@ export const TRAITS: Record<TraitId, { name: string; desc: string; joke: string 
   caffeinated: { name: 'Caffeinated', desc: '+2 skill early in the day, −1 later.', joke: 'Vibrates at a frequency only dogs can hear.' },
   mole: { name: 'Ex-Tree Mole', desc: "Reveals Tree's next move. 10% chance a day to leak yours.", joke: 'Still has a Tree U lanyard "for nostalgia."' },
   rust10: { name: 'Claims 10 Years of Rust Experience', desc: 'Random ±3 skill each day.', joke: 'Rust is 11 years old. They started in the womb.' },
-  nepo: { name: 'Nepo Baby', desc: '+$500 on hire. Skill is a coin flip.', joke: 'Their parent "knows a guy" at every company.' },
+  nepo: { name: 'Nepo Baby', desc: '+3 reputation on hire. Skill is a coin flip.', joke: 'Their parent "knows a guy" at every company.' },
   linkedin: { name: 'LinkedIn Lunatic', desc: '+post power, but more cringe flops.', joke: 'Agree? 👇' },
   trenchcoat: { name: 'Three Interns in a Trench Coat', desc: 'Random task counts as their specialty each day.', joke: 'Payroll is confused. So is the trench coat.' },
   survivor: { name: 'Group Project Survivor', desc: '+2 skill on Venue (logistics).', joke: 'Has carried four group projects on their back.' },

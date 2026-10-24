@@ -3,6 +3,7 @@ import { EXTRA_PROMISES, PROMISES } from '../content/promises';
 import { REPLIES, SPONSOR_BY_ID, VIBE_SCORES } from '../content/sponsors';
 import { addRep, addTicker, equityCut, fx, log, taskSkillSum } from './helpers';
 import { fill, joke } from './jokes';
+import { aiCreditsNews } from './tech';
 import { chance, pick, randInt, shuffle } from './rng';
 import type { Courting, GameState, PromiseKind, ReplyType } from './types';
 
@@ -74,7 +75,7 @@ function settle(s: GameState, c: Courting): NonNullable<Courting['result']> {
   const d = SPONSOR_BY_ID[c.sponsorId];
   if (c.interest < 35) return { outcome: 'walk', money: 0, promises: [], text: `${d.name} walked away. They said "let's circle back." They will not circle back.` };
   const premium = c.interest >= 70;
-  let money = d.money * (premium ? 1 : 0.6) * (c.overpromised ? 1.25 : 1);
+  let money = d.money * (premium ? 0.85 : 0.5) * (c.overpromised ? 1.25 : 1);
   money = Math.round((money * (1 - equityCut(s) / 100)) / 100) * 100;
   const kinds: PromiseKind[] = [d.promise];
   if (premium && chance(s, 0.4)) kinds.push(pick(s, EXTRA_PROMISES.filter((k) => k !== 'logo_moon')));
@@ -106,6 +107,7 @@ export function finishCourting(s: GameState) {
     log(s, 'sponsor', d.name, c.result.money);
     fx(s, { kind: 'banner', text: `${d.name} signed!`, tone: 'good' });
     fx(s, { kind: 'sfx', sfx: 'levelup' });
+    if (c.result.outcome === 'premium' && d.perk.startsWith('AI Credits')) aiCreditsNews(s);
   } else {
     log(s, 'sponsorWalk', d.name);
     fx(s, { kind: 'sfx', sfx: 'trombone' });

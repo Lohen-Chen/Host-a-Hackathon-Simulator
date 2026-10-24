@@ -30,3 +30,18 @@ Vercel's main advantage is a preview URL for every PR. That doesn't justify the 
 - **Single-file fallback** (`vite-plugin-singlefile`) is shipped inside `dist.zip` for judges who can't rely on a network.
 - **Specialty auto-assign.** New crew start on their role's task, so the opening isn't an empty chore. Designers default to venue scouting until the Website node is researched.
 - **Font:** system monospace stands in for a pixel font, to stay under budget and avoid licensing.
+
+## Plague Inc rework (Changes.md)
+
+All of Changes.md was implemented, with five adjustments agreed up front:
+
+1. **Popups pause the world but are capped at about 2 a day** (3 in Full). World news, rumors, Tree moves and decisions use the newspaper popup. Flavor stays on the ticker so the game doesn't stop every few seconds.
+2. **Tree moves are news, not quick-time events.** They land as a pausing popup. A new **Clapback Team** hype node softens them (×0.6) so there is still a way to respond.
+3. **Income is sponsor-only**, but the starting budget covers a small crowd, so a player who whiffs every sponsor can still run a hackathon.
+4. **Confirming is one button.** It confirms a batch of 250. Conversion tech lowers the price per head, and about 10% of unconfirmed signups walk in anyway, so forgetting to confirm hurts but isn't a zero.
+5. **Tree University leaves the map.** Its eight regions became Twitter, Frat Row, Local Highschool, International students, B1G, SEC, UC and ACC, with 10,000 students across them. Bear starts in UC and Tree starts in ACC.
+
+Other choices:
+- The bidding (venue auction) and courting minigames stay unchanged.
+- The AI-credits news fires when the player first unlocks AI Credits, either from the tech tree or as a premium sponsor perk. It brings in business majors (more signups, lower project quality).
+- Save version bumped to 2. Old saves are discarded rather than migrated.

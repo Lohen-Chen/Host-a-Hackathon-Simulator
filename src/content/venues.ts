@@ -4,16 +4,16 @@ export interface VenueDef { id: VenueId; name: string; cap: number; price: numbe
 
 // Section 6.9
 export const VENUES: VenueDef[] = [
-  { id: 'lawn', name: 'The Lawn', cap: 250, price: 0, ambience: 1, joke: "Sprinklers run at 3 AM. It's a feature." },
-  { id: 'soda', name: 'Basement of Soda Hall', cap: 400, price: 2000, ambience: 2, joke: 'Smells like 12 years of cold pizza.' },
-  { id: 'parking', name: 'A Very Large Parking Structure', cap: 700, price: 4500, ambience: 3, joke: 'Hackers sleep in their cars (they would anyway).' },
-  { id: 'stadium', name: 'Memorial Stadium (Seismic Retrofit Pending)', cap: 1500, price: 12000, ambience: 5, joke: "Technically safe if you don't cheer." },
-  { id: 'palace', name: 'The Palace of Fine Pastries', cap: 1000, price: 15000, ambience: 9, joke: 'Dome, pillars, free croissants. Insufferably beautiful.' },
+  { id: 'lawn', name: 'The Lawn', cap: 2500, price: 0, ambience: 1, joke: "Sprinklers run at 3 AM. It's a feature." },
+  { id: 'soda', name: 'Basement of Soda Hall', cap: 3200, price: 3000, ambience: 2, joke: 'Smells like 12 years of cold pizza.' },
+  { id: 'parking', name: 'A Very Large Parking Structure', cap: 4500, price: 7000, ambience: 3, joke: 'Hackers sleep in their cars (they would anyway).' },
+  { id: 'stadium', name: 'Memorial Stadium (Seismic Retrofit Pending)', cap: 10000, price: 13000, ambience: 5, joke: "Technically safe if you don't cheer." },
+  { id: 'palace', name: 'The Palace of Fine Pastries', cap: 7000, price: 18000, ambience: 9, joke: 'Dome, pillars, free croissants. Insufferably beautiful.' },
 ];
 export const VENUE_BY_ID = Object.fromEntries(VENUES.map((v) => [v.id, v])) as Record<VenueId, VenueDef>;
 
 /** Tree's fallback if it loses every lot. */
-export const TREE_BACKUP = { name: 'Tree U Gymnasium', cap: 600, ambience: 4 };
+export const TREE_BACKUP = { name: 'Tree U Gymnasium', cap: 4500, ambience: 4 };
 
 export interface BidderDef {
   id: BidderId;

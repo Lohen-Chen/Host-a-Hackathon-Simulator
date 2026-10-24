@@ -1,8 +1,10 @@
 // The hype map: per-step virus-style spread (Section 6.3). No DOM.
 import { MODES, STEPS_PER_DAY, T } from './config';
-import { addTicker, fx, hasTech, log } from './helpers';
+import { addTicker, fx, log } from './helpers';
 import { isTreeControlled, joke } from './jokes';
+import { showPopup } from './popups';
 import { clamp, chance, rand, weighted } from './rng';
+import { bar } from './tech';
 import type { GameState, RegionId } from './types';
 
 export function repFactor(rep: number) {
@@ -11,13 +13,23 @@ export function repFactor(rep: number) {
 
 /** Tree's off-map hackers (its own campus mailing lists), scaled by hype. */
 export function treeBase(s: GameState) {
-  return 30 + s.treeHype * 1.0;
+  return T.treeBase + s.treeHype * T.treeBasePerHype;
+}
+
+/** How much of an aware, controlled population becomes interested. Every unlock helps a little. */
+export function conversionMult(s: GameState) {
+  return 0.45 + 0.6 * (bar(s, 'conversion') / 100) + 0.015 * s.unlockedTech.length;
+}
+
+/** Hype bar → faster spread between neighbors. */
+export function hypeMult(s: GameState) {
+  return 1 + 0.8 * (bar(s, 'hype') / 100);
 }
 
 export function stepMap(s: GameState) {
   const rs = s.regions;
   const byId = new Map(rs.map((r) => [r.id, r]));
-  const spreadK = T.spread * (1 + s.reputation / 100);
+  const spreadK = T.spread * (1 + s.reputation / 100) * hypeMult(s);
   const treeK = T.treeSpread * (1 + s.treeHype / 100);
   const decay = T.decay * (1 - s.websiteScore / 200) * (s.siteDownSteps > 0 ? 2.5 : 1);
   const nextBear: number[] = [];
@@ -42,15 +54,13 @@ export function stepMap(s: GameState) {
     treeImpulse(s, target.id, T.treePostPower * (s.treeHype / 50) * (0.6 + rand(s) * 0.8));
   }
 
-  const rf = repFactor(s.reputation);
-  const promo = hasTech(s, 'promo') ? 1 : 0;
-  const appl = hasTech(s, 'applications') ? 0.85 : 1;
+  const rf = repFactor(s.reputation) * conversionMult(s);
   const treeRf = repFactor(s.treeHype * 0.7);
   let total = 0;
   let treeTotal = 0;
   rs.forEach((r, i) => {
     const control = clamp(r.bear - T.treeControlPenalty * r.tree, 0, 1);
-    const target = r.pop * r.conv * control * rf * (1 + T.promoBonus * promo) * appl;
+    const target = r.pop * r.conv * control * rf;
     const before = r.signups;
     r.signups += T.signupLerp * (target - r.signups);
     const tControl = clamp(r.tree - T.treeControlPenalty * r.bear, 0, 1);
@@ -59,13 +69,14 @@ export function stepMap(s: GameState) {
     total += r.signups;
     treeTotal += r.treeSignups;
     const drop = before - r.signups;
-    if (drop >= 6) fx(s, { kind: 'defect', regionId: r.id, value: -Math.round(drop), text: `−${Math.round(drop)} DEFECTED`, tone: 'bad' });
+    if (drop >= 40) fx(s, { kind: 'defect', regionId: r.id, value: -Math.round(drop), text: `−${Math.round(drop)} DEFECTED`, tone: 'bad' });
     const nowTree = isTreeControlled(r);
     if (nowTree !== wasTree[i]) regionFlipped(s, r.id, nowTree);
   });
   s.signups = Math.max(0, total + s.bonusSignups);
   s.treeSignups = treeTotal + treeBase(s);
   checkSignupMilestones(s);
+  checkSpreadNews(s);
 }
 
 function regionFlipped(s: GameState, id: RegionId, toTree: boolean) {
@@ -90,7 +101,7 @@ export function milestone(s: GameState, id: string, text: string, tone: 'good' |
 
 function checkSignupMilestones(s: GameState) {
   if (s.signups >= 1) milestone(s, 'first', 'First signup! (It was someone\'s mom.)');
-  for (const n of [100, 250, 500, 750]) {
+  for (const n of [1000, 2500, 5000, 7500]) {
     if (s.signups >= n && !s.milestones.includes(`s${n}`)) {
       milestone(s, `s${n}`, `${n} signups! ${joke(s, 'toast')}`);
       addTicker(s, 'BEAR BEAT', joke(s, 'headline|bear'));
@@ -114,5 +125,19 @@ export function treeImpulse(s: GameState, id: RegionId, amount: number, spill = 
   for (const n of r.neighbors) {
     const nr = s.regions.find((x) => x.id === n)!;
     nr.tree = clamp(nr.tree + amount * spill, 0, 1);
+  }
+}
+
+/** Mundane Plague Inc-style spread news. Optional: over the daily popup budget they go to the ticker. */
+function checkSpreadNews(s: GameState) {
+  const once = (id: string, fn: () => void) => { if (!s.milestones.includes(id)) { s.milestones.push(id); fn(); } };
+  const spreadTo = s.regions.filter((r) => r.id !== 'uc' && r.bear >= 0.15);
+  if (spreadTo.length) {
+    once('news:spread', () => showPopup(s, { kind: 'milestone', icon: '🐻', title: 'Bear Hacks begins to spread', body: `Word of Bear Hacks has left the UC system. Students in ${spreadTo[0].name} are asking what it is.`, regionId: spreadTo[0].id }, true, 'BEAR BEAT'));
+  }
+  if (s.signups >= 500) once('news:talk', () => showPopup(s, { kind: 'milestone', icon: '💬', title: 'People are beginning to talk about Bear Hacks', body: 'Group chats across the country now contain the phrase "wait, is Bear Hacks free?"' }, true, 'BEAR BEAT'));
+  if (s.signups >= 3000) once('news:national', () => showPopup(s, { kind: 'milestone', icon: '📰', title: 'Bear Hacks goes national', body: 'A local news anchor called Bear Hacks "a hackathon." That is technically correct, the best kind of correct.' }, true, 'BEAR BEAT'));
+  for (const r of s.regions) {
+    if (r.id !== 'uc' && r.bear >= 0.5) once(`news:region:${r.id}`, () => showPopup(s, { kind: 'milestone', icon: '📍', title: `Bear Hacks is big in ${r.name}`, body: `Half of ${r.name} has heard of Bear Hacks. The other half is pretending not to have.`, regionId: r.id }, true, 'BEAR BEAT'));
   }
 }

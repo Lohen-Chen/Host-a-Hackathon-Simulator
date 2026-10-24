@@ -7,9 +7,9 @@ import { VIBE_SCORES } from '../src/content/sponsors';
 import { TECH } from '../src/content/techTree';
 import { VENUE_BY_ID } from '../src/content/venues';
 import {
-  advance, affinity, assign, beginGame, buyTech, canFire, canRespond, chargesLeft, courtingReply, endLiveDay, finishAuction,
-  finishCourting, firePost, hackdaySkip, hire, newGame, nextDay, partyMult, resolveAlert, respondTreeMove, startLiveDay,
-  tapBubble, techState, tickAuction, type GameState, type Mode, type RegionId, type Task, type TechId,
+  advance, affinity, assign, beginGame, buyTech, canConfirm, canFire, chargesLeft, confirmBatch, confirmCost, confirmHackers, courtingReply,
+  dismissPopup, endLiveDay, finishAuction, finishCourting, firePost, hackdaySkip, hire, newGame, nextDay, partyMult, resolveAlert,
+  startLiveDay, tapBubble, techState, tickAuction, type GameState, type Mode, type RegionId, type Task, type TechId,
 } from '../src/core';
 import { rand } from '../src/core/rng';
 
@@ -18,10 +18,10 @@ export interface BotCfg { style: Style; bubbleRate: number; alertRate: number }
 export interface RunResult { state: GameState; stuck: boolean; ticks: number; reason?: string }
 
 const TECH_ORDER: Record<Exclude<Style, 'random'>, TechId[]> = {
-  balanced: ['website', 'coordinator', 'design', 'snack', 'training2', 'logistics', 'promo', 'rep2', 'clubfair', 'prestige2'],
-  perfect: ['website', 'coordinator', 'training2', 'design', 'snack', 'promo', 'logistics', 'rep2', 'clubfair', 'prestige2'],
-  hype: ['website', 'promo', 'training2', 'design', 'clubfair', 'prestige2', 'snack', 'coordinator', 'logistics', 'rep2'],
-  money: ['coordinator', 'rep2', 'snack', 'logistics', 'website', 'design', 'training2', 'promo', 'clubfair', 'prestige2'],
+  balanced: ['website', 'coordinator', 'applications', 'design', 'snack', 'training2', 'discord', 'travel', 'logistics', 'memes', 'swag', 'promo', 'rep2', 'clapback', 'aicredits', 'clubfair', 'prestige2', 'reelposts', 'billboard', 'training3', 'rep3'],
+  perfect: ['applications', 'website', 'coordinator', 'discord', 'travel', 'training2', 'snack', 'design', 'swag', 'memes', 'clapback', 'aicredits', 'promo', 'logistics', 'rep2', 'billboard', 'reelposts', 'training3', 'clubfair', 'prestige2', 'rep3'],
+  hype: ['website', 'memes', 'promo', 'reelposts', 'clapback', 'billboard', 'applications', 'discord', 'training2', 'design', 'snack', 'coordinator', 'travel', 'swag', 'aicredits', 'logistics', 'rep2', 'clubfair', 'prestige2', 'training3', 'rep3'],
+  money: ['coordinator', 'rep2', 'applications', 'travel', 'swag', 'snack', 'logistics', 'website', 'discord', 'design', 'training2', 'promo', 'memes', 'aicredits', 'clapback', 'reelposts', 'clubfair', 'prestige2', 'billboard', 'training3', 'rep3'],
 };
 
 /** Bot-local RNG so bot decisions never consume the game's seeded stream. */
@@ -125,7 +125,7 @@ function buyStep(s: GameState, style: Style, rng: BotRng) {
 
 function bestTarget(s: GameState, handIdx: number): { region: RegionId; v: number } {
   const card = POST_BY_ID[s.hand[handIdx]];
-  let best: RegionId = 'sproul';
+  let best: RegionId = 'uc';
   let bv = -1;
   for (const r of s.regions) {
     const room = Math.max(0.05, 1 - r.bear) * (1 + r.tree);
@@ -147,7 +147,7 @@ function postStep(s: GameState, style: Style, rng: BotRng) {
     return;
   }
   let bi = -1;
-  let best = { region: 'sproul' as RegionId, v: -1 };
+  let best = { region: 'uc' as RegionId, v: -1 };
   s.hand.forEach((_, i) => {
     if (!canFire(s, i)) return;
     if (style === 'money' && POST_BY_ID[s.hand[i]].cost > 0) return;
@@ -172,13 +172,30 @@ function courtStep(s: GameState, style: Style, rng: BotRng) {
 function auctionHold(s: GameState, style: Style, willing: Record<string, number>): boolean {
   const a = s.auction!;
   const vid = a.lots[a.lot];
-  const v = VENUE_BY_ID[vid];
   if (s.venue) return false;
-  const projected = s.signups * 2.1 * 0.7;
-  const isLast = a.lot === a.lots.length - 1;
-  if (style !== 'random' && v.cap < projected * 0.55 && !isLast) return false;
-  if (style !== 'random' && v.cap > projected * 2.6 && vid !== 'palace' && !isLast) return false;
-  return a.price <= Math.min(s.budget - (style === 'money' ? 4000 : 2500), v.price * willing[vid]);
+  const limit = (id: string) => Math.min(s.budget - (style === 'money' ? 4000 : 1500), VENUE_BY_ID[id as keyof typeof VENUE_BY_ID].price * willing[id]);
+  if (style !== 'random') {
+    // Aim for the biggest remaining lot we expect to afford (Tree folds by ~1.85× price); fall back to later lots.
+    const rest = a.lots.slice(a.lot);
+    const affordable = rest.filter((id) => VENUE_BY_ID[id].price * 1.9 <= limit(id));
+    const target = affordable.sort((x, y) => VENUE_BY_ID[y].cap - VENUE_BY_ID[x].cap)[0];
+    if (target && target !== vid) return false;
+  }
+  return a.price <= limit(vid);
+}
+
+/** Spend money to confirm interested hackers, keeping a reserve for the venue auction and hires. */
+function confirmStep(s: GameState, style: Style, rng: BotRng) {
+  if (!canConfirm(s)) return;
+  if (style === 'random') { if (rng.next() < 0.02) confirmHackers(s); return; }
+  const auctionReserve = !s.venue && s.day <= 3 ? (style === 'money' ? 10000 : 18000) : 0;
+  const reserve = auctionReserve + 800;
+  // Money bot waits for the last two days; everyone else confirms as interest grows.
+  if (style === 'money' && s.day < 6) return;
+  // Once the venue is known, don't pay for hackers who won't fit.
+  const cap = s.venue ? VENUE_BY_ID[s.venue].cap / 0.85 : Infinity;
+  let guard = 0;
+  while (canConfirm(s) && s.confirmed < cap && s.budget - confirmBatch(s) * confirmCost(s) >= reserve && confirmBatch(s) >= Math.min(100, s.signups - s.confirmed) && guard++ < 40) confirmHackers(s);
 }
 
 export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000): RunResult {
@@ -188,7 +205,7 @@ export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000
   const decidedAlerts = new Set<number>();
   const willing: Record<string, number> = {};
   for (const id of ['soda', 'parking', 'stadium', 'palace']) {
-    willing[id] = cfg.style === 'random' ? 0.5 + rng.next() * 1.3 : cfg.style === 'money' ? 0.95 : cfg.style === 'hype' ? 1.6 : 1.35;
+    willing[id] = cfg.style === 'random' ? 0.5 + rng.next() * 1.3 : cfg.style === 'money' ? 1.2 : cfg.style === 'hype' ? 1.8 : cfg.style === 'perfect' ? 2 : 1.8;
   }
   let ticks = 0;
   const dt = 0.5;
@@ -208,18 +225,17 @@ export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000
           decided.add(b.id);
           if (rng.next() < cfg.bubbleRate) tapBubble(s, b.id);
         }
+        // Popups pause the world; the bot reads them instantly.
+        while (s.popups.length) dismissPopup(s);
+        // Alerts pause too. A bot that "doesn't engage" takes the default choice.
         const a = s.alertQueue[0];
         if (a && !decidedAlerts.has(a.uid)) {
           decidedAlerts.add(a.uid);
-          if (rng.next() < cfg.alertRate) resolveAlert(s, pickAlertChoice(s, cfg.style, rng));
+          resolveAlert(s, rng.next() < cfg.alertRate ? pickAlertChoice(s, cfg.style, rng) : a.defaultChoice);
         }
-        if (s.treeMove && s.treeMove.responded === 'none') {
-          if (cfg.style === 'random') { if (rng.next() < 0.3) respondTreeMove(s, rng.pick(['counter', 'clapback', 'ignore'] as const)); }
-          else if (cfg.style !== 'money' && canRespond(s, 'counter') && s.budget > 6000) respondTreeMove(s, 'counter');
-          else if (canRespond(s, 'clapback') && cfg.style === 'hype') respondTreeMove(s, 'clapback');
-          else if (cfg.style === 'money' && canRespond(s, 'clapback')) respondTreeMove(s, 'clapback');
-        }
+        if (s.alertQueue.length) break;
         buyStep(s, cfg.style, rng);
+        confirmStep(s, cfg.style, rng);
         if (ticks % 10 === 0) manageCrew(s, cfg.style, rng);
         postStep(s, cfg.style, rng);
         if (cfg.style === 'random' && rng.next() < 0.002) endLiveDay(s, true);
@@ -230,7 +246,7 @@ export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000
         if (s.auction!.phase === 'done') finishAuction(s);
         else tickAuction(s, 0.25, auctionHold(s, cfg.style, willing));
         break;
-      case 'night': nextDay(s); break;
+      case 'night': confirmStep(s, cfg.style, rng); nextDay(s); break;
       case 'hackday': hackdaySkip(s); break;
     }
   }

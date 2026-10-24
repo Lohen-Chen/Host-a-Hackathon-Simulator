@@ -8,11 +8,11 @@ import { joke, treeRegionCount } from './jokes';
 import { stepMap } from './map';
 import { startHackday } from './hackday';
 import { prepareMorning } from './state';
-import { tickTreeMove } from './tree';
 import type { GameState } from './types';
 
+/** The world pauses for courting, decision alerts and news popups (Plague Inc style). */
 export function isClockRunning(s: GameState): boolean {
-  return s.phase === 'live' && !s.courting;
+  return s.phase === 'live' && !s.courting && !s.alertQueue.length && !s.popups.length;
 }
 
 /** Leave the intro and enter Day 1's morning. */
@@ -28,8 +28,9 @@ export function startLiveDay(s: GameState) {
   s.t = 0;
   s.step = 0;
   s.tickerT = 0;
+  s.popupsToday = 0;
   s.treeHype = Math.min(100, s.treeHype + T.treeHypeDaily);
-  s.dayStart = { signups: s.signups, budget: s.budget, rep: s.reputation, treeRegions: treeRegionCount(s), treeSignups: s.treeSignups, tp: s.techPoints };
+  s.dayStart = { signups: s.signups, confirmed: s.confirmed, budget: s.budget, rep: s.reputation, treeRegions: treeRegionCount(s), treeSignups: s.treeSignups, tp: s.techPoints };
   scheduleDay(s);
   addTicker(s, 'BEAR BEAT', joke(s, 'headline|bear'));
 }
@@ -43,13 +44,12 @@ export function advance(s: GameState, dt: number) {
     const slice = Math.min(0.25, end - s.t);
     s.t += slice;
     tickEvents(s, slice);
-    tickTreeMove(s, slice);
     while (s.step < STEPS_PER_DAY && s.t >= (s.step + 1) * s.stepSec - 1e-9) {
       s.step++;
       doStep(s);
     }
   }
-  if (s.t >= s.daySec - 1e-9 && s.phase === 'live' && !s.courting) endLiveDay(s, false);
+  if (s.t >= s.daySec - 1e-9 && isClockRunning(s)) endLiveDay(s, false);
 }
 
 /** One of the 20 steps of a day: continuous member output + map spread. */
@@ -101,10 +101,10 @@ export function endLiveDay(s: GameState, early: boolean) {
     s.techPoints += T.endDayBonusTp;
     while (s.step < STEPS_PER_DAY) { s.step++; doStep(s); }
   }
-  // Nothing is left hanging: open alerts take their default, a pending Tree move lands.
+  // Nothing is left hanging: open alerts take their default, unread news is dismissed.
   let guard = 0;
   while (s.alertQueue.length && guard++ < 20) resolveAlert(s, s.alertQueue[0].defaultChoice, true);
-  if (s.treeMove) tickTreeMove(s, 999);
+  s.popups = [];
   for (const b of s.bubbles) if (b.type === 'bsod') s.flags.bsod = 'haunted';
   s.bubbles = [];
   s.schedule = [];
@@ -127,7 +127,8 @@ function buildRecap(s: GameState) {
   const dBudget = Math.round(s.budget - d.budget);
   const tr = treeRegionCount(s);
   s.recap = [
-    `Signups ${dSign >= 0 ? '+' : ''}${dSign} (now ${Math.round(s.signups)} vs Tree ${Math.round(s.treeSignups)})`,
+    `Interested ${dSign >= 0 ? '+' : ''}${dSign.toLocaleString('en-US')} (now ${Math.round(s.signups).toLocaleString('en-US')} vs Tree ${Math.round(s.treeSignups).toLocaleString('en-US')})`,
+    `Confirmed ${Math.round(s.confirmed).toLocaleString('en-US')}${s.confirmed > d.confirmed ? ` (+${Math.round(s.confirmed - d.confirmed).toLocaleString('en-US')} today)` : ''}`,
     `Budget ${dBudget >= 0 ? '+' : '−'}$${Math.abs(dBudget).toLocaleString('en-US')} · TP ${s.techPoints} · Rep ${Math.round(s.reputation)}`,
     `Tree controls ${tr}/8 regions${tr > d.treeRegions ? ' (up!)' : tr < d.treeRegions ? ' (down!)' : ''}`,
     joke(s, 'recap'),

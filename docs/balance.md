@@ -2,63 +2,47 @@
 
 All tunable constants live in `src/core/config.ts` (`T` and `MODES`), plus two formulas in `src/core/map.ts` (`repFactor`, `treeBase`) and the category formulas in `src/core/score.ts`. `npm run sim` plays 2,000 headless games per bot on the real sim core (`-- --mode judge|standard|full`, `-- --runs N`, `-- --bot name`).
 
-## Results (Standard, 2,000 runs per bot)
+## Results after the Plague Inc rework (Standard, 2,000 runs per bot)
 
-| Target (spec §13) | Result | Status |
+The rework moved the game to 10,000 students across 8 regions, so signups and attendees are now in the thousands. "Attendees" counts confirmed hackers times the show rate plus about 10% walk-ins, capped by the venue.
+
+| Target | Result | Status |
 | --- | --- | --- |
-| Random bot median 25–40, usually loses | median 38, beats Tree 6% | ✅ |
-| Balanced@70 median 60–75 | median 71 | ✅ |
-| Balanced@70 beats Tree ~65% | 65% | ✅ |
-| Perfect play 85–100 | median 77, p90 86 | ⚠️ see below |
-| Skipping bubbles costs 10–15 points | Balanced@0 57 vs @70 71 (−14) | ✅ |
-| Median total signups 350–550 | Balanced@70 363, Perfect 401 | ✅ |
-| Tree holds 1–4 of 8 regions in typical runs | Balanced@70 median 3 (p10 0, p90 8) | ✅ |
-| No sponsor/venue in >80% of top-decile runs | None dominant (see YSee note) | ✅ |
+| Random bot median 25–40, usually loses | median 40, beats Tree 11% | ✅ |
+| Balanced@70 median 60–75 | median 70 | ✅ |
+| Balanced@70 beats Tree ~65% | 70% | ✅ |
+| Perfect play 85–100 | median 74, p90 84 | ⚠️ see below |
+| Skipping bubbles costs 10–15 points | Balanced@0 55 vs @70 70 (−15) | ✅ |
+| Popups pause the world about twice a day | 2.1–2.4 per day | ✅ |
+| Rumors mutate 1–2 nodes per run | 1–2 | ✅ |
+| Money stops piling up | Balanced@70 median leftover $5.4k (was most of the budget) | ✅ |
 | No stuck games | 0 in 16,000 | ✅ |
 
-| Bot | p10 | Median | p90 | Beats Tree | Median signups |
-| --- | --- | --- | --- | --- | --- |
-| Random | 29 | 38 | 48 | 6% | 31 |
-| Greedy-Money | 46 | 53 | 62 | 34% | 228 |
-| Greedy-Hype | 65 | 75 | 82 | 71% | 379 |
-| Balanced@40 | 55 | 65 | 76 | 50% | 327 |
-| Balanced@70 | 60 | 71 | 81 | 65% | 363 |
-| Balanced@95 | 66 | 76 | 85 | 76% | 392 |
-| Balanced@0 | 47 | 57 | 66 | 36% | 296 |
-| Perfect | 67 | 77 | 86 | 79% | 401 |
+| Bot | p10 | Median | p90 | Beats Tree | Median interested | Median confirmed | Median leftover |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Random | 34 | 40 | 52 | 11% | 1,720 | 1,282 | $233 |
+| Greedy-Money | 51 | 60 | 69 | 61% | 3,436 | 3,379 | $13.8k |
+| Greedy-Hype | 49 | 57 | 66 | 48% | 3,906 | 3,000 | $1.0k |
+| Balanced@40 | 55 | 66 | 75 | 62% | 4,116 | 3,778 | $2.1k |
+| Balanced@70 | 59 | 70 | 78 | 70% | 4,464 | 3,882 | $5.4k |
+| Balanced@95 | 62 | 71 | 80 | 73% | 4,426 | 4,000 | $10.3k |
+| Balanced@0 | 46 | 55 | 66 | 34% | 2,776 | 2,572 | $1.5k |
+| Perfect | 62 | 74 | 84 | 85% | 4,312 | 4,500 | $11.2k |
 
-Other modes, 400 runs each (Balanced@70):
+## Economy after the rework
 
-| Mode | Median score | Beats Tree | Median signups |
-| --- | --- | --- | --- |
-| Judge | 64 | 67% | 368 |
-| Standard | 71 | 65% | 363 |
-| Full | 76 | 75% | 387 |
-
-## What changed and why
-
-**1. Proportional awareness decay** (`T.decay` 0.006 → 0.03, `T.treeDecay` 0.004 → 0.02, now multiplied by current awareness). With a flat decay, spread pushed every region to about 0.96 awareness for both schools by Day 7. Control was then identical everywhere and the result was a coin flip that play barely affected. With proportional decay, awareness settles where posting effort holds it. Regions now end up clearly Bear's or Tree's, and posts aimed at the right region matter.
-
-**2. Tree's ambient posting** (`T.treePostsPerDay` 3 → 4.25, `T.treePostPower` 0.11). With the faster decay, Tree needs a steadier drip of its own posts to hold territory. Win rate is very sensitive here: 4.0 gives Balanced@70 77%, 4.5 gives 57%.
-
-**3. Per-mode Tree power** (`MODES[mode].treePower`: Judge 0.8, Standard 1, Full 1.2). A day is always 20 steps, so Tree posts at the same rate in every mode, but shorter modes give the player fewer bubbles and alerts to answer with. Without this, Judge was the hardest mode (54% win) and Full the easiest (83%).
-
-**4. Signup conversion** (`repFactor` base 0.5 → 0.66) puts median signups in the 350–550 band. **Tree's off-map base** (`treeBase` 110 + 1.6·hype → 30 + 1.0·hype) makes Tree's total come mostly from the map, which the player can contest.
-
-**5. Score floors lowered.** The Random bot was getting about 44 for doing almost nothing. Base values dropped:
-- mood 46 → 38
-- amenities 30 → 20
-- project quality 28 → 20
-- promises with none made 55 → 40
-- sponsor mood with no sponsors 38 → 25
-
-**6. Attendance and sponsors pay off sooner and saturate later.**
-- Attendance reaches full marks at 480 attendees (`T.attendanceFull`, was 620), so hitting the signup band is rewarded.
-- Sponsor quality is scaled ×0.7 (non-premium ×0.6), so it no longer sits at 100 for every competent bot.
-- Website weight in Artistic is up 0.5 → 0.6.
+- **Money comes only from the starting budget and sponsors.** Bubbles give tech points only. Alerts no longer pay cash, except YSee's SAFE, which is a sponsor deal. A test checks that the final budget plus everything spent never exceeds start + sponsor payouts.
+- **Confirming costs money.** `T.confirmBatch` 250 hackers per tap at `T.confirmCost` $14 each (floor `T.confirmCostMin` $9). Travel Grants cut $3 and Swag Bags cut $2. This replaces the old per-attendee food cost and is the main money sink.
+- **Sponsor payouts trimmed.** Premium deals pay ×0.85 and basic deals ×0.5 of the listed amount.
+- **Show rate.** `T.showRateBase` 0.8, clamped 0.6–0.97. Unconfirmed signups walk in at `T.walkInRate` 10%.
+- **Tech bars.** Each branch bar starts at 10 and owned nodes add to it (cap 100). Hype speeds spread (`1 + 0.8·hype/100`), Conversion raises signups per aware student (`0.45 + 0.6·conv/100 + 0.015·nodes`), and Talent feeds project quality.
+- **Tree.** Off-map base `treeBase` 900 + 12·hype. Tree's show rate is 0.72 + 0.0015·hype (0.5–0.9). Tree moves land instantly; Clapback Team cuts them to ×0.6.
+- **Pauses.** `MODES[mode].popupsPerDay` (2/2/3) caps pausing popups. Each day from Day 2 gets one special (world news or a rumor). Milestone popups that would go over the cap go to the ticker instead.
 
 ## Known gaps
 
-- **Perfect play scores 77, not 85+.** The Perfect bot is the Balanced bot with optimal courting replies and a different tech order. It doesn't time posts, chase bubbles by value, or plan promises, so it's a soft upper bound, not true perfect play. In Full mode it reaches 84. Raising the ceiling further would mostly mean un-capping categories that good players already max (participant mood, sponsor quality), so I left it. Real playtests are the better check.
-- **Tree region count is wide** (p10 0, p90 8). The map still snowballs once one side gets a lead. That's part of the drama, but if playtests feel swingy, raise `T.treeControlPenalty` or lower `T.spread`.
-- **YSee appears in about 99% of all runs, not just top ones.** The spec makes it a guaranteed hero invite (the after-party), and the bots accept every invite. The sim now reports something as **dominant** only if it shows up in >80% of top-decile runs *and* is noticeably more common there than overall (lift > 1.15). Nothing meets that bar.
+- **Perfect play scores 74, not 85+.** The Perfect bot is the Balanced bot with optimal courting replies and a different tech order. It doesn't time posts or chase bubbles by value, so it's a soft upper bound. Real playtests are the better check.
+- **Parking dominates the Perfect bot's top decile.** Bots can't afford the Stadium (about $25k at auction on Day 3), so Parking is the biggest venue they win. A human who saves early can still buy the Stadium. If playtests show nobody does, lower the Stadium price.
+- **Leftover cash still has a long tail.** p90 leftover is $35k–$48k, from runs that land Balantir late in the week when there is little left to spend on. Medians are low, which was the main complaint.
+- **Tree region count is wide** (p10 0, p90 8). The map snowballs once one side leads. If playtests feel swingy, raise `T.treeControlPenalty` or lower `T.spread`.
+- **YSee appears in almost every run.** It is a guaranteed invite and the bots accept every invite. The sim only flags something as dominant if it is also much more common in top runs (lift > 1.15), and YSee isn't.
