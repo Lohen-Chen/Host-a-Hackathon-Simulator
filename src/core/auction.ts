@@ -2,7 +2,7 @@
 import { BIDDERS, BIDDER_BY_ID, VENUE_BY_ID } from '../content/venues';
 import { MODES } from './config';
 import { addTicker, fx, log } from './helpers';
-import { joke } from './jokes';
+import { RIVAL_CEO, joke } from './jokes';
 import { pick, rand, randRange, shuffle } from './rng';
 import type { Auction, BidderId, GameState, VenueId } from './types';
 
@@ -118,7 +118,7 @@ function sell(s: GameState, winner: BidderId | 'you') {
     if (winner === 'tree' && !s.treeVenue) s.treeVenue = vid;
     a.speech = { who: 'Auctioneer', text: `SOLD to ${a.soldTo}!` };
     fx(s, { kind: 'sfx', sfx: 'gavel' });
-    if (winner === 'tree') addTicker(s, 'TREE TIMES', `Tree Hacks wins ${v.name}; {rivalceo} "humbled"`.replace('{rivalceo}', 'Chad Leland III'));
+    if (winner === 'tree') addTicker(s, 'TREE TIMES', `Tree Hacks wins ${v.name}; {rivalceo} "humbled"`.replace('{rivalceo}', RIVAL_CEO));
     if (winner === 'furcon') addTicker(s, 'CAMPUS', `Bay Area FurCon wins ${v.name}; plans "the most wholesome dance-off ever"`.slice(0, 100));
     if (winner === 'tammy') addTicker(s, 'CAMPUS', `Wedding planner Tammy wins ${v.name}; "the bride will be thrilled," she says, menacingly`.slice(0, 100));
   }

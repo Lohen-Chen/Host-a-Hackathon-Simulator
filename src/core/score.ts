@@ -129,9 +129,9 @@ export function scoreTree(s: GameState): ScoreBreakdown {
     quality: clamp(54 + randRange(s, -10, 10) + stumble, 0, 100),
   };
   const TREE_LINES: Record<string, string> = {
-    attendance: 'Tree U filled the room. Mostly with Chad\'s phone chargers.',
+    attendance: 'Tree U filled the room. Mostly with Leland Sr.\'s phone chargers.',
     mood: 'Tree hackers rated the vibes "synergistic." Nobody knows what that means.',
-    sponsor: 'Tree had sponsors. All of them were Chad\'s dad\'s friends.',
+    sponsor: 'Tree had sponsors. All of them were Leland Sr.\'s golf buddies.',
     sponsormood: 'Tree sponsors were "aligned." They seemed tired.',
     amenities: 'Tree had catering. On a boat. The boat left early.',
     promises: 'Tree promised synergy. Delivered a keynote about synergy.',

@@ -121,6 +121,6 @@ describe('mad-lib engine', () => {
     for (const line of [...jokes.split('\n'), ...wordbank.split('\n')]) expect(blocked(line), line).toBeNull();
     const all = jokes + wordbank + JSON.stringify(ALERTS.map((a) => [a.title, a.body, a.choices.map((c) => [c.label, c.out?.text])]));
     expect(all).not.toMatch(/raccoon|Discord|Greek Row|Y Cinnamon/i);
-    expect(RIVAL_CEO).toBe('Chad Leland III');
+    expect(RIVAL_CEO).toBe('Leland Sr.');
   });
 });

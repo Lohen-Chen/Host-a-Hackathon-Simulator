@@ -275,3 +275,15 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .evo-node.available { background: #3b3216; }
 .evo-node.sel { background: var(--bear); }
 .evo-detail { display: flex; flex-direction: column; gap: 6px; }
+.member .burnout { color: var(--bad, #ff6b6b); font-weight: 700; }
+
+/* Desktop: frame the game as a centered panel so the dock isn't glued to the bottom
+   of a tall window, and let the map grow to fill the middle instead of hugging the top. */
+@media (min-width: 900px) and (min-height: 600px) {
+  #app { display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  .app { width: 100%; height: min(100%, 880px); border: 2px solid #000; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
+  .map-wrap { align-items: center; padding: 8px 0; }
+  .map { width: auto; height: 100%; max-width: 100%; }
+  /* keep Beary's hints off the top of the map (Twitter/X sits there) */
+  .hint { top: auto; bottom: 8px; right: 300px; }
+}

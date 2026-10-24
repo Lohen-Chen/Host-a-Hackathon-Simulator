@@ -13,7 +13,7 @@ export type TechId =
   // Hype
   | 'website' | 'promo' | 'reelposts' | 'memes' | 'billboard' | 'clapback'
   // Talent
-  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack'
+  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack' | 'nepolist'
   // Conversion
   | 'applications' | 'discord' | 'travel' | 'aicredits' | 'swag' | 'rep2' | 'rep3';
 export type TechBranch = 'hype' | 'talent' | 'conversion';
@@ -45,6 +45,9 @@ export interface Member {
   acc: number;
   /** days of output lost (T1 revert, T16 redraw, bsod Arch reinstall) */
   benchedDays: number;
+  /** burned out: works again and they quit tonight; a rest day clears it */
+  burnout?: boolean;
+  burnoutWorked?: boolean;
 }
 
 export interface RegionNode {
@@ -202,7 +205,6 @@ export interface GameState {
 
   members: Member[];
   candidates: Member[];
-  rosterCap: number;
   nextId: number;
 
   unlockedRoles: Role[];

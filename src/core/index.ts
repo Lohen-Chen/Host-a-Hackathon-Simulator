@@ -2,6 +2,7 @@
 export * from './types';
 export * from './config';
 export { newGame, hire, assign, canAssign, dealHand, candidateCount } from './state';
+export { hireCost, burnoutChance } from './crew';
 export { advance, beginGame, startLiveDay, endLiveDay, finishAuction, nextDay, isClockRunning, doStep } from './sim';
 export { armPost, firePost, reroll, canFire, affinity, partyMult, viralChance, ratioChance } from './posts';
 export { tapBubble, resolveAlert, inviteChance, BUBBLE_ICON, spawnBubble, queueAlert } from './events';

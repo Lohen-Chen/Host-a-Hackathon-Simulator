@@ -1,8 +1,7 @@
 // Title, intro, morning, night recap and pause screens.
 import { useEffect, useState } from 'preact/hooks';
-import { MODES, OBJECTIVE, TITLE, beginGame, candidateCount, hire, jokeEngine, startLiveDay, nextDay, type GameState, type Mode } from '../core';
+import { MODES, OBJECTIVE, TITLE, beginGame, burnoutChance, candidateCount, hire, hireCost, jokeEngine, startLiveDay, nextDay, type GameState, type Mode } from '../core';
 import { ROLE_INFO, TRAITS } from '../content/members';
-import { T } from '../core/config';
 import { sfx } from '../audio/sfx';
 import { Avatar, BearMascot, TreeMascot } from './art';
 import { CrewSheet } from './sheets';
@@ -25,7 +24,6 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
     sfx.unlock();
     store.newGame(mode, seedParam ? Number(seedParam) : undefined);
   };
-  const urlMode = params.get('mode') as Mode | null;
   return (
     <div class="title-screen">
       <div class="title-vs"><BearMascot size={72} /><span>VS</span><TreeMascot size={72} /></div>
@@ -33,11 +31,7 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
       <div class="small">You are the president of a club at Bear University. Tree University is hosting a hackathon the same weekend. 🎯 {OBJECTIVE}</div>
       <div class="mode-btns">
         {hasSave && <button class="btn btn-blue btn-big" onClick={() => { sfx.unlock(); store.continueGame(); }}>▶ Continue</button>}
-        {(['judge', 'standard', 'full'] as Mode[]).map((m) => (
-          <button key={m} class={`btn btn-big ${m === (urlMode ?? 'standard') ? 'btn-gold' : ''}`} onClick={() => start(m)}>
-            ▶ Play · {MODES[m].label}
-          </button>
-        ))}
+        <button class="btn btn-big btn-gold" onClick={() => start('standard')}>▶ Play · {MODES.standard.label}</button>
       </div>
       <div class="toggles">
         <button class="tab" onClick={() => store.setSettings({ music: !store.settings.music })}>🎵 Music: {store.settings.music ? 'on' : 'off'}</button>
@@ -53,7 +47,7 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
 
 const INTRO = [
   { icon: <BearMascot size={64} />, text: 'You are the president of a club at Bear University. You will host the greatest hackathon of all time.' },
-  { icon: <TreeMascot size={64} />, text: 'Tree University is hosting one the SAME weekend. Their CEO, Chad Leland III, is on his phone. He says "synergy."' },
+  { icon: <TreeMascot size={64} />, text: 'Tree University is hosting one the SAME weekend. Their CEO, Leland Sr., is on his phone. He says "synergy."' },
   { icon: <span style={{ fontSize: '54px' }}>🗺️</span>, text: 'Bear Hacks spreads across the country like a virus. 10,000 students. Fire posts at regions, tap 💡 bubbles for tech points, evolve your Hype, Talent and Conversion.' },
   { icon: <span style={{ fontSize: '54px' }}>✅</span>, text: 'Interest is free. Attendance is not. Spend your budget (and sponsor money) to confirm hackers. Seven days. Go.' },
 ];
@@ -76,7 +70,8 @@ export function Intro({ s }: { s: GameState }) {
 }
 
 export function Morning({ s }: { s: GameState }) {
-  const full = s.members.length >= s.rosterCap;
+  const cost = hireCost(s);
+  const risk = Math.round(burnoutChance(s) * 100);
   const tease = s.ticker.filter((t) => t.cat === 'TREE TIMES').slice(-1)[0];
   return (
     <>
@@ -85,14 +80,14 @@ export function Morning({ s }: { s: GameState }) {
       <div class="scene">
         <h2>☀️ Day {s.day} · Morning</h2>
         {tease && <div class="speech"><b>🌲 TREE TIMES:</b> {tease.text}</div>}
-        <div class="row"><h3 class="grow">Candidates ({s.candidates.length}/{candidateCount(s)})</h3><span class="small dim">${T.hireCost} each · roster {s.members.length}/{s.rosterCap}</span></div>
+        <div class="row"><h3 class="grow">Candidates ({s.candidates.length}/{candidateCount(s)})</h3><span class="small dim">next hire ${cost} · crew {s.members.length} · burnout risk {risk}%/night</span></div>
         <div class="carousel">
           {s.candidates.map((c, i) => (
             <div key={c.id} class="card cand col">
               <div class="row"><Avatar seed={c.avatarSeed} size={44} /><div><b>{c.name}</b><div class="tiny">{ROLE_INFO[c.role].icon} {ROLE_INFO[c.role].name} · skill {c.baseSkill}</div></div></div>
               <div class="tiny"><b>{TRAITS[c.trait].name}</b>: {TRAITS[c.trait].desc}</div>
               <div class="tiny dim">{c.bio}</div>
-              <button class="btn btn-blue" disabled={full || s.budget < T.hireCost} onClick={() => store.act((st) => hire(st, i))}>Hire (${T.hireCost})</button>
+              <button class="btn btn-blue" disabled={s.budget < cost} onClick={() => store.act((st) => hire(st, i))}>Hire (${cost})</button>
             </div>
           ))}
           {s.candidates.length === 0 && <div class="dim small">Nobody else applied. Unlock Club Prestige or put a Recruiter on Recruit.</div>}

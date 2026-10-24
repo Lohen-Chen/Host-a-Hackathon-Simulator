@@ -4,6 +4,7 @@ import { ROLE_INFO, TRAITS } from '../content/members';
 import { POSTS } from '../content/posts';
 import { emptyHistory } from '../jokes/engine';
 import { MODES, STEPS_PER_DAY, T } from './config';
+import { hireCost } from './crew';
 import { hasTech, taskSkillSum } from './helpers';
 import { joke } from './jokes';
 import { clamp, normal, pick, rand, randInt, seedState, shuffle } from './rng';
@@ -47,7 +48,6 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     treeVenue: null,
     members: [],
     candidates: [],
-    rosterCap: T.rosterCap,
     nextId: 1,
     unlockedRoles: ['organizer', 'social'],
     unlockedPosts: POSTS.filter((p) => !p.unlock).map((p) => p.id),
@@ -130,7 +130,7 @@ export function genMember(s: GameState, roles: Role[], quality: number): Member 
 export function candidateCount(s: GameState): number {
   const base = s.prestigeLevel === 3 ? 12 : s.prestigeLevel === 2 ? 7 : 3;
   const recruit = Number(s.flags.recruitPts ?? 0);
-  return base + Math.min(5, Math.floor(recruit / 3));
+  return base + (hasTech(s, 'nepolist') ? 2 : 0) + Math.min(5, Math.floor(recruit / 3));
 }
 
 export function dealHand(s: GameState) {
@@ -142,7 +142,7 @@ export function dealHand(s: GameState) {
 /** Morning setup: candidates, hand, daily trait rolls (Section 4). */
 export function prepareMorning(s: GameState) {
   s.phase = 'morning';
-  const recruitQuality = Math.min(1.5, Number(s.flags.recruitPts ?? 0) * 0.05);
+  const recruitQuality = Math.min(1.5, Number(s.flags.recruitPts ?? 0) * 0.05) + (hasTech(s, 'nepolist') ? 1.5 : 0);
   const n = candidateCount(s);
   s.candidates = [];
   for (let i = 0; i < n; i++) s.candidates.push(genMember(s, s.unlockedRoles, recruitQuality));
@@ -163,8 +163,9 @@ export function prepareMorning(s: GameState) {
 
 export function hire(s: GameState, idx: number): boolean {
   const c = s.candidates[idx];
-  if (!c || s.budget < T.hireCost || s.members.length >= s.rosterCap) return false;
-  s.budget -= T.hireCost;
+  const cost = hireCost(s);
+  if (!c || s.budget < cost) return false;
+  s.budget -= cost;
   if (c.trait === 'nepo') s.reputation = Math.min(s.repCap, s.reputation + 3);
   s.candidates.splice(idx, 1);
   if (c.trait === 'rust10') c.dailyMod = randInt(s, -3, 3);
