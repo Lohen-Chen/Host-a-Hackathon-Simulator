@@ -83,7 +83,7 @@ Other choices:
 ## Follow-up round
 
 - **Tips are centered cards**, like a news event, and pause the world until "Got it."
-- **Symmetrical dot blocks.** Each region is a full rectangle of dots (e.g. UC 6×6, B1G 8×5), so a dot is about 50 students but varies slightly by region (47.5 to 52). Dots fill in rings from the center.
+- **Symmetrical dot blocks.** Each region is a full rectangle of dots (e.g. UC 6×6, B1G 8×5), so a dot is about 50 students but varies slightly by region (47.5 to 52). Dots fill from opposite corners: Bear from the top-left, Tree mirrored from the bottom-right, meeting in the middle.
 - **Decision events are about tech leaders and AI.** Cut the generic ones (typo flyer, mom's share, lost receipts, fire marshal, pizza strike, smelly suit, boba, payroll hoodie, misquote, Tammy's email, flyer merge conflict, club dog) and ten food-gag headlines (nacho cheese is gone from the word bank). New decisions: Petros Thiel's doom tweet (Repost / Post a story condemning it), Alex Carp's "lethality" and his speaker rider, Mario A. Model's manifesto, an AI CEO replacing junior engineers, "AGI achieved internally," a private equity buyout offer and a $100k drop-out offer.
 - **The reply-all event is gone.** The comeback slot it used (when Bear is far behind, and Tree's final-day stumble) is now Leland Sr. letting an AI agent run Tree Hacks.
 - **"Retweet," not "quote-tweet."** Decision choices that share a post say "Retweet it."

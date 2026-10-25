@@ -28,8 +28,8 @@ function grid(pop: number): [number, number] {
   return best;
 }
 
-/** Each region is a compact block of dots around its map point. The fill order grows in rings from the
- *  middle outward, so Bear spreads like an infection from the center and Tree closes in from the edges. */
+/** Each region is a compact block of dots around its map point. The fill order grows in quarter rings out of
+ *  the top-left corner, so Bear spreads from there; Tree mirrors it from the bottom-right corner. */
 function blockFor(r: { id: string; pop: number; x: number; y: number }): Block {
   const key = `${r.id}:${r.pop}`;
   const hit = blocks.get(key);
@@ -38,10 +38,9 @@ function blockFor(r: { id: string; pop: number; x: number; y: number }): Block {
   const n = cols * rows;
   const w = cols * CELL - (CELL - SQ);
   const h = rows * CELL - (CELL - SQ);
-  const cx = (cols - 1) / 2;
-  const cy = (rows - 1) / 2;
+  // Distance from the top-left corner; ties sweep from the top edge to the left edge.
   const order = Array.from({ length: n }, (_, i) => i)
-    .map((i) => { const dx = (i % cols) - cx; const dy = Math.floor(i / cols) - cy; return { i, d: Math.hypot(dx, dy), a: Math.atan2(dy, dx) }; })
+    .map((i) => { const dx = i % cols; const dy = Math.floor(i / cols); return { i, d: Math.hypot(dx, dy), a: Math.atan2(dy, dx) }; })
     .sort((a, b) => a.d - b.d || a.a - b.a).map((o) => o.i);
   const b = { n, cols, rows, per: r.pop / n, x0: r.x - w / 2, y0: r.y - h / 2, w, h, order };
   blocks.set(key, b);
@@ -79,7 +78,8 @@ export function MapSvg({ s, onRegion, selected, pulses, arrival }: { s: GameStat
         // Check-in: everyone interested shows dim blue until they walk in.
         if (arrival !== undefined) for (let k = 0; k < squareSplit(r, b)[0]; k++) color[b.order[k]] = 'sq-w';
         for (let k = 0; k < bear; k++) color[b.order[k]] = 'sq-b';
-        for (let k = 0; k < tree; k++) color[b.order[b.n - 1 - k]] = 'sq-t';
+        // Tree mirrors Bear's order through the center (bottom-right corner first), stepping around Bear's dots.
+        for (let k = 0, placed = 0; k < b.n && placed < tree; k++) { const c = b.n - 1 - b.order[k]; if (color[c] === 'sq-n') { color[c] = 'sq-t'; placed++; } }
         const treeOwned = isTreeControlled(r);
         const pulse = pulses?.find((p) => p.regionId === r.id);
         const sel = selected === r.id;
