@@ -3,7 +3,7 @@ import { PROMISES } from '../content/promises';
 import { SPONSOR_BY_ID } from '../content/sponsors';
 import { TREE_BACKUP, VENUE_BY_ID } from '../content/venues';
 import { log } from './helpers';
-import { RIVAL_BACKERS, joke, treeRegionCount } from './jokes';
+import { RIVAL_CEO, joke, treeRegionCount } from './jokes';
 import { checkPromises, expectedAttendees, scoreBear, scoreTree, treeAttendees, venueCap, type EventFacts } from './score';
 import { pick, shuffle } from './rng';
 import type { Beat, GameState } from './types';
@@ -35,8 +35,8 @@ export function startHackday(s: GameState) {
     win,
     awards: awards(s, facts),
     headline: win
-      ? pick(s, ['BEAR WINS. Tree University is "pivoting to reflection."', 'More hackers than Tree! Alex Carp is "re-evaluating the lethality of our hackathon strategy."', 'VICTORY. The bear suit still smells, but it smells like winning.'])
-      : pick(s, ['Tree wins this year. Petros Thiel called it "a zero-to-one moment."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. But the Blue Screen respects you.']),
+      ? pick(s, ['BEAR WINS. Tree University is "pivoting to reflection."', 'More hackers than Tree! Leland Sr. put down his phone.', 'VICTORY. The bear suit still smells, but it smells like winning.'])
+      : pick(s, ['Tree wins this year. Leland Sr. called it "synergy."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. But the Blue Screen respects you.']),
   };
   log(s, 'result', win ? 'win' : 'loss', bear.total);
 }
@@ -86,7 +86,7 @@ function buildBeats(s: GameState, f: EventFacts): Beat[] {
   // 9. Tree check-in
   const tv = s.treeVenue ? VENUE_BY_ID[s.treeVenue].name : TREE_BACKUP.name;
   const tr = treeRegionCount(s);
-  add('tree', '🌲', 'Meanwhile at Tree U', `At ${tv}, ${pick(s, RIVAL_BACKERS)} is giving a keynote about synergy from his phone. Tree controlled ${tr}/8 regions. ${pick(s, TREE_CHAOS)}`);
+  add('tree', '🌲', 'Meanwhile at Tree U', `At ${tv}, ${RIVAL_CEO} is giving a keynote about synergy from his phone. Tree controlled ${tr}/8 regions. ${pick(s, TREE_CHAOS)}`);
 
   // 10. Closing ceremony (promise check #2 + callbacks)
   const rest = s.promises.slice(1, 3).map((p) => (p.kept ? PROMISES[p.kind].kept : PROMISES[p.kind].broken));

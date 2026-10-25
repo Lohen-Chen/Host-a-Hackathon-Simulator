@@ -44,46 +44,12 @@ export const ALERTS: AlertDef[] = [
     needsMember: true,
   },
   {
-    id: 'typo_flyer', icon: '📄', title: 'Flyers say "Hackathon of the Yeer"', weight: 2, max: 1,
-    body: '500 flyers. One typo. Huge font.', defaultChoice: 1,
-    choices: [
-      { label: 'Reprint', cost: 800, out: { text: 'Reprinted. The new flyers say "Hackathon of the Year." Boring. Correct.' } },
-      { label: 'Lean into it', out: { text: '"Yeer" is now a meme. Someone made merch. You are not getting a cut.', impulse: { target: 'random', amount: 0.15 }, flags: { yeer: true }, rep: 1 } },
-    ],
-  },
-  {
     id: 'dave', icon: '📧', title: 'Dave from Sponsorship sent 47 emails', weight: 2, max: 1, foreshadow: 'headline|fs_dave', satire: true,
     body: 'Subject lines include "Re: Re: Fwd: quick sync??" and "Dave".', defaultChoice: 0,
     choices: [
       { label: 'Reply all', out: { text: 'You replied all. Dave replied all to your reply all. It is now a mailing list.', inviteBonus: 0.08, mood: -1, flags: { dave: 'replied' } } },
       { label: 'Hire Dave', cost: 300, out: { text: 'Dave is on the team. Dave has sent 12 emails about it.', inviteBonus: 0.15, flags: { dave: 'hired' } } },
       { label: 'Block Dave', out: { text: 'Dave is blocked. Dave has found your fax number.', flags: { dave: 'blocked' } } },
-    ],
-  },
-  {
-    id: 'mom_share', icon: '👩', title: "{member}'s mom shared your post", weight: 2, max: 1, needsMember: true,
-    body: 'With 4,000 relatives. And a comment: "so proud of my baby."', defaultChoice: 0,
-    choices: [
-      { label: 'Thank her publicly', out: { text: 'She replied with 14 heart emojis and your baby photo. Reach: enormous.', impulse: { target: 'all', amount: 0.05 }, mood: 2 } },
-      { label: 'Pretend it never happened', out: { text: 'She shared it again. With a caption. "He\'s shy."', impulse: { target: 'highschools', amount: 0.12 } } },
-    ],
-  },
-  {
-    id: 'budget_hole', icon: '🧾', title: 'The treasurer lost the receipts', weight: 2, max: 1,
-    body: 'All of them. Possibly in a pizza box. Possibly eaten.', defaultChoice: 1,
-    choices: [
-      { label: 'Audit', cost: 400, out: { text: 'The audit found $600 in a hoodie pocket. It belongs to the treasurer. Respect restored, though.', rep: 2 } },
-      { label: 'Blame the intern', out: { text: 'The intern has been blamed. The intern does not exist. Still blamed.', budget: -500 } },
-      { label: 'Blame the Blue Screen', out: { text: 'The laptop took the fall. It was already sad. Now it\'s sadder.', budget: -200, rep: -1 } },
-    ],
-  },
-  {
-    id: 'fire_marshal', icon: '🚒', title: 'The fire marshal has questions', weight: 1.5, max: 1,
-    body: 'Specifically about "the pizza oven" you described on the website.', defaultChoice: 2,
-    choices: [
-      { label: 'Explain it\'s a metaphor', out: { text: 'The fire marshal does not accept metaphors. Fined for a figurative oven.', budget: -300 } },
-      { label: 'Invite them to judge', out: { text: 'The fire marshal is now a judge. Their only criterion: "exits."', rep: 3 } },
-      { label: 'Hide the oven', out: { text: 'You hid the oven. There was no oven. Somehow you are still in trouble.', rep: -2 } },
     ],
   },
   {
@@ -151,15 +117,6 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
-    id: 'viral_misquote', icon: '📰', title: 'Your president was quoted out of context', weight: 1.5, max: 1,
-    body: 'Headline: "Club President: \'We Will Destroy {food}\'". The context was a snack table.', defaultChoice: 2,
-    choices: [
-      { label: 'Issue a correction', out: { text: 'Correction issued. Nobody read it. Everyone read the original.', rep: 1 } },
-      { label: 'Double down', odds: { p: 0.5, win: { text: 'You doubled down. It\'s a meme now. You are the snack destroyer.', rep: 6, impulse: { target: 'twitter', amount: 0.15 } }, lose: { text: 'You doubled down. A snack lobby has formed. They are organized.', rep: -5 } } },
-      { label: 'Say nothing', out: { text: 'Silence. The internet took it as a confession.', rep: -2 } },
-    ],
-  },
-  {
     id: 'billboard_prank', icon: '🚌', title: 'Someone edited the bus ad to "Cal Hack$"', weight: (s) => (hasTech(s, 'sfbus') ? 2 : 0), max: 1,
     body: 'The dollar sign is very professionally done.', defaultChoice: 0,
     choices: [
@@ -174,33 +131,6 @@ export const ALERTS: AlertDef[] = [
       { label: '"Love it, ship it"', out: { text: 'They shipped. It\'s a text box that says "thinking…" forever.', quality: -1, rep: 1 } },
       { label: 'Ask what it does', out: { text: '"It\'s a platform." You asked again. "It\'s an AI platform."', tp: 1 } },
       { label: 'Wrap their wrapper', out: { text: 'You built a wrapper for their wrapper. Valuation: $40M.', quality: 2, rep: 1 } },
-    ],
-  },
-  {
-    id: 'pizza_strike', icon: '🍕', title: 'Pizza vendor demands hazard pay', weight: 1.5, max: 1,
-    body: '"Last hackathon, a hacker asked me to review his pull request."', defaultChoice: 1,
-    choices: [
-      { label: 'Pay it', cost: 600, out: { text: 'Hazard pay approved. The pizza arrives on time (11:59 AM tomorrow).', mood: 3 } },
-      { label: 'Negotiate', odds: { p: 0.5, win: { text: 'You negotiated with code review. The vendor is now a contributor.', mood: 2 }, lose: { text: 'Negotiations failed. You will be served "artisanal crackers."', mood: -3 } } },
-      { label: 'Switch to sushi', cost: 300, out: { text: 'Switched to gas-station sushi. Brave. Mood: complicated.', mood: -1 } },
-    ],
-  },
-  {
-    id: 'mascot_suit', icon: '🐻', title: 'The bear suit smells', weight: 1.5, max: 1,
-    body: 'Like 12 years of game days and one burrito incident.', defaultChoice: 2,
-    choices: [
-      { label: 'Dry-clean it', cost: 400, out: { text: 'Dry-cleaned. It now smells like a dry cleaner\'s worst day.', mood: 1 } },
-      { label: 'Febreze and pray', out: { text: 'Smells like "Mountain Breeze" over "burrito." Worse, somehow.', mood: -1 } },
-      { label: 'Market it as a feature', out: { text: '"Authentic bear musk." Frat Row wants to buy it.', impulse: { target: 'frat', amount: 0.12, party: true } } },
-    ],
-  },
-  {
-    id: 'tammy', icon: '💐', title: 'Tammy sent a stern email', weight: (s) => (s.day >= 2 && s.day <= 4 ? 1.5 : 0), max: 1,
-    body: 'Subject: "your ceremony conflict." She has a bride. She has a spreadsheet.', defaultChoice: 0,
-    choices: [
-      { label: 'Apologize', out: { text: 'Tammy accepted. Tammy will remember this. Tammy remembers everything.', flags: { tammy: 'calm' } } },
-      { label: 'Invite her bride to hack', out: { text: 'The bride registered. She\'s building a seating-chart optimizer.', impulse: { target: 'b1g', amount: 0.1 } } },
-      { label: 'Reply "per my last email"', out: { text: 'Tammy has declared war. She will bid on everything.', flags: { tammy: 'angry' } } },
     ],
   },
   {
@@ -293,15 +223,6 @@ export const ALERTS: AlertDef[] = [
       { label: 'Vendor it', out: { text: 'Vendored. A single point of failure called "pad left" now lives in your repo forever.', tp: -1 } },
       { label: 'Wait', out: { text: 'Waited. The site was down for a while. Left-padding is a human right.', siteDown: 3 } },
       { ...RUST, out: { text: 'Rewrote it in Rust. It pads left in 0.001 ms. The site is now right-aligned.', website: -5, flagAdd: { rust: 1 } } },
-    ],
-  },
-  {
-    id: 'merge_conflict', icon: '🔀', title: 'Two members edited the same flyer', weight: 1.5, max: 1, tech: true,
-    body: 'One says Saturday. One says Sunday. Git says both.', defaultChoice: 0,
-    choices: [
-      { label: 'Keep both', run: (s) => { const good = chance(s, 0.5); s.bonusSignups += good ? 15 : -15; return good ? 'The flyer says "Saturday and not Saturday." People came both days.' : 'The flyer says "Saturday and not Saturday." Nobody came either day.'; } },
-      { label: 'Pick one', out: { text: 'You picked Saturday. The Sunday faction has formed a splinter club.', mood: -1 } },
-      { label: 'Rebase', out: { text: 'Rebased cleanly. Nobody understands what you did. Respect.', tp: -1 } },
     ],
   },
   {
@@ -465,37 +386,78 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
-    id: 'tree_stumble', icon: '🌲', title: '{rivalceo} replied-all to 4,000 applicants', weight: 0, max: 2,
-    body: 'The email was meant for his assistant. It says "lol they think the prizes are real." Opportunity?', defaultChoice: 0,
+    id: 'tree_stumble', icon: '🌲', title: '{rivalceo} let an AI agent run Tree Hacks', weight: 0, max: 2,
+    body: 'It booked the venue for 2031, emailed every applicant a coupon for "one (1) GPU," and named itself Head of Synergy. Opportunity?', defaultChoice: 0,
     choices: [
       { label: 'Quote-tweet it (politely)', out: { text: 'You just added "oof." It did numbers. Tree hype dropped.', treeHype: -8, rep: 1 } },
-      { label: 'Send a get-well card', out: { text: 'The card said "synergy." Tree U is deeply confused. Their fans switched sides.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
+      { label: 'Offer the agent a job', out: { text: 'The agent accepted. It now runs your snack spreadsheet. Tree fans switched sides out of pity.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
+    ]
+  },
+
+  // ─────────────── tech-leader satire (decisions) ───────────────
+  {
+    id: 'thiel_doom', icon: '🕳️', title: 'Petros Thiel tweets that humanity is doomed', weight: 2, max: 1, satire: true,
+    body: 'Also that the antichrist is "probably a regulator." 40 million views. Your social team is asking what to do.', defaultChoice: 1,
+    choices: [
+      { label: 'Repost', out: { text: 'Reach: enormous. Replies: 200 Substack invites. The hackers who read things are quietly unsubscribing.', impulse: { target: 'twitter', amount: 0.16 }, rep: -3, mood: -1 } },
+      { label: 'Post a story condemning it', out: { text: 'Your story got 300 views and 12 replies that just say "real." Hackers respect it.', rep: 3, mood: 2, impulse: { target: 'twitter', amount: 0.05 } } },
     ],
   },
   {
-    id: 'bubble_tea_flood', icon: '🧋', title: 'A boba delivery went to the wrong building', weight: 1, max: 1,
-    body: '300 boba teas are melting in the lobby of {place}.', defaultChoice: 0,
+    id: 'carp_lethality', icon: '🎯', title: 'Alex Carp says hackathons need "more lethality"', weight: 1.8, max: 1, satire: true,
+    body: 'He said it during a 90-minute earnings call that was mostly about "the West." Defense sponsors are suddenly very interested in you.', defaultChoice: 1,
     choices: [
-      { label: 'Give them away', out: { text: 'Free boba in {region}. You are now a local legend. Tapioca everywhere.', impulse: { target: 'random', amount: 0.15 }, mood: 2 } },
-      { label: 'Sell them', out: { text: 'You tried to sell free boba. The hackers organized a boycott. You gave it away anyway, angrily.', rep: -1, mood: 1 } },
-    ],
-    region: 'random',
-  },
-  {
-    id: 'trench_payroll', icon: '🧥', title: "Payroll found three people in one hoodie", weight: (s) => (s.members.some((m) => m.trait === 'trenchcoat') ? 2 : 0), max: 1,
-    body: 'It might be the interns. It might be one very tall intern.', defaultChoice: 1,
-    choices: [
-      { label: 'Pay all three', cost: 300, out: { text: 'Paid three salaries. Output tripled. Hoodie very warm.', outputMult: 1.1 } },
-      { label: 'Ask no questions', out: { text: 'No questions asked. The trench coat nods. It respects you now.', mood: 1 } },
+      { label: 'Add a "defense track"', out: { text: 'Defense sponsors love it. Your hackers built a drone that delivers boba. Close enough?', inviteBonus: 0.1, rep: -2, mood: -3 } },
+      { label: 'Make a meme about it', out: { text: 'The meme is a bear in a tactical vest saying "synergy." It did numbers.', impulse: { target: 'twitter', amount: 0.12 }, rep: 2 } },
     ],
   },
   {
-    id: 'club_dog', icon: '🐕', title: 'Fans want to meet the club dog', weight: (s) => (s.postsFired > 1 ? 1.3 : 0.4), max: 1,
-    body: 'You do not have a club dog. You have never had a club dog.', defaultChoice: 2,
+    id: 'model_manifesto', icon: '📜', title: 'Mario A. Model posts a 5,000-word techno-optimist manifesto', weight: 1.8, max: 1, satire: true,
+    body: 'It says "builders" 212 times. It mentions hackathons once, as "a vibe." VCs are sharing it with a single 🔥.', defaultChoice: 1,
     choices: [
-      { label: 'Rent a dog', cost: 400, out: { text: 'Rented a golden retriever named "Synergy." 400 photos taken. Worth it.', impulse: { target: 'uc', amount: 0.2 }, flags: { dog: 'rented' } } },
-      { label: 'Admit there is no dog', out: { text: '"The club dog was the friends we made along the way." Nobody accepted this.', rep: -2, flags: { dog: 'admitted' } } },
-      { label: 'Say the dog is "remote"', out: { text: 'The club dog is "working remote." It has a LinkedIn now.', rep: 1, flags: { dog: 'remote' } } },
+      { label: 'Quote it in your promo', out: { text: 'VCs liked it. Your designer asked to be removed from the group chat.', inviteBonus: 0.08, rep: -1, mood: -1 } },
+      { label: 'Write a counter-manifesto', out: { text: 'Yours is six words: "please just let us eat pizza." It went further than his.', rep: 2, impulse: { target: 'twitter', amount: 0.08 } } },
+    ],
+  },
+  {
+    id: 'ai_replaces_juniors', icon: '🤖', title: 'An AI CEO says AI will replace every junior engineer', weight: 1.8, max: 1, satire: true, tech: true,
+    body: 'He said it at a conference. To junior engineers. Who paid $1,200 for the ticket.', defaultChoice: 1,
+    choices: [
+      { label: 'Repost: "so true king"', out: { text: 'Sponsors liked it. Your hackers did the math on their student loans.', inviteBonus: 0.06, mood: -3 } },
+      { label: 'Host a "Humans Still Code" workshop', cost: 300, out: { text: 'Packed room. Someone wrote a for-loop by hand and got a standing ovation.', mood: 3, quality: 2, rep: 1 } },
+    ],
+  },
+  {
+    id: 'agi_internally', icon: '🌀', title: 'An AI lab tweets "AGI achieved internally" again', weight: 1.5, max: 1, satire: true, tech: true,
+    body: 'Fourth time this month. Everyone on Twitter/X is "feeling the AGI." Nobody has seen it.', defaultChoice: 1,
+    choices: [
+      { label: 'Retweet it with "🤯"', out: { text: 'Engagement up. Three hackers now think the judges are AGI. They are grad students.', impulse: { target: 'twitter', amount: 0.1 }, quality: -1 } },
+      { label: 'Ask for a demo', out: { text: 'The demo was a waitlist. Hackers loved that you asked.', rep: 2, mood: 1 } },
+    ],
+  },
+  {
+    id: 'pe_acquisition', icon: '🏦', title: '{pe} wants to acquire Bear Hacks', weight: 1.5, max: 1, satire: true,
+    body: 'They plan to "unlock value" by charging for WiFi, cutting the snack bar, and renaming it "HackathonCo."', defaultChoice: 1,
+    choices: [
+      { label: 'Take the meeting', out: { text: 'They suggested replacing the hackers with a spreadsheet. The spreadsheet declined.', tp: -1, sponsorMood: 3 } },
+      { label: 'Decline publicly', out: { text: '"Bear Hacks is not for sale." 4,000 likes. {pe} bought a laundromat instead.', rep: 3, impulse: { target: 'twitter', amount: 0.06 } } },
+    ],
+  },
+  {
+    id: 'dropout_fellowship', icon: '🎓', title: 'Petros Thiel offers {member} $100k to drop out', weight: (s) => (s.members.length > 3 ? 1.5 : 0), max: 1, satire: true, needsMember: true,
+    body: 'The email says "skip college, build the future." The future is a B2B dashboard for dentists.', defaultChoice: 1,
+    choices: [
+      { label: 'Wish them luck', out: { text: '{member} is gone. Their LinkedIn now says "Founder (stealth)." The stealth is that there is no product.', rep: 1 },
+        run: (s, c) => { if (c.memberId !== undefined) removeMember(s, c.memberId); } },
+      { label: 'Counter with free pizza', cost: 200, out: { text: '{member} chose pizza. The future can wait until Monday.', mood: 1 } },
+    ],
+  },
+  {
+    id: 'carp_hoodie', icon: '🧥', title: 'Alex Carp wants to speak at your opening ceremony', weight: (s) => (s.day >= 3 ? 1.4 : 0), max: 1, satire: true,
+    body: 'His team sent a rider: a treadmill desk, a sword, and "no questions from the audience."', defaultChoice: 1,
+    choices: [
+      { label: 'Book him', out: { text: 'Sponsors are thrilled. The hackers have started making protest signs. Some of them are very good.', inviteBonus: 0.1, mood: -4 } },
+      { label: 'Book a hacker instead', out: { text: 'A sophomore gave a 4-minute talk on her Raspberry Pi weather station. Standing ovation.', mood: 3, rep: 2 } },
     ],
   },
 ];

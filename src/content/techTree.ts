@@ -46,7 +46,7 @@ export const TECH: TechNode[] = [
     desc: '"SoCal Asians flock to me."',
     rumor: 'A rumor says Eric Ou is coming to Bear Hacks. Eric Ou heard the rumor and is coming to Bear Hacks.' },
   { id: 'ricklee', name: 'Rick Lee of Bluely', branch: 'hype', cost: 8, prereq: 'ericou', bars: { hype: 16 }, effect: 'Post viral chance +8%.', joke: 'stretch',
-    desc: '""global rank #1 entrepreneur""',
+    desc: '"global rank #1 entrepreneur"',
     rumor: 'A rumor says Rick Lee of Bluely cheated his way into Bear Hacks. He would like you to know it was "on purpose."' },
   { id: 'discord', name: 'Discord Server', branch: 'hype', cost: 4, prereq: 'website', bars: { hype: 8, org: 4 }, effect: 'Interested hackers stick around: show rate +3%.', joke: 'stretch',
     rumor: 'A rumor says Bear Hacks has a Discord with 10,000 members. It has 12. Then it had 3,000. Rumors work.' },

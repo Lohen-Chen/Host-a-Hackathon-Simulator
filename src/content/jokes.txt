@@ -3,7 +3,7 @@
 # Format:  [category|subtag needs=key>n,key<n]   template text
 # Slots:   {noun} {verb:past} {verb:ing} {verb:3s} {noun:pl} {a:adj} {Noun} {noun#1}
 #          plus any [category] from wordbank.txt, plus state slots:
-#          {sponsor} {sponsor2} {member} {role} {venue} {region} {rival} {rivalceo} (Tree's billionaire backers) {pe}
+#          {sponsor} {sponsor2} {member} {role} {venue} {region} {rival} {rivalceo} (Leland Sr.) {mogul} (tech moguls) {pe}
 #          {signups} {day} {treeRegions} {score} {equitySold} {treesignups} {budget}
 # needs keys: signups day treeRegions rep budget sponsors website treesignups lead equitySold wifiPain
 # Lines must render to <= 100 characters. Keep it PG-13 and punch up.
@@ -25,7 +25,6 @@
 [headline|bear]   Bear crew {verb:past} flyers all over {region}; flyers fought back
 [headline|tree]   Tree U unveils {a:adj} {noun}; experts say "{buzzword}"
 [headline|tree]   {rivalceo} announces "{buzzword}" on a call he took during a different call
-[headline|tree]   {rival} hackathon promises {food} and a keynote on {buzzword}
 [headline|tree]   {rival} migrates to {language}; productivity "temporarily" at zero
 [headline|tree]   {rival} closes {round}; {rivalceo} calls it "validation"
 [headline|tree]   {rivalceo} said "synergy" to {a:animal}; the {animal#1} agreed
@@ -36,10 +35,10 @@
 [headline|tree needs=treesignups>2500]   {rival} hits {treesignups} signups; {rivalceo} buys a second phone
 [headline|tree]   {rival} offers {food} to anyone who says "{buzzword}"
 [headline|tree]   Tree swag bag leaked: one {gadget} and a QR code to {a:noun}
-[headline|tree]   {rivalceo} funds Tree's grand prize: a drone that follows you to the snack bar
+[headline|tree]   {mogul} funds Tree's grand prize: a drone that follows you to the snack bar
 [headline|tree]   {pe} buys into Tree Hacks; will "unlock value" from the extension cords
-[headline|tree]   {rivalceo} keynotes Tree Hacks in a puffer vest; says "lethality" 11 times
-[headline|tree]   {rivalceo} tells Tree hackers to "drop out and build"; Tree registrar faints
+[headline|tree]   {mogul} keynotes Tree Hacks in a puffer vest; says "lethality" 11 times
+[headline|tree]   {mogul} tells Tree hackers to "drop out and build"; Tree registrar faints
 [headline|sponsor]   {sponsor} unveils {a:noun} for hackers who {verb} too much
 [headline|sponsor]   {sponsor} pledges {food} and a tasteful amount of {buzzword}
 [headline|sponsor]   {sponsor} denies rumor its CEO is three {animal:pl} in a blazer
@@ -60,31 +59,29 @@
 [headline|campus]   Local founder raises {round} on {a:noun}; product "coming soon"
 [headline|campus]   {member} announces {codebase} rewrite in {language}
 [headline|campus]   Venue WiFi reported "{wifi_excuse}"; hackers flee to their phones
-[headline|campus]   Campus {animal} elected to student senate on a platform of {food}
-[headline|campus]   {place} closed after someone tried to {verb} {a:noun}
-[headline|campus]   Study finds 9 in 10 students "would hack for {food}"
 [headline|campus]   Dining hall introduces "{buzzword} bowl"; it is {food}
 [headline|campus]   Club fair booth gives away {number} {noun:pl}; nobody takes the flyer
 [headline|campus]   {region} reports outbreak of {emotion}; experts blame hackathon season
 [headline|campus]   Campus Wi-Fi rebrands as "an experience"; speed now {wifi_excuse}
 [headline|campus]   Student builds {bad_idea}; professor gives it a B-minus "for ambition"
-[headline|campus]   Library extends hours "until everyone stops {verb:ing}"
 [headline|campus]   {place} vending machine now accepts {round} terms
+[headline|campus]   CS department renamed "AI-native Computing"; same professors, new lanyards
+[headline|campus]   {mogul} gives commencement speech; tells graduates degrees are "legacy software"
+[headline|campus]   Students asked to rate their professor; an AI agent rated it first
+[headline|campus]   {pe} acquires the campus bookstore; textbooks now a monthly subscription
 [headline|breaking]   BREAKING: {member} has opened {number} browser tabs; laptop requests a lawyer
 [headline|breaking]   BREAKING: club printer prints only the word "{buzzword}"
 [headline|breaking]   BREAKING: someone said "{tech_excuse}" and the room went silent
-[headline|breaking]   BREAKING: {food} sighted in {region}; crowd forms instantly
-[headline|breaking]   BREAKING: {region} reports {emotion}; officials urge {food}
-[headline|breaking]   BREAKING: {number} hackers stuck in an elevator; they're building {bad_idea}
-[headline|breaking]   BREAKING: club dog (which does not exist) spotted in {region}
-[headline|breaking]   BREAKING: pizza ordered for the hackathon will arrive at 11:59 AM tomorrow
 [headline|breaking]   BREAKING: Devpost deadline moved to 9:00; everyone still submits at 8:59
 [headline|breaking]   BREAKING: Dave from Sponsorship has sent another email
 [headline|breaking]   BREAKING: someone asked what the product is; the founder said "platform"
 [headline|breaking]   {member} rewrote the {codebase} in {language}, told nobody
+[headline|breaking]   BREAKING: {mogul} tweets humanity is doomed; reply guys agree in 4 minutes
+[headline|breaking]   BREAKING: AI lab announces AGI "achieved internally" for the 4th time this month
+[headline|breaking]   BREAKING: {mogul} warns of "the antichrist"; it is a regulatory agency
 [headline|breaking]   "AI-native" named word of the year; runner-up "agentic," third place "vibes"
 [headline|breaking]   Transhumanist meetup ends early; the crabs had a prior commitment
-[headline|breaking]   {rivalceo} says AI will replace {department:pl}; {department:pl#1} reply-all
+[headline|breaking]   {mogul} says AI will replace {department:pl}; {department:pl#1} reply-all
 
 # Foreshadowing headlines (alerts land 5–8 s later). Alert data points at these subtags.
 [headline|fs_bsod]       BREAKING: Club laptop reports "a problem has occurred" near {place}

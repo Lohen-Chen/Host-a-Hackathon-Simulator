@@ -3,7 +3,7 @@ import { loadErrors } from './setup';
 import { ALERTS } from '../src/content/alerts';
 import { REPLIES } from '../src/content/sponsors';
 import { jokeEngine, newGame } from '../src/core';
-import { slotsFor, needsFor } from '../src/core/jokes';
+import { slotsFor, needsFor, RIVAL_CEO } from '../src/core/jokes';
 import { emptyHistory } from '../src/jokes/engine';
 import { article, past, ing, thirdPerson, plural } from '../src/jokes/inflect';
 import { parseJokes, parseWordbank } from '../src/jokes/parse';
@@ -120,6 +120,7 @@ describe('mad-lib engine', () => {
     const { jokes, wordbank } = readContent();
     for (const line of [...jokes.split('\n'), ...wordbank.split('\n')]) expect(blocked(line), line).toBeNull();
     const all = jokes + wordbank + JSON.stringify(ALERTS.map((a) => [a.title, a.body, a.choices.map((c) => [c.label, c.out?.text])]));
-    expect(all).not.toMatch(/raccoon|Discord|Greek Row|Y Cinnamon|Leland/i);
+    expect(all).not.toMatch(/raccoon|Discord|Greek Row|Y Cinnamon/i);
+    expect(RIVAL_CEO).toBe('Leland Sr.');
   });
 });

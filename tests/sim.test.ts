@@ -78,7 +78,7 @@ describe('simulation core', () => {
     beginGame(s);
     startLiveDay(s);
     s.schedule = [];
-    queueAlert(s, 'typo_flyer');
+    queueAlert(s, 'dave');
     expect(s.alertQueue).toHaveLength(1);
     const t = s.t;
     advance(s, 12);
