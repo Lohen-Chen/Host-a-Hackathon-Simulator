@@ -268,7 +268,7 @@ describe('simulation core', () => {
     for (const t of ['Purdue football wins natty', 'Purdue obliterates IU in 80-2 game', 'IU falls to chaos', 'IU Kelley School named #1 in most annoying students']) expect(titles).toContain(t);
     const s = newGame(18);
     s.techPoints = 99;
-    buyTech(s, 'aicredits');
+    for (const id of ['applications', 'discord', 'aicredits'] as const) buyTech(s, id);
     expect(s.popups.some((p) => p.body.includes('increased the participation of business majors by 200%'))).toBe(true);
   });
 
@@ -297,6 +297,7 @@ describe('simulation core', () => {
     expect(n.desc).toContain('direct recruitment');
     const s = newGame(31);
     s.techPoints = 99;
+    for (const id of ['clubfair', 'coordinator', 'prestige2'] as const) buyTech(s, id);
     const before = bar(s, 'talent');
     buyTech(s, 'nepolist');
     expect(bar(s, 'talent')).toBeGreaterThan(before);

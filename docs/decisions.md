@@ -58,3 +58,12 @@ Other choices:
 - **One 10-minute mode.** Judge and Full are gone from the title screen. The sim still supports them internally for tests.
 - **Rival CEO renamed** to Leland Sr.
 - **Desktop layout.** On wide windows the game is a centered panel, the map fills the middle, and Beary's hints sit at the bottom so they don't cover Twitter/X.
+
+## UI round (Changes.pdf)
+
+- **Squares map.** Regions are blocks of squares, one per 50 students, filled from the center: blue for Bear, red for Tree, gray for undecided. You can read who is winning a region at a glance, like Plague Inc's red spread. A world bar shows the overall split.
+- **Automated posts.** The Posts sheet and card hand are gone. 📱 bubbles appear where a post would help; tapping one picks the best card for that region. Results show as a tier banner and comments on the map, and as a line in the news feed. We kept the tap so the player still chooses where and when to post.
+- **Evolve is a real tree.** Each branch grows from one root node, drawn left to right with links. Three new nodes: Influencers (more 📱 bubbles, wider spill), Mentor Program (project quality) and Reminder Emails (show rate).
+- **Landscape layout.** Phones in landscape and desktops put the map on the left and objective, world bar, Confirm and the news feed on the right. Portrait keeps the stacked layout and uses spare height under the map for a short news feed. Hints and region info sit in the layout flow instead of floating over the map, and map comments stack instead of overlapping.
+- **Leland screenshot joke replaced** with a Tree reply-all blunder. The rubber-band alert stays.
+- **Tree is red** (`--tree-hi`) so the map reads as blue against red.

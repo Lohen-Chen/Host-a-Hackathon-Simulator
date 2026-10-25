@@ -82,7 +82,7 @@ export function doStep(s: GameState) {
       case 'recruit':
         s.flags.recruitPts = Number(s.flags.recruitPts ?? 0) + (m.role === 'recruiter' ? k : k * 0.5) / STEPS_PER_DAY;
         break;
-      default: break; // social and sponsors are read live (charges, virality, invite chance)
+      default: break; // social and sponsors are read live (post bubbles, virality, invite chance)
     }
   }
   if (s.tpAcc >= 1) {
@@ -110,7 +110,6 @@ export function endLiveDay(s: GameState, early: boolean) {
   for (const b of s.bubbles) if (b.type === 'bsod') s.flags.bsod = 'haunted';
   s.bubbles = [];
   s.schedule = [];
-  s.armedPost = null;
   buildRecap(s);
   s.recap.splice(s.recap.length - (s.day < DAYS ? 2 : 1), 0, ...crewNight(s));
   if (s.day === 3 && !s.venue) startAuction(s);

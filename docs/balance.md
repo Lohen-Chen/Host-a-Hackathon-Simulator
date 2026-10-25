@@ -2,6 +2,17 @@
 
 All tunable constants live in `src/core/config.ts` (`T` and `MODES`), plus two formulas in `src/core/map.ts` (`repFactor`, `treeBase`) and the category formulas in `src/core/score.ts`. `npm run sim` plays 2,000 headless games per bot on the real sim core (`-- --mode judge|standard|full`, `-- --runs N`, `-- --bot name`).
 
+## UI round: automated posts (Standard, 300 runs per bot)
+
+Posts are no longer a hand of cards. Each day spawns `1 + Social members on Social` 📱 bubbles (capped at 3, +1 each for Reel Posts and Influencers), weighted toward regions where Bear is already known and Tree is strong. Tapping one fires the best-fitting card for that region; paid cards are only picked when they cost under 5% of the budget. Bots lost some precision from hand-picking cards, so Tree's base pull dropped from 900 to 750.
+
+| Bot | Median score | Beats Tree |
+| --- | --- | --- |
+| Random | 43 | 10% |
+| Balanced@0 | 47 | 21% |
+| Balanced@70 | 66 | 61% |
+| Perfect | 68 | 76% |
+
 ## Better flow round (Standard, 800 runs per bot)
 
 Lower sponsor invite odds, rising hire costs, burnout and the scripted Balantir call cut leftover cash again:

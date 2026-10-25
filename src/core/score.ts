@@ -41,7 +41,7 @@ export function venueCap(s: GameState) {
 
 /** Share of confirmed hackers who actually show up. */
 export function showRate(s: GameState) {
-  return clamp(T.showRateBase + 0.0008 * s.reputation + s.moodBank * 0.003 + s.websiteScore / 2000, 0.6, 0.97);
+  return clamp(T.showRateBase + (hasTech(s, 'reminders') ? 0.05 : 0) + 0.0008 * s.reputation + s.moodBank * 0.003 + s.websiteScore / 2000, 0.6, 0.97);
 }
 
 /** Confirmed hackers × show rate, plus a trickle of unconfirmed walk-ins. */
@@ -99,7 +99,7 @@ export function scoreBear(s: GameState, f: EventFacts): ScoreBreakdown {
   const promises = f.kept + f.broken ? (100 * f.kept) / (f.kept + f.broken) : 40;
   const artistic = clamp(10 + s.websiteScore * 0.6 + v.ambience * 5 + Math.min(16, s.ambienceBonus * 2.2) + (s.flags.dog === 'rented' ? 3 : 0), 0, 100);
   const avgSkill = s.members.length ? s.members.reduce((a, m) => a + m.baseSkill, 0) / s.members.length : 3;
-  const quality = clamp(14 + perkQuality + s.qualityBonus + mood * 0.15 + avgSkill * 2.2 + (s.trainingMult - 1) * 14 + bar(s, 'talent') * 0.25, 0, 100);
+  const quality = clamp(14 + perkQuality + s.qualityBonus + (hasTech(s, 'mentors') ? 8 : 0) + mood * 0.15 + avgSkill * 2.2 + (s.trainingMult - 1) * 14 + bar(s, 'talent') * 0.25, 0, 100);
 
   const values: Record<string, number> = { attendance, mood, sponsor, sponsormood, amenities, promises, artistic, quality };
   const categories = CATEGORIES.map((c) => ({ ...c, value: Math.round(values[c.id]), line: line(s, c.id, values[c.id] >= 60) }));

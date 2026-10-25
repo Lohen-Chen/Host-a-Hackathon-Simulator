@@ -2,14 +2,13 @@
 import { ALERT_BY_ID } from '../src/content/alerts';
 import type { Effects, Outcome } from '../src/core/effects';
 import { ROLE_INFO } from '../src/content/members';
-import { POST_BY_ID } from '../src/content/posts';
 import { VIBE_SCORES } from '../src/content/sponsors';
 import { TECH } from '../src/content/techTree';
 import { VENUE_BY_ID } from '../src/content/venues';
 import {
-  advance, affinity, assign, beginGame, buyTech, canConfirm, canFire, chargesLeft, confirmBatch, confirmCost, confirmHackers, courtingReply,
-  dismissPopup, endLiveDay, finishAuction, finishCourting, firePost, hackdaySkip, hire, newGame, nextDay, partyMult, resolveAlert,
-  startLiveDay, tapBubble, techState, tickAuction, type GameState, type Mode, type RegionId, type Task, type TechId,
+  advance, assign, beginGame, buyTech, canConfirm, confirmBatch, confirmCost, confirmHackers, courtingReply,
+  dismissPopup, endLiveDay, finishAuction, finishCourting, hackdaySkip, hire, newGame, nextDay, resolveAlert,
+  startLiveDay, tapBubble, techState, tickAuction, type GameState, type Mode, type Task, type TechId,
 } from '../src/core';
 import { rand } from '../src/core/rng';
 
@@ -18,10 +17,10 @@ export interface BotCfg { style: Style; bubbleRate: number; alertRate: number }
 export interface RunResult { state: GameState; stuck: boolean; ticks: number; reason?: string }
 
 const TECH_ORDER: Record<Exclude<Style, 'random'>, TechId[]> = {
-  balanced: ['website', 'coordinator', 'applications', 'design', 'snack', 'training2', 'discord', 'travel', 'logistics', 'memes', 'swag', 'promo', 'rep2', 'clapback', 'aicredits', 'clubfair', 'prestige2', 'reelposts', 'billboard', 'training3', 'rep3'],
-  perfect: ['applications', 'website', 'coordinator', 'discord', 'travel', 'training2', 'snack', 'design', 'swag', 'memes', 'clapback', 'aicredits', 'promo', 'logistics', 'rep2', 'billboard', 'reelposts', 'training3', 'clubfair', 'prestige2', 'rep3'],
-  hype: ['website', 'memes', 'promo', 'reelposts', 'clapback', 'billboard', 'applications', 'discord', 'training2', 'design', 'snack', 'coordinator', 'travel', 'swag', 'aicredits', 'logistics', 'rep2', 'clubfair', 'prestige2', 'training3', 'rep3'],
-  money: ['coordinator', 'rep2', 'applications', 'travel', 'swag', 'snack', 'logistics', 'website', 'discord', 'design', 'training2', 'promo', 'memes', 'aicredits', 'clapback', 'reelposts', 'clubfair', 'prestige2', 'billboard', 'training3', 'rep3'],
+  balanced: ['website', 'applications', 'clubfair', 'coordinator', 'design', 'reelposts', 'discord', 'travel', 'training2', 'logistics', 'snack', 'memes', 'swag', 'promo', 'rep2', 'clapback', 'aicredits', 'reminders', 'mentors', 'influencers', 'prestige2', 'billboard', 'training3', 'nepolist', 'rep3'],
+  perfect: ['applications', 'website', 'clubfair', 'coordinator', 'discord', 'travel', 'reelposts', 'training2', 'logistics', 'snack', 'design', 'swag', 'memes', 'reminders', 'clapback', 'aicredits', 'promo', 'influencers', 'mentors', 'rep2', 'billboard', 'training3', 'prestige2', 'nepolist', 'rep3'],
+  hype: ['website', 'reelposts', 'memes', 'promo', 'influencers', 'clapback', 'billboard', 'applications', 'discord', 'clubfair', 'training2', 'design', 'logistics', 'snack', 'coordinator', 'travel', 'swag', 'aicredits', 'reminders', 'rep2', 'mentors', 'prestige2', 'nepolist', 'training3', 'rep3'],
+  money: ['clubfair', 'coordinator', 'applications', 'rep2', 'travel', 'swag', 'logistics', 'snack', 'website', 'discord', 'reminders', 'design', 'training2', 'prestige2', 'promo', 'reelposts', 'memes', 'aicredits', 'clapback', 'mentors', 'influencers', 'nepolist', 'billboard', 'training3', 'rep3'],
 };
 
 /** Bot-local RNG so bot decisions never consume the game's seeded stream. */
@@ -125,40 +124,6 @@ function buyStep(s: GameState, style: Style, rng: BotRng) {
   }
 }
 
-function bestTarget(s: GameState, handIdx: number): { region: RegionId; v: number } {
-  const card = POST_BY_ID[s.hand[handIdx]];
-  let best: RegionId = 'uc';
-  let bv = -1;
-  for (const r of s.regions) {
-    const room = Math.max(0.05, 1 - r.bear) * (1 + r.tree);
-    const v = r.pop * r.conv * room * affinity(card, r.id) * partyMult(card, r.id);
-    if (v > bv) { bv = v; best = r.id; }
-  }
-  return { region: best, v: bv * card.power };
-}
-
-function postStep(s: GameState, style: Style, rng: BotRng) {
-  if (chargesLeft(s) <= 0 || !s.hand.length) return;
-  // Spread posts across the day.
-  const frac = s.t / s.daySec;
-  if (style !== 'random' && frac < 0.15 * (3 - chargesLeft(s))) return;
-  if (style === 'random') {
-    if (rng.next() > 0.03) return;
-    const i = Math.floor(rng.next() * s.hand.length);
-    if (canFire(s, i)) firePost(s, i, rng.pick(s.regions).id);
-    return;
-  }
-  let bi = -1;
-  let best = { region: 'uc' as RegionId, v: -1 };
-  s.hand.forEach((_, i) => {
-    if (!canFire(s, i)) return;
-    if (style === 'money' && POST_BY_ID[s.hand[i]].cost > 0) return;
-    const t = bestTarget(s, i);
-    if (t.v > best.v) { best = t; bi = i; }
-  });
-  if (bi >= 0) firePost(s, bi, best.region);
-}
-
 function courtStep(s: GameState, style: Style, rng: BotRng) {
   const c = s.courting!;
   if (c.result) { finishCourting(s); return; }
@@ -225,7 +190,9 @@ export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000
         for (const b of s.bubbles) {
           if (decided.has(b.id)) continue;
           decided.add(b.id);
-          if (rng.next() < cfg.bubbleRate) tapBubble(s, b.id);
+          // 📱 posts: engaged bots tap every one; the random bot taps half. TP bubbles follow bubbleRate.
+          const rate = b.type === 'post' ? (cfg.style === 'random' ? 0.5 : 1) : cfg.bubbleRate;
+          if (rng.next() < rate) tapBubble(s, b.id);
         }
         // Popups pause the world; the bot reads them instantly.
         while (s.popups.length) dismissPopup(s);
@@ -239,7 +206,6 @@ export function playGame(seed: number, mode: Mode, cfg: BotCfg, maxTicks = 40000
         buyStep(s, cfg.style, rng);
         confirmStep(s, cfg.style, rng);
         if (ticks % 10 === 0) manageCrew(s, cfg.style, rng);
-        postStep(s, cfg.style, rng);
         if (cfg.style === 'random' && rng.next() < 0.002) endLiveDay(s, true);
         else advance(s, dt);
         break;

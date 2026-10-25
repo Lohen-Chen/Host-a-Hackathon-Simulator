@@ -2,16 +2,15 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { REGION_BLURB } from '../content/regions';
 import {
-  OBJECTIVE, canConfirm, chargesLeft, confirmBatch, confirmCost, confirmHackers, dismissPopup, endLiveDay, firePost, resolveAlert,
+  OBJECTIVE, canConfirm, confirmBatch, confirmCost, confirmHackers, dismissPopup, endLiveDay, resolveAlert,
   treeRegionCount, unconfirmed, type GameState, type RegionId, type TickerItem,
 } from '../core';
 import { BearMascot } from './art';
 import { HypeMap } from './HypeMap';
-import { CrewSheet, PostsSheet, SponsorsSheet, TechSheet } from './sheets';
+import { CrewSheet, SponsorsSheet, TechSheet } from './sheets';
 import { store } from './store';
-import { WebsitePreview } from './WebsitePreview';
 
-type SheetId = 'crew' | 'posts' | 'tech' | 'sponsors' | null;
+type SheetId = 'crew' | 'tech' | 'sponsors' | null;
 
 export function TopBar({ s }: { s: GameState }) {
   const frac = s.phase === 'live' ? s.t / s.daySec : 0;
@@ -24,7 +23,7 @@ export function TopBar({ s }: { s: GameState }) {
       <span class="stat">💰 {money(s.budget)}</span>
       <span class="stat">🔬 {s.techPoints}</span>
       <span class="stat">⭐ {Math.round(s.reputation)}</span>
-      <span class="stat vs" title="Interested · confirmed vs Tree"><span class="b">🙋 {num(s.signups)} · ✅ {num(s.confirmed)}</span> vs <span class="t">🌲 {num(s.treeSignups)}</span></span>
+      <span class="stat vs" title="Interested · confirmed vs Tree"><span class="b">🙋 {num(s.signups)} · ✅ {num(s.confirmed)}</span><span class="vs-sep">vs</span><span class="t">🌲 {num(s.treeSignups)}</span></span>
       <span class="grow" />
       <MuteButton />
       <button class="icon-btn" aria-label="Pause" onClick={() => { store.paused = true; store.emit(); }}>⏸</button>
@@ -142,8 +141,8 @@ export function Toasts() {
 }
 
 const HINTS = [
-  'Tap the 💡 bubbles before they pop! They are your tech points (TP). Spend TP in 🔬 Tech.',
-  'Open 📣 Posts, tap a card, then tap a region on the map to spread Bear Hacks there.',
+  'Tap the 💡 bubbles before they pop! They are tech points (TP). Spend them in 🧬 Evolve.',
+  'Tap 📱 bubbles to post there. Your social team picks the post; results land in the news.',
   'Interest is free, attendance is not: tap ✅ Confirm to pay for hackers (food, swag, travel).',
   'News and decisions pause the world. Read, decide, carry on. Good luck!',
 ];
@@ -160,16 +159,57 @@ function Tutorial({ s }: { s: GameState }) {
   );
 }
 
+/** Plague Inc's bottom bar: how the 10,000 students split between Bear, Tree and undecided. */
+export function WorldBar({ s }: { s: GameState }) {
+  const total = s.regions.reduce((a, r) => a + r.pop, 0);
+  const bear = s.regions.reduce((a, r) => a + r.signups, 0);
+  const tree = s.regions.reduce((a, r) => a + r.treeSignups, 0);
+  const pb = (bear / total) * 100;
+  const pt = (tree / total) * 100;
+  return (
+    <div class="world">
+      <div class="world-bar" aria-hidden="true"><span class="wb-b" style={{ width: `${pb}%` }} /><span class="wb-n" /><span class="wb-t" style={{ width: `${pt}%` }} /></div>
+      <div class="world-legend tiny">
+        <span><i class="sw sw-b" />Bear {num(bear)}</span>
+        <span><i class="sw sw-n" />Undecided {num(Math.max(0, total - bear - tree))}</span>
+        <span><i class="sw sw-t" />Tree {num(tree)}</span>
+      </div>
+    </div>
+  );
+}
+
+const FEED_ICON: Record<string, string> = { 'BEAR BEAT': '🐻', 'TREE TIMES': '🌲', 'SPONSOR WIRE': '💼', CAMPUS: '🏫', BREAKING: '🚨', POSTS: '📱' };
+
+/** Landscape news feed: the newest ticker items, newest first. Post results land here. */
+function NewsFeed({ s, limit = 14, cls = '' }: { s: GameState; limit?: number; cls?: string }) {
+  const items = s.ticker.slice(-limit).reverse();
+  return (
+    <div class={`feed ${cls}`} aria-live="polite">
+      <div class="feed-head tiny">📰 News feed</div>
+      {items.map((t, i) => (
+        <div key={t.id} class={`feed-item cat-${t.cat.split(' ')[0]} ${i === 0 ? 'new' : ''}`}><span class="feed-ico">{FEED_ICON[t.cat] ?? '•'}</span><span>{t.text}</span></div>
+      ))}
+    </div>
+  );
+}
+
+function RegionInfo({ s, id, close }: { s: GameState; id: RegionId; close: () => void }) {
+  const r = s.regions.find((x) => x.id === id)!;
+  return (
+    <button class="region-info" onClick={close} aria-label="Close region info">
+      <div class="row"><b class="grow">{r.name}</b><span class="tiny dim">✕</span></div>
+      <div class="tiny dim">{REGION_BLURB[r.id]}</div>
+      <div class="tiny">{r.pop.toLocaleString('en-US')} students · conversion ×{r.conv}</div>
+      <div class="tiny"><span class="b">🐻 {Math.round(r.bear * 100)}% aware · {num(r.signups)} interested</span></div>
+      <div class="tiny"><span class="t">🌲 {Math.round(r.tree * 100)}% aware · {num(r.treeSignups)} with Tree</span></div>
+    </button>
+  );
+}
+
 export function Live({ s }: { s: GameState }) {
   const [sheet, setSheet] = useState<SheetId>(null);
   const [info, setInfo] = useState<RegionId | null>(null);
-  const onRegion = (id: RegionId) => {
-    if (s.armedPost !== null) {
-      store.act((st) => { firePost(st, st.armedPost!, id); if (st.tutorialStep === 1) st.tutorialStep = 2; });
-      return;
-    }
-    setInfo(info === id ? null : id);
-  };
+  const onRegion = (id: RegionId) => setInfo(info === id ? null : id);
   const toggle = (id: SheetId) => setSheet(sheet === id ? null : id);
   // Like Plague Inc, the world stops while you evolve.
   useEffect(() => {
@@ -177,41 +217,44 @@ export function Live({ s }: { s: GameState }) {
     store.emit();
     return () => { store.uiModal = null; };
   }, [sheet]);
-  const r = info ? s.regions.find((x) => x.id === info) : null;
   return (
     <>
       <TopBar s={s} />
-      <Objective s={s} />
-      <Ticker items={s.ticker} />
-      <div class="map-wrap">
-        <HypeMap s={s} onRegion={onRegion} />
-        <div class="site-mini" onClick={() => setSheet('crew')}>{s.unlockedTech.includes('website') && <WebsitePreview score={s.websiteScore} />}</div>
-        <Tutorial s={s} />
-        <Toasts />
-        {!sheet && <ConfirmButton s={s} />}
-      </div>
-      {r && !sheet && !s.alertQueue.length && (
-        <div class="toasts" style={{ top: 'auto', bottom: 'calc(var(--dock-h) + 12px)', pointerEvents: 'auto' }}>
-          <div class="toast" style={{ animation: 'none' }} onClick={() => setInfo(null)}>
-            <b>{r.name}</b> · {r.pop.toLocaleString('en-US')} students · conv ×{r.conv} · {REGION_BLURB[r.id]}<br />
-            🐻 {Math.round(r.bear * 100)}% aware · 🌲 {Math.round(r.tree * 100)}% · {num(r.signups)} interested
+      <div class="live-body">
+        <div class="live-main">
+          <div class="portrait-only"><Objective s={s} /><Ticker items={s.ticker} /></div>
+          <Tutorial s={s} />
+          <div class="map-wrap">
+            <HypeMap s={s} onRegion={onRegion} selected={info} />
+            <Toasts />
           </div>
+          <div class="strip portrait-only">
+            {info ? <RegionInfo s={s} id={info} close={() => setInfo(null)} /> : <WorldBar s={s} />}
+            <ConfirmButton s={s} inline />
+          </div>
+          <NewsFeed s={s} limit={6} cls="portrait-only feed-mini" />
         </div>
-      )}
-      {sheet && (
-        <div class="sheet" role="dialog" aria-label={sheet}>
-          {sheet === 'crew' && <CrewSheet s={s} />}
-          {sheet === 'posts' && <PostsSheet s={s} close={() => setSheet(null)} />}
-          {sheet === 'tech' && <TechSheet s={s} />}
-          {sheet === 'sponsors' && <SponsorsSheet s={s} />}
-        </div>
-      )}
+        <aside class="live-side landscape-only">
+          <Objective s={s} />
+          <WorldBar s={s} />
+          {info && <RegionInfo s={s} id={info} close={() => setInfo(null)} />}
+          <ConfirmButton s={s} inline />
+          <NewsFeed s={s} />
+        </aside>
+        {sheet && sheet !== 'tech' && (
+          <div class="sheet" role="dialog" aria-label={sheet}>
+            <button class="icon-btn sheet-close" aria-label="Close" onClick={() => setSheet(null)}>✕</button>
+            {sheet === 'crew' && <CrewSheet s={s} />}
+            {sheet === 'sponsors' && <SponsorsSheet s={s} />}
+          </div>
+        )}
+        {sheet === 'tech' && <TechSheet s={s} close={() => setSheet(null)} />}
+      </div>
       <AlertModal s={s} />
       <PopupModal s={s} />
-      <div class="dock" style={{ height: 'calc(var(--dock-h) + var(--safe-b))' }}>
-        <button class={`btn ${sheet === 'crew' ? 'active' : ''}`} onClick={() => toggle('crew')}><span class="ico">👥</span>Crew{s.members.some((m) => !m.task) && <span class="badge">!</span>}</button>
-        <button class={`btn ${sheet === 'posts' ? 'active' : ''}`} onClick={() => toggle('posts')}><span class="ico">📣</span>Posts <span class="badge" style={{ background: chargesLeft(s) ? 'var(--bear)' : '#444' }}>{chargesLeft(s)}</span></button>
-        <button class={`btn ${sheet === 'tech' ? 'active' : ''}`} onClick={() => toggle('tech')}><span class="ico">🔬</span>Tech</button>
+      <div class="dock live-dock">
+        <button class={`btn ${sheet === 'crew' ? 'active' : ''}`} onClick={() => toggle('crew')}><span class="ico">👥</span>Crew{s.members.some((m) => !m.task || m.burnout) && <span class="badge">!</span>}</button>
+        <button class={`btn ${sheet === 'tech' ? 'active' : ''}`} onClick={() => toggle('tech')}><span class="ico">🧬</span>Evolve{s.techPoints >= 3 && <span class="badge" style={{ background: 'var(--gold)', color: '#000' }}>{s.techPoints}</span>}</button>
         <button class={`btn ${sheet === 'sponsors' ? 'active' : ''}`} onClick={() => toggle('sponsors')}><span class="ico">💼</span>Sponsors</button>
         <button class="btn btn-gold" onClick={() => { setSheet(null); store.act((st) => endLiveDay(st, true)); }}><span class="ico">🌙</span>End Day</button>
       </div>

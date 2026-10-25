@@ -5,10 +5,11 @@ import { NEWS, NEWS_BY_ID } from '../content/news';
 import { SPONSOR_BY_ID } from '../content/sponsors';
 import { MODES, T } from './config';
 import type { AlertDef, Effects, Outcome } from './effects';
-import { addRep, addTicker, chargesLeft, fx, log, memberById, pickInviteSponsor, rngPickRegion, taskSkillSum } from './helpers';
+import { addRep, addTicker, fx, log, postsPerDay, memberById, pickInviteSponsor, rngPickRegion, taskSkillSum } from './helpers';
 import { fill, joke, regionName, type SlotOverrides } from './jokes';
 import { bearImpulse, treeImpulse } from './map';
 import { showPopup } from './popups';
+import { firePost, pickCard } from './posts';
 import { chance, clamp, pick, rand, randInt, randRange, weighted } from './rng';
 import { startRumor } from './tech';
 import { scheduleTreeMoves, startTreeMove } from './tree';
@@ -87,6 +88,8 @@ export function scheduleDay(s: GameState) {
   if (s.day === 4 && !s.sponsors.some((x) => x.id === 'ysee')) {
     for (const t of placeTimes(s, taken, 1, 3, D - 6)) { s.schedule.push({ at: t, kind: 'invite', data: 'ysee' }); taken.push(t); }
   }
+  // 📱 post bubbles: the social team's posts for the day, spread across it.
+  for (const t of placeTimes(s, taken, postsPerDay(s), 2, D - 3)) { s.schedule.push({ at: t, kind: 'bubble', data: 'post' }); taken.push(t); }
   // Bubbles.
   let bubbles = cfg.bubbles;
   if (bsodPlaced) bubbles--;
@@ -168,25 +171,37 @@ export function fireNews(s: GameState, id: string) {
 // ─────────────────────────────── bubbles ───────────────────────────────
 
 // Bubbles are Plague Inc DNA: they only ever give tech points.
-export const BUBBLE_ICON: Record<BubbleType, string> = { idea: '💡', eureka: '🧬', bsod: '🟦' };
+export const BUBBLE_ICON: Record<BubbleType, string> = { idea: '💡', eureka: '🧬', bsod: '🟦', post: '📱' };
 
 export function spawnBubble(s: GameState, type?: BubbleType, regionId?: RegionId) {
-  if (s.bubbles.length >= T.maxBubbles) {
+  if (type !== 'post' && s.bubbles.filter((b) => b.type !== 'post').length >= T.maxBubbles) {
     // The once-per-run Blue Screen must not be lost to a crowded map: it bumps the oldest bubble.
     if (type !== 'bsod') return;
     s.bubbles.shift();
   }
-  // Bubbles pop up where Bear Hacks is known, like DNA bubbles over infected countries.
-  const rid = regionId ?? weighted(s, s.regions, (r) => 0.15 + r.bear).id;
   const t: BubbleType = type ?? (rand(s) < 0.15 ? 'eureka' : 'idea');
-  s.bubbles.push({ id: ++s.uid, type: t, regionId: rid, spawnedAt: s.t, ttl: T.bubbleTtl });
+  // TP bubbles pop up where Bear Hacks is known, like DNA bubbles over infected countries.
+  // 📱 post bubbles pop up on the frontier: regions next to the hype that aren't won yet.
+  const rid = regionId ?? (t === 'post' ? weighted(s, s.regions, (r) => postWeight(s, r)).id : weighted(s, s.regions, (r) => 0.15 + r.bear).id);
+  s.bubbles.push({ id: ++s.uid, type: t, regionId: rid, spawnedAt: s.t, ttl: t === 'post' ? T.postBubbleTtl : T.bubbleTtl });
   s.lastInteractiveAt = s.t;
+}
+
+function postWeight(s: GameState, r: GameState['regions'][number]): number {
+  const near = Math.max(r.bear, ...r.neighbors.map((n) => s.regions.find((x) => x.id === n)!.bear));
+  return 0.15 + near * (1.1 - r.bear) * (1 + r.tree);
 }
 
 export function tapBubble(s: GameState, id: number): boolean {
   const b = s.bubbles.find((x) => x.id === id);
   if (!b) return false;
   s.bubbles = s.bubbles.filter((x) => x.id !== id);
+  if (b.type === 'post') {
+    firePost(s, pickCard(s, b.regionId).id, b.regionId);
+    log(s, 'bubble:post', 'tap');
+    if (s.tutorialStep === 1) s.tutorialStep = 2;
+    return true;
+  }
   const o: SlotOverrides = { region: regionName(s, b.regionId) };
   const tp = b.type === 'eureka' ? 3 : b.type === 'bsod' ? 2 : randInt(s, 1, 2);
   s.techPoints += tp;
@@ -204,6 +219,7 @@ function expireBubble(s: GameState, id: number) {
   if (!b) return;
   s.bubbles = s.bubbles.filter((x) => x.id !== id);
   if (b.type === 'bsod') { s.flags.bsod = 'haunted'; log(s, 'bsod', 'haunted'); fx(s, { kind: 'toast', text: 'The Blue Screen faded away… for now. 👻', tone: 'bad' }); }
+  if (b.type === 'post') addTicker(s, 'POSTS', `📱 A post in ${regionName(s, b.regionId)} sat in drafts and expired. The intern is "circling back."`);
   log(s, `bubble:${b.type}`, 'miss');
 }
 
@@ -326,8 +342,6 @@ export function applyEffects(s: GameState, e: Effects, ctx: AlertCtx) {
   if (e.inviteBonus) s.inviteBonus += e.inviteBonus;
   if (e.outputMult) s.outputMult *= e.outputMult;
   if (e.siteDown) s.siteDownSteps += e.siteDown;
-  // charges: −1 spends a post charge
-  if (e.charges) s.chargesUsed = Math.max(0, s.chargesUsed - e.charges);
   if (e.impulse) {
     for (const id of targets(s, e.impulse.target, ctx)) {
       if (e.impulse.party && id === 'frat') bearImpulse(s, id, e.impulse.amount * 2, 1);
@@ -355,4 +369,3 @@ function targets(s: GameState, t: RegionId | 'ctx' | 'random' | 'all', ctx: Aler
   return [t];
 }
 
-export { chargesLeft };

@@ -61,13 +61,13 @@ export function socialSkillSum(s: GameState): number {
   return taskSkillSum(s, 'social');
 }
 
-export function maxCharges(s: GameState): number {
-  const socials = s.members.filter((m) => m.task === 'social' && m.role === 'social' && m.idleSteps === 0 && m.benchedDays === 0).length;
-  const cap = 3 + (hasTech(s, 'reelposts') ? 1 : 0);
+/** 📱 post bubbles per day: one, plus one per Social Media member on Social (Content Calendar raises the cap). */
+export function postsPerDay(s: GameState): number {
+  const socials = s.members.filter((m) => m.task === 'social' && m.role === 'social' && m.benchedDays === 0).length;
+  const cap = 3 + (hasTech(s, 'reelposts') ? 1 : 0) + (hasTech(s, 'influencers') ? 1 : 0);
   return Math.min(cap, 1 + socials);
 }
 
-export const chargesLeft = (s: GameState) => Math.max(0, maxCharges(s) - s.chargesUsed);
 
 export function equityCut(s: GameState): number {
   return Math.min(T.equityCap, Number(s.flags.equitySold ?? 0));

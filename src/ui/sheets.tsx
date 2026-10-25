@@ -1,13 +1,12 @@
-// Bottom sheets: Crew · Posts · Tech · Sponsors. None of them pause the clock.
+// Sheets: Crew and Sponsors (side/bottom panels, clock keeps running) and the Evolve screen (pauses).
 import { useState } from 'preact/hooks';
 import { MISMATCH_TOOLTIPS, ROLE_INFO, TASK_INFO, TRAITS } from '../content/members';
-import { POST_BY_ID } from '../content/posts';
 import { PROMISES } from '../content/promises';
 import { SPONSOR_BY_ID, TIER_INFO } from '../content/sponsors';
 import { BRANCHES, TECH } from '../content/techTree';
 import {
-  armPost, assign, bar, buyTech, canAssign, canFire, chargesLeft, effectiveSkill, equityCut, inviteChance, isMatch,
-  maxCharges, reroll, techState, viralChance, type GameState, type Member, type Task, type TechBranch, type TechId,
+  assign, bar, buyTech, canAssign, effectiveSkill, equityCut, inviteChance, isMatch, postsPerDay,
+  techState, type GameState, type Member, type Task, type TechBranch, type TechId,
 } from '../core';
 import { Avatar } from './art';
 import { store } from './store';
@@ -38,7 +37,7 @@ export function CrewSheet({ s }: { s: GameState }) {
   const m = s.members.find((x) => x.id === sel);
   return (
     <div class="col">
-      <div class="sheet-head"><h3>👥 Crew ({s.members.length})</h3>
+      <div class="sheet-head"><h3>👥 Crew ({s.members.length})</h3><span class="chip" title="1 + one per Social Media member on Social">📱 {postsPerDay(s)} posts/day</span>
         <button class="tab" onClick={() => setShowSite(!showSite)}>🌐 Website {Math.round(s.websiteScore)}</button></div>
       {showSite && <div class="row"><WebsitePreview score={s.websiteScore} /><div class="small dim">The website evolves with its score: GeoCities → template → parallax bear. {s.unlockedTech.includes('website') ? 'Assign a Designer to Website.' : 'Unlock the Website node in Tech.'}</div></div>}
       {s.members.map((x) => <MemberRow key={x.id} m={x} s={s} selected={x.id === sel} onClick={() => setSel(x.id === sel ? null : x.id)} />)}
@@ -68,43 +67,48 @@ export function CrewSheet({ s }: { s: GameState }) {
   );
 }
 
-export function PostsSheet({ s, close }: { s: GameState; close: () => void }) {
-  const left = chargesLeft(s);
-  return (
-    <div class="col">
-      <div class="sheet-head"><h3>📣 Posts</h3><span class="chip">Charges {left}/{maxCharges(s)}</span>
-        <button class="tab" disabled={s.rerollsLeft <= 0} onClick={() => store.act((st) => reroll(st))}>🔄 Reroll ({s.rerollsLeft})</button></div>
-      {s.hand.length === 0 && <div class="small dim">Hand empty. New cards tomorrow morning.</div>}
-      {s.hand.map((id, i) => {
-        const c = POST_BY_ID[id];
-        const ok = canFire(s, i);
-        const fav = c.favored === 'all' ? 'everywhere' : c.favored.map((r) => s.regions.find((x) => x.id === r)?.name).join(', ');
-        return (
-          <button key={id + i} class="post-card" disabled={!ok} onClick={() => { store.act((st) => armPost(st, i)); close(); }}>
-            <span class="ico">{c.icon}</span>
-            <div class="grow">
-              <div><b>{c.name}</b> {c.cost ? <span class="gold">${c.cost}</span> : <span class="dim">free</span>} {c.party && <span class="chip">🎉 party</span>}</div>
-              <div class="tiny dim">{id === 'linkedin' ? flavor(s, 'linkedin', `li:${s.day}:${i}`, c.blurb) : c.blurb}</div>
-              <div class="tiny">Loves: {fav} · viral {Math.round(viralChance(s, c) * 100)}%{c.risk ? ` · ratio risk ${Math.round(Math.max(0, c.risk) * 100)}%` : ''}</div>
-            </div>
-          </button>
-        );
-      })}
-      <div class="tiny dim">Tap a card to arm it, then tap a region on the map. Each Social member on the Social task adds a charge (max 3). Frat Row loves 🎉 party posts (×2, spilling to every neighbor) and leaves everything else on read (×0.5).</div>
-    </div>
-  );
+// ── Evolve: each branch is a real tree (prereq = parent), laid out left → right by depth. ──
+const COLW = 128;
+const ROWH = 52;
+const NODEW = 112;
+const NODEH = 40;
+
+interface Placed { id: TechId; x: number; y: number; parent?: TechId }
+interface Band { branch: TechBranch; nodes: Placed[]; w: number; h: number }
+
+function layoutBranch(branch: TechBranch): Band {
+  const nodes = TECH.filter((t) => t.branch === branch);
+  const placed: Placed[] = [];
+  let leaf = 0;
+  let maxDepth = 0;
+  // Tidy tree: leaves take consecutive rows, parents sit centered on their children.
+  const walk = (id: TechId, depth: number, parent?: TechId): number => {
+    maxDepth = Math.max(maxDepth, depth);
+    const ys = nodes.filter((t) => t.prereq === id).map((c) => walk(c.id, depth + 1, id));
+    const y = ys.length ? (Math.min(...ys) + Math.max(...ys)) / 2 : leaf++ * ROWH;
+    placed.push({ id, x: depth * COLW, y, parent });
+    return y;
+  };
+  for (const root of nodes.filter((t) => !t.prereq || !nodes.some((n) => n.id === t.prereq))) walk(root.id, 0);
+  return { branch, nodes: placed, w: maxDepth * COLW + NODEW + 8, h: Math.max(0, leaf - 1) * ROWH + NODEH + 8 };
 }
 
-/** Plague Inc-style evolution menu: three bars on top, branch tabs, a grid of nodes, detail + Evolve. */
-export function TechSheet({ s }: { s: GameState }) {
-  const [tab, setTab] = useState<TechBranch>('hype');
+const BANDS: Band[] = BRANCHES.map((b) => layoutBranch(b.id));
+
+/** Plague Inc-style evolution screen: three bars, then each branch as a connected tree. Pauses the world. */
+export function TechSheet({ s, close }: { s: GameState; close?: () => void }) {
   const [sel, setSel] = useState<TechId | null>(null);
-  const nodes = TECH.filter((t) => t.branch === tab);
   const n = sel ? TECH.find((t) => t.id === sel) : null;
   const st = n ? techState(s, n.id) : null;
   return (
-    <div class="col">
-      <div class="sheet-head"><h3>🧬 Evolve</h3>{s.phase === 'live' && <span class="chip">⏸ World paused</span>}<span class="chip gold">🔬 {s.techPoints} TP</span></div>
+    <div class="evo-screen" role="dialog" aria-label="Evolve">
+      <div class="evo-top">
+        <h3>🧬 Evolve</h3>
+        {s.phase === 'live' && <span class="chip">⏸ World paused</span>}
+        <span class="chip gold">🔬 {s.techPoints} TP</span>
+        <span class="grow" />
+        {close && <button class="icon-btn" aria-label="Close" onClick={close}>✕</button>}
+      </div>
       <div class="bars">
         {BRANCHES.map((b) => (
           <div key={b.id} class={`bar-row bar-${b.id}`} title={b.blurb}>
@@ -114,32 +118,61 @@ export function TechSheet({ s }: { s: GameState }) {
           </div>
         ))}
       </div>
-      <div class="tabs evo-tabs">{BRANCHES.map((b) => <button key={b.id} class={`tab ${tab === b.id ? 'active' : ''}`} onClick={() => { setTab(b.id); setSel(null); }}>{b.icon} {b.name}</button>)}</div>
-      <div class="tiny dim">{BRANCHES.find((b) => b.id === tab)!.blurb}</div>
-      <div class="evo-grid">
-        {nodes.map((t) => {
-          const ts = techState(s, t.id);
-          return (
-            <button key={t.id} class={`evo-node ${ts} ${sel === t.id ? 'sel' : ''}`} onClick={() => setSel(sel === t.id ? null : t.id)} aria-label={`${t.name}, ${ts}`}>
-              <span class="evo-name">{t.name}</span>
-              <span class="evo-cost">{ts === 'owned' ? '✓' : ts === 'locked' ? '🔒' : `${t.cost} TP`}</span>
-            </button>
-          );
-        })}
-      </div>
-      {n && st && (
-        <div class="card evo-detail">
-          <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {k}</span>)}</div>
-          <div class="small">{n.effect}{n.prereq ? ` (needs ${TECH.find((t) => t.id === n.prereq)?.name})` : ''}</div>
-          <div class="tiny dim">{n.desc ?? flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
-          {st !== 'owned' && (
-            <button class="btn btn-gold" disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
-              {st === 'locked' ? 'Locked' : st === 'poor' ? `Need ${n.cost} TP` : `🧬 Evolve (${n.cost} TP)`}
-            </button>
+      <div class="evo-body">
+        <div class="evo-web">
+          {BANDS.map((band) => {
+            const info = BRANCHES.find((b) => b.id === band.branch)!;
+            const pos = new Map(band.nodes.map((p) => [p.id, p]));
+            return (
+              <section key={band.branch} class={`evo-band band-${band.branch}`}>
+                <div class="evo-band-head"><b>{info.icon} {info.name}</b> <span class="tiny dim">{info.blurb}</span></div>
+                <div class="evo-canvas" style={{ width: `${band.w}px`, height: `${band.h}px` }}>
+                  <svg class="evo-links" width={band.w} height={band.h} aria-hidden="true">
+                    {band.nodes.filter((p) => p.parent).map((p) => {
+                      const a = pos.get(p.parent!)!;
+                      const x1 = a.x + NODEW + 4;
+                      const y1 = a.y + NODEH / 2 + 4;
+                      const x2 = p.x + 4;
+                      const y2 = p.y + NODEH / 2 + 4;
+                      const mid = (x1 + x2) / 2;
+                      const owned = s.unlockedTech.includes(p.id);
+                      const open = s.unlockedTech.includes(p.parent!);
+                      return <path key={p.id} class={`evo-link ${owned ? 'owned' : open ? 'open' : 'locked'}`} d={`M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`} />;
+                    })}
+                  </svg>
+                  {band.nodes.map((p) => {
+                    const t = TECH.find((x) => x.id === p.id)!;
+                    const ts = techState(s, t.id);
+                    return (
+                      <button key={t.id} class={`evo-node ${ts} ${sel === t.id ? 'sel' : ''}`} style={{ left: `${p.x + 4}px`, top: `${p.y + 4}px`, width: `${NODEW}px`, height: `${NODEH}px` }}
+                        onClick={() => setSel(sel === t.id ? null : t.id)} aria-label={`${t.name}, ${ts}`}>
+                        <span class="evo-name">{t.name}</span>
+                        <span class="evo-cost">{ts === 'owned' ? '✓ evolved' : ts === 'locked' ? '🔒' : `${t.cost} TP`}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+        <div class="evo-detail card">
+          {n && st ? (
+            <>
+              <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {k}</span>)}</div>
+              <div class="small">{n.effect}</div>
+              <div class="tiny dim">{n.desc ?? flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
+              {st !== 'owned' && (
+                <button class="btn btn-gold" disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
+                  {st === 'locked' ? `Evolve ${TECH.find((t) => t.id === n.prereq)?.name} first` : st === 'poor' ? `Need ${n.cost} TP` : `🧬 Evolve (${n.cost} TP)`}
+                </button>
+              )}
+            </>
+          ) : (
+            <div class="tiny dim">Tap a node to see what it does. Each branch grows from its first node. Earn TP from 💡 bubbles and Organizers on Research; rumors can unlock nodes for free.</div>
           )}
         </div>
-      )}
-      <div class="tiny dim">Earn TP from 💡 bubbles and Organizers on Research. Rumors can unlock nodes for free. Every node also grows your interested pool a little.</div>
+      </div>
     </div>
   );
 }
