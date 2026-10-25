@@ -1,7 +1,7 @@
 // Hackathon Day: text beats over one CSS-animated scene (skippable).
 import { useEffect } from 'preact/hooks';
 import { hackdayNext, hackdaySkip, type GameState } from '../core';
-import { BlueScreen, BearMascot } from '../ui/art';
+import { BearMascot } from '../ui/art';
 import { store } from '../ui/store';
 
 export function HackDay({ s }: { s: GameState }) {
@@ -11,15 +11,13 @@ export function HackDay({ s }: { s: GameState }) {
     const t = setTimeout(() => store.act((st) => hackdayNext(st)), 5200);
     return () => clearTimeout(t);
   }, [h.index]);
-  const screen = b.id === 'bsod'
-    ? (s.flags.bsod === 'haunted' ? <BlueScreen big /> : <span>IT HERO 🦸</span>)
-    : b.id === 'tree' ? <span>🌲 synergy 🌲</span> : b.id === 'expo' ? <span>DEMO TIME</span> : <span>BEAR HACKS<br />{h.index + 1}/{h.beats.length}</span>;
+  const screen = b.id === 'tree' ? <span>🌲 synergy 🌲</span> : b.id === 'expo' ? <span>DEMO TIME</span> : <span>BEAR HACKS<br />{h.index + 1}/{h.beats.length}</span>;
   return (
     <div class="scene" onClick={() => store.act((st) => hackdayNext(st))}>
       <div class="row"><h2 class="grow">🏁 Hackathon Day</h2><button class="btn btn-ghost" onClick={(e) => { e.stopPropagation(); store.act((st) => hackdaySkip(st)); }}>Skip to results</button></div>
       <div class="stage">
         <div class="spot" />
-        <div class="screen" style={b.id === 'bsod' && s.flags.bsod === 'haunted' ? { padding: 0 } : {}}>{screen}</div>
+        <div class="screen">{screen}</div>
         <div style={{ position: 'absolute', left: '10px', bottom: '40px' }}><BearMascot size={40} mood={b.tone === 'bad' ? 'sad' : 'happy'} /></div>
         <div class="crowd" />
       </div>

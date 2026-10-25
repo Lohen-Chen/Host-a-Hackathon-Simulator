@@ -40,15 +40,6 @@ export function TreeMascot({ size = 64 }: { size?: number }) {
   );
 }
 
-export function BlueScreen({ big = false }: { big?: boolean }) {
-  return (
-    <div class={`bsod ${big ? 'bsod-big' : ''}`} role="img" aria-label="Blue screen with a sad face">
-      <div class="bsod-face">:(</div>
-      {big && <div class="bsod-text">Your hackathon ran into a problem and needs to restart.</div>}
-    </div>
-  );
-}
-
 const SKIN = ['#f5d0a9', '#e0ac69', '#c68642', '#8d5524', '#ffdbac', '#a0662b'];
 const HAIR = ['#2b1a0e', '#6b3f1d', '#d4a017', '#111', '#b5651d', '#8c1515', '#4b0082', '#ff69b4'];
 const SHIRT = ['#003262', '#fdb515', '#3b7ea1', '#c4820e', '#46535e', '#00a598', '#ee1f60', '#859438'];

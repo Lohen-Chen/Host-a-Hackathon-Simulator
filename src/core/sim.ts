@@ -112,7 +112,6 @@ export function endLiveDay(s: GameState, early: boolean) {
   let guard = 0;
   while (s.alertQueue.length && guard++ < 20) resolveAlert(s, s.alertQueue[0].defaultChoice, true);
   s.popups = [];
-  for (const b of s.bubbles) if (b.type === 'bsod') s.flags.bsod = 'haunted';
   s.bubbles = [];
   s.schedule = [];
   buildRecap(s);

@@ -35,12 +35,6 @@ export function scheduleDay(s: GameState) {
   const taken: number[] = [];
   // Tree moves first (fixed beats of the storyline).
   for (const ev of scheduleTreeMoves(s)) { s.schedule.push(ev); taken.push(ev.at); }
-  // The once-per-run Blue Screen goes next so a short Judge-mode day can't crowd it out.
-  let bsodPlaced = false;
-  if (s.day === Number(s.flags.bsodDay)) {
-    const t = placeTimes(s, taken, 1, 3, D - 6)[0] ?? randRange(s, 3, D - 6);
-    s.schedule.push({ at: t, kind: 'bubble', data: 'bsod' }); taken.push(t); bsodPlaced = true;
-  }
   // Each day from Day 2 gets exactly one "special": a world-news headline or a rumor (tech mutation),
   // drawn from what's left. Decisions fill the rest of the day's pause budget, so the world stops
   // about twice a day.
@@ -91,9 +85,7 @@ export function scheduleDay(s: GameState) {
   // 📱 post bubbles: the social team's posts for the day, spread across it.
   for (const t of placeTimes(s, taken, postsPerDay(s), 2, D - 3)) { s.schedule.push({ at: t, kind: 'bubble', data: 'post' }); taken.push(t); }
   // Bubbles.
-  let bubbles = cfg.bubbles;
-  if (bsodPlaced) bubbles--;
-  for (const t of placeTimes(s, taken, bubbles, 1, D - 1.5)) { s.schedule.push({ at: t, kind: 'bubble' }); taken.push(t); }
+  for (const t of placeTimes(s, taken, cfg.bubbles, 1, D - 1.5)) { s.schedule.push({ at: t, kind: 'bubble' }); taken.push(t); }
   s.schedule.sort((a, b) => a.at - b.at);
 }
 
@@ -108,8 +100,7 @@ function alertWeight(s: GameState, a: AlertDef): number {
 function pickAlert(s: GameState, exclude: string[]): AlertDef | null {
   const pool = ALERTS.filter((a) => !exclude.includes(a.id) && alertWeight(s, a) > 0);
   if (!pool.length) return null;
-  // The Blue Screen alert stays out of the random pool once the flag is set.
-  return weighted(s, pool, (a) => alertWeight(s, a) * (a.id === 'bsod' && s.flags.bsod ? 0 : 1));
+  return weighted(s, pool, (a) => alertWeight(s, a));
 }
 
 // ─────────────────────────────── per-tick ───────────────────────────────
@@ -171,14 +162,10 @@ export function fireNews(s: GameState, id: string) {
 // ─────────────────────────────── bubbles ───────────────────────────────
 
 // Bubbles are Plague Inc DNA: they only ever give tech points.
-export const BUBBLE_ICON: Record<BubbleType, string> = { idea: '💡', eureka: '🧬', bsod: '🟦', post: '📱' };
+export const BUBBLE_ICON: Record<BubbleType, string> = { idea: '💡', eureka: '🧬', post: '📱' };
 
 export function spawnBubble(s: GameState, type?: BubbleType, regionId?: RegionId) {
-  if (type !== 'post' && s.bubbles.filter((b) => b.type !== 'post').length >= T.maxBubbles) {
-    // The once-per-run Blue Screen must not be lost to a crowded map: it bumps the oldest bubble.
-    if (type !== 'bsod') return;
-    s.bubbles.shift();
-  }
+  if (type !== 'post' && s.bubbles.filter((b) => b.type !== 'post').length >= T.maxBubbles) return;
   const t: BubbleType = type ?? (rand(s) < 0.15 ? 'eureka' : 'idea');
   // TP bubbles pop up where Bear Hacks is known, like DNA bubbles over infected countries.
   // 📱 post bubbles pop up on the frontier: regions next to the hype that aren't won yet.
@@ -203,11 +190,10 @@ export function tapBubble(s: GameState, id: number): boolean {
     return true;
   }
   const o: SlotOverrides = { region: regionName(s, b.regionId) };
-  const tp = b.type === 'eureka' ? 3 : b.type === 'bsod' ? 2 : randInt(s, 1, 2);
+  const tp = b.type === 'eureka' ? 3 : randInt(s, 1, 2);
   s.techPoints += tp;
-  if (b.type === 'bsod') { s.flags.bsod = 'rebooted'; log(s, 'bsod', 'rebooted'); }
   fx(s, { kind: 'pop', regionId: b.regionId, text: `+${tp} TP`, tone: 'good' });
-  fx(s, { kind: 'toast', text: joke(s, `bubble|${b.type === 'bsod' ? 'bsod' : 'idea'}`, o), tone: 'neutral' });
+  fx(s, { kind: 'toast', text: joke(s, 'bubble|idea', o), tone: 'neutral' });
   fx(s, { kind: 'sfx', sfx: 'pop' });
   log(s, `bubble:${b.type}`, 'tap');
   if (s.tutorialStep === 0) s.tutorialStep = 1;
@@ -218,7 +204,6 @@ function expireBubble(s: GameState, id: number) {
   const b = s.bubbles.find((x) => x.id === id);
   if (!b) return;
   s.bubbles = s.bubbles.filter((x) => x.id !== id);
-  if (b.type === 'bsod') { s.flags.bsod = 'haunted'; log(s, 'bsod', 'haunted'); fx(s, { kind: 'toast', text: 'The Blue Screen faded away… for now. 👻', tone: 'bad' }); }
   if (b.type === 'post') addTicker(s, 'POSTS', `📱 A post in ${regionName(s, b.regionId)} sat in drafts and expired. The intern is "circling back."`);
   log(s, `bubble:${b.type}`, 'miss');
 }

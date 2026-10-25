@@ -19,7 +19,7 @@ export type TechId =
   | 'applications' | 'highsignal' | 'leetcode' | 'mentors' | 'workshops' | 'olympiad' | 'aicredits';
 export type TechBranch = 'hype' | 'org' | 'talent';
 export type PostId = 'flyer' | 'meme_bear' | 'linkedin' | 'dance' | 'pizza' | 'reel' | 'influencer' | 'clapback' | 'countdown' | 'dog';
-export type BubbleType = 'idea' | 'eureka' | 'bsod' | 'post';
+export type BubbleType = 'idea' | 'eureka' | 'post';
 export type Tier = 'flop' | 'meh' | 'solid' | 'viral' | 'mega' | 'ratio';
 export type Vibe = 'corporate' | 'techbro' | 'startup' | 'defense' | 'vc' | 'genz';
 export type SponsorTier = 'bronze' | 'silver' | 'golden' | 'partner';
@@ -44,7 +44,7 @@ export interface Member {
   trenchTask: Task | null;
   /** fractional output accumulators per member (for "+1" pops) */
   acc: number;
-  /** days of output lost (T1 revert, T16 redraw, bsod Arch reinstall) */
+  /** days of output lost (T1 revert, T16 redraw) */
   benchedDays: number;
   /** burned out: works again and they quit tonight; a rest day clears it */
   burnout?: boolean;

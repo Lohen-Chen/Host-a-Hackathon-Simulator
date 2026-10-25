@@ -31,19 +31,6 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
-    id: 'bsod', icon: '🟦', title: 'Blue Screen of Death in {region}', weight: 0, max: 1, foreshadow: 'headline|fs_bsod', region: 'random', tech: true,
-    body: 'The club laptop shows a sad face and "a problem has occurred." It has many problems.',
-    defaultChoice: 1,
-    choices: [
-      { label: 'Turn it off and on again', odds: { p: 0.7, win: { text: 'Have you tried turning it off and on again? It worked. It always works.', flags: { bsod: 'rebooted' } },
-        lose: { text: 'Off. On. Sad face. It has achieved sentience and chosen sadness.', flags: { bsod: 'haunted' }, mood: -2 } } },
-      { label: 'Blame the update', odds: { p: 0.4, win: { text: 'The update apologized. Rebooted. Fixed.', flags: { bsod: 'rebooted' } },
-        lose: { text: '"It\'s the update" is now the club motto. The laptop is still blue.', flags: { bsod: 'haunted' }, rep: -1 } } },
-      { label: '"I use Arch, btw"', hint: 'Costs a member a day', out: { text: '{member} reinstalled everything from scratch. Told everyone. Twice.', flags: { bsod: 'rebooted' }, memberBenchDays: 1, rep: 2, impulse: { target: 'twitter', amount: 0.08 } } },
-    ],
-    needsMember: true,
-  },
-  {
     id: 'dave', icon: '📧', title: 'Dave from Sponsorship sent 47 emails', weight: 2, max: 1, foreshadow: 'headline|fs_dave', satire: true,
     body: 'Subject lines include "Re: Re: Fwd: quick sync??" and "Dave".', defaultChoice: 0,
     choices: [

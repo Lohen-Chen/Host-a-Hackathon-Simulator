@@ -134,13 +134,12 @@ export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id
         {s.bubbles.map((b) => {
           const r = regionOf(b.regionId)!;
           const left = Math.max(0, b.ttl - (s.t - b.spawnedAt));
-          const hazard = b.type === 'bsod';
           const jitter = ((b.id * 37) % 30) - 15;
           return (
-            <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''} ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
+            <button key={b.id} class={`bubble ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
               onPointerDown={(e) => { e.stopPropagation(); bubbleTapAt = performance.now(); store.act((st) => tapBubble(st, b.id)); }}
               aria-label={`${b.type} bubble`}>
-              {b.type === 'bsod' ? <span class="bsod" style={{ width: '40px', height: '30px' }}><span class="bsod-face">:(</span></span> : BUBBLE_ICON[b.type]}
+              {BUBBLE_ICON[b.type]}
               <span class="ttl" style={{ animationDuration: `${left}s` }} />
             </button>
           );

@@ -36,7 +36,7 @@ export function startHackday(s: GameState) {
     awards: awards(s, facts),
     headline: win
       ? pick(s, ['BEAR WINS. Tree University is "pivoting to reflection."', 'More hackers than Tree! Leland Sr. put down his phone.', 'VICTORY. The bear suit still smells, but it smells like winning.'])
-      : pick(s, ['Tree wins this year. Leland Sr. called it "synergy."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. But the Blue Screen respects you.']),
+      : pick(s, ['Tree wins this year. Leland Sr. called it "synergy."', 'Tree had more hackers. You had more heart. (Heart is not a metric.)', 'Defeat. Leland Sr. has already posted a LinkedIn carousel about it.']),
   };
   log(s, 'result', win ? 'win' : 'loss', bear.total);
 }
@@ -75,26 +75,22 @@ function buildBeats(s: GameState, f: EventFacts): Beat[] {
   // 6. Protest (Balantir)
   if (f.protest) add('protest', '📢', 'Protest', 'Hackers protest the Balantir "Defense track." Signs read "HACK THE PLANET, NOT THE PLANET." The Balantir rep watches. Silently. Through sunglasses.', 'bad');
 
-  // 7. Blue Screen
-  if (s.flags.bsod === 'rebooted') add('bsod', '🦸', 'The Blue Screen returns', 'The projector shows a sad face. An IT hero steps up: "Have you tried turning it off and on again?" It works. Standing ovation.', 'good');
-  else if (s.flags.bsod === 'haunted') add('bsod', '🟦', 'The Blue Screen returns', 'Mid-ceremony, the projector dies and shows a giant sad face :( "Your hackathon ran into a problem." Nobody knows how to reboot it.', 'bad');
-
-  // 8. Demo expo
+  // 7. Demo expo
   const projects = [joke(s, 'project'), joke(s, 'project'), joke(s, 'project')];
   add('expo', '🏆', 'Demo expo', `Judges see "${projects[0]}," "${projects[1]}," and "${projects[2]}." One demo works. It was on one machine.`);
 
-  // 9. Tree check-in
+  // 8. Tree check-in
   const tv = s.treeVenue ? VENUE_BY_ID[s.treeVenue].name : TREE_BACKUP.name;
   const tr = treeRegionCount(s);
   add('tree', '🌲', 'Meanwhile at Tree U', `At ${tv}, ${RIVAL_CEO} is giving a keynote about synergy from his phone. Tree controlled ${tr}/8 regions. ${pick(s, TREE_CHAOS)}`);
 
-  // 10. Closing ceremony (promise check #2 + callbacks)
+  // 9. Closing ceremony (promise check #2 + callbacks)
   const rest = s.promises.slice(1, 3).map((p) => (p.kept ? PROMISES[p.kind].kept : PROMISES[p.kind].broken));
   const founder = Number(s.flags.founderRound ?? 0) >= 1 ? ' The walk-in founder returns, now "a unicorn." The product is still "coming soon."' : '';
   const rust = Number(s.flags.rust ?? 0) >= 1 ? ' The website is still in Rust. It still compiles.' : '';
   add('closing', '🎉', 'Closing ceremony', `${rest.join(' ') || 'Awards are handed out. Everyone gets a sticker.'}${founder}${rust}`.trim(), f.broken > f.kept ? 'bad' : 'good');
 
-  // 11. After-party epilogue
+  // 10. After-party epilogue
   if (s.flags.afterparty === 'official') add('afterparty', '🪩', 'After-party', 'The official after-party goes off. The Founder announces a "Series D, for the vibes." Frat Row calls it "historic."', 'good');
   else if (s.flags.afterparty === 'ysee') add('afterparty', '🪩', 'After-party', `YSee runs the after-party. Four hundred founders. Zero customers. One cheese plate. The cap table: you ${100 - Number(s.flags.equitySold ?? 0)}%, YSee ${Number(s.flags.equitySold ?? 0)}%.`);
   else if (s.flags.afterparty === 'declined') add('afterparty', '🪩', 'After-party', 'You declined the after-party. Frat Row threw its own anyway. You can hear it from here.');
@@ -111,7 +107,6 @@ const TREE_CHAOS = [
 function awards(s: GameState, f: EventFacts): string[] {
   const out: string[] = [];
   const virals = s.log.filter((l) => l.kind === 'post:viral' || l.kind === 'post:mega').length;
-  if (s.flags.bsod === 'rebooted') out.push('IT Hero: Turned It Off and On Again');
   if (Number(s.flags.rust ?? 0) >= 1) out.push('Best Rewrite Nobody Asked For (Rust)');
   if (Number(s.flags.equitySold ?? 0) >= 7) out.push(`Most Equity Sold for Least Money (${s.flags.equitySold}%)`);
   if (virals >= 3) out.push('Most Viral Club (Mostly by Accident)');

@@ -9,7 +9,7 @@ export { tapBubble, resolveAlert, inviteChance, BUBBLE_ICON, spawnBubble, queueA
 export { courtingReply, finishCourting, BRIBE_COST } from './courting';
 export { tickAuction, skipAuction, auctionVenue } from './auction';
 export { hackdayNext, hackdaySkip } from './hackday';
-export { buyTech, techState, bar, startRumor } from './tech';
+export { buyTech, techState, techCost, techMarkup, bar, startRumor } from './tech';
 export { dismissPopup, showPopup } from './popups';
 export { confirmHackers, confirmCost, confirmBatch, canConfirm, unconfirmed } from './confirm';
 export { expectedAttendees, showRate } from './score';

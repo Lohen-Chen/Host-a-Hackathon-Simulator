@@ -103,7 +103,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 
 .overlay { position: absolute; inset: 0; pointer-events: none; }
 .bubble { position: absolute; width: 56px; height: 56px; margin: -64px 0 0 -28px; border-radius: 50%; border: 2px solid #000; background: rgba(255, 255, 255, 0.92); font-size: 28px; display: grid; place-items: center; pointer-events: auto; box-shadow: 0 3px 0 #000; animation: bubble-in 0.25s ease-out, bob 1.6s ease-in-out infinite alternate; z-index: 5; }
-.bubble.hazard { background: #ffe1e1; }
 .bubble .ttl { position: absolute; inset: -5px; border-radius: 50%; border: 3px solid var(--gold); clip-path: inset(0 0 0 0); animation: ttl linear forwards; }
 @keyframes ttl { from { opacity: 1; transform: scale(1); } to { opacity: 0.1; transform: scale(0.8); } }
 @keyframes bubble-in { from { transform: scale(0.2); } to { transform: scale(1); } }
@@ -193,11 +192,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .stage .screen { position: absolute; left: 50%; top: 12px; width: 120px; height: 66px; margin-left: -60px; border: 3px solid #000; background: #fff; display: grid; place-items: center; color: #111; font-weight: 900; font-size: 13px; text-align: center; padding: 4px; }
 .stage .spot { position: absolute; top: -40px; width: 80px; height: 200px; background: radial-gradient(rgba(253, 181, 21, 0.35), transparent 70%); animation: spot 3s ease-in-out infinite alternate; }
 @keyframes spot { from { transform: translateX(-30px) rotate(-10deg); } to { transform: translateX(220px) rotate(10deg); } }
-.bsod { background: #0a5fd6; color: #fff; display: grid; place-items: center; border-radius: 6px; width: 48px; height: 36px; }
-.bsod-face { font-size: 18px; font-weight: 900; }
-.bsod-big { width: 100%; height: 100%; padding: 6px; }
-.bsod-big .bsod-face { font-size: 30px; }
-.bsod-text { font-size: 9px; }
 
 .score-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
 .bar { height: 10px; border-radius: 5px; background: #0b1220; overflow: hidden; grid-column: 1 / -1; display: flex; }

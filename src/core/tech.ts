@@ -1,6 +1,7 @@
 // The Plague Inc-style evolution menu: three branches feeding three bars (Hype, Organization, Talent).
 // Buying does not pause the clock. Rumors unlock a random node for free ("mutations").
 import { TECH, TECH_BY_ID } from '../content/techTree';
+import { T } from './config';
 import { fx, log } from './helpers';
 import { bearImpulse } from './map';
 import { showPopup } from './popups';
@@ -18,20 +19,32 @@ export function bar(s: GameState, b: TechBranch): number {
   return Math.min(100, v);
 }
 
+/** Plague Inc rule: every node you evolve makes the rest pricier, so you can't buy the whole tree and have to pick a direction.
+ * Rumor unlocks are free and don't count. */
+export function techMarkup(s: GameState): number {
+  return Math.floor(Number(s.flags.evolved ?? 0) / T.techMarkupEvery);
+}
+
+export function techCost(s: GameState, id: TechId): number {
+  return TECH_BY_ID[id].cost + techMarkup(s);
+}
+
 export function techState(s: GameState, id: TechId): TechState {
   const n = TECH_BY_ID[id];
   if (s.unlockedTech.includes(id)) return 'owned';
   if (n.prereq && !s.unlockedTech.includes(n.prereq)) return 'locked';
-  return s.techPoints >= n.cost ? 'available' : 'poor';
+  return s.techPoints >= techCost(s, id) ? 'available' : 'poor';
 }
 
 export function buyTech(s: GameState, id: TechId): boolean {
   if (techState(s, id) !== 'available') return false;
   const n = TECH_BY_ID[id];
-  s.techPoints -= n.cost;
+  const cost = techCost(s, id);
+  s.techPoints -= cost;
+  s.flags.evolved = Number(s.flags.evolved ?? 0) + 1;
   unlock(s, id);
   fx(s, { kind: 'toast', text: `Unlocked: ${n.name}. ${n.effect}`, tone: 'good' });
-  log(s, 'tech', id, n.cost);
+  log(s, 'tech', id, cost);
   return true;
 }
 

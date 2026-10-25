@@ -96,3 +96,9 @@ Other choices:
 - **The venue auction is the night of Day 4**, after Balantir's scripted call, so the Balantir decision (and its money) comes first. The sim bot keeps its auction reserve until then; Balanced@70 still beats Tree 57%.
 - Smaller fixes: the goal strip fits on one line on phones ("🎯 Get more hackers than Tree · 🌲 holds 7/8 regions"), and BREAKING headlines no longer say "BREAKING BREAKING:".
 - **Full screen on phones.** A "⛶ Full screen" button on the title screen and in the pause menu. Android and iPad browsers go full screen. iPhone Safari has no Fullscreen API for web pages, so on iPhone the button explains how to Add to Home Screen, and the game is set up to run from there with no address bar (web-app meta tags, a 180 px Home Screen icon, safe-area padding for the notch). The installed app on Android opens full screen in any orientation. The button hides when the game already runs from the Home Screen.
+
+## Prioritize round
+
+- **The Blue Screen is gone**: the decision, the 🟦 map bubble, its hackathon-day beat, the IT Hero award and the art.
+- **You can't evolve the whole tree.** Plague Inc's rule: every 2 nodes you evolve make every other node cost +1 TP (rumor unlocks are free and don't count). The Evolve screen shows the current markup. A good player now evolves about 15 of 36 nodes (it was about 23), so picking a direction matters.
+- Balance after both changes (300 runs each): Balanced@70 beats Tree 58%, Perfect 75%, Balanced@0 38%, Random 9%. Skipping bubbles and tech now costs more than it did.

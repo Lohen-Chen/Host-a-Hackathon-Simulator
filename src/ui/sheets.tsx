@@ -6,7 +6,7 @@ import { SPONSOR_BY_ID, TIER_INFO } from '../content/sponsors';
 import { BRANCHES, TECH } from '../content/techTree';
 import {
   assign, bar, buyTech, canAssign, effectiveSkill, equityCut, inviteChance, isMatch, postsPerDay,
-  techState, type GameState, type Member, type Task, type TechBranch, type TechId,
+  techCost, techMarkup, techState, type GameState, type Member, type Task, type TechBranch, type TechId,
 } from '../core';
 import { Avatar } from './art';
 import { store } from './store';
@@ -106,6 +106,7 @@ export function TechSheet({ s, close }: { s: GameState; close?: () => void }) {
         <h3>🧬 Evolve</h3>
         {s.phase === 'live' && <span class="chip">⏸ World paused</span>}
         <span class="chip gold">🔬 {s.techPoints} TP</span>
+        {techMarkup(s) > 0 && <span class="chip" title="Every 2 nodes you evolve make every other node cost +1 TP. You can't evolve everything: pick what matters.">📈 +{techMarkup(s)} TP each</span>}
         <span class="grow" />
         {close && <button class="icon-btn" aria-label="Close" onClick={close}>✕</button>}
       </div>
@@ -147,7 +148,7 @@ export function TechSheet({ s, close }: { s: GameState; close?: () => void }) {
                       <button key={t.id} class={`evo-node ${ts} ${sel === t.id ? 'sel' : ''}`} style={{ left: `${p.x + 4}px`, top: `${p.y + 4}px`, width: `${NODEW}px`, height: `${NODEH}px` }}
                         onClick={() => setSel(sel === t.id ? null : t.id)} aria-label={`${t.name}, ${ts}`}>
                         <span class="evo-name">{t.name}</span>
-                        <span class="evo-cost">{ts === 'owned' ? '✓ evolved' : ts === 'locked' ? '🔒' : `${t.cost} TP`}</span>
+                        <span class="evo-cost">{ts === 'owned' ? '✓ evolved' : ts === 'locked' ? '🔒' : `${techCost(s, t.id)} TP`}</span>
                       </button>
                     );
                   })}
@@ -164,12 +165,12 @@ export function TechSheet({ s, close }: { s: GameState; close?: () => void }) {
               <div class="tiny dim">{n.desc ?? flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
               {st !== 'owned' && (
                 <button class="btn btn-gold" disabled={st !== 'available'} onClick={() => store.act((x) => buyTech(x, n.id))}>
-                  {st === 'locked' ? `Evolve ${TECH.find((t) => t.id === n.prereq)?.name} first` : st === 'poor' ? `Need ${n.cost} TP` : `🧬 Evolve (${n.cost} TP)`}
+                  {st === 'locked' ? `Evolve ${TECH.find((t) => t.id === n.prereq)?.name} first` : st === 'poor' ? `Need ${techCost(s, n.id)} TP` : `🧬 Evolve (${techCost(s, n.id)} TP)`}
                 </button>
               )}
             </>
           ) : (
-            <div class="tiny dim">Tap a node to see what it does. Each branch grows from its first node. Earn TP from 💡 bubbles and Organizers on Research; rumors can unlock nodes for free.</div>
+            <div class="tiny dim">Tap a node to see what it does. Each branch grows from its first node. Earn TP from 💡 bubbles and Organizers on Research; rumors can unlock nodes for free. Every 2 nodes you evolve make every other node cost +1 TP, so you can't evolve everything: pick what matters.</div>
           )}
         </div>
       </div>

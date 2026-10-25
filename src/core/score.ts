@@ -82,12 +82,11 @@ export function scoreBear(s: GameState, f: EventFacts): ScoreBreakdown {
   const perkMood = premium.reduce((a, d) => a + (d.perkFx.mood ?? 0) - (d.perkFx.riot ?? 0), 0) + allSp.filter((d) => d.tier === 'partner').length * 2;
   const perkQuality = premium.reduce((a, d) => a + (d.perkFx.quality ?? 0), 0);
   const traitMood = s.members.filter((m) => m.trait === 'veteran' || m.trait === 'grass').length * 2;
-  const bsod = s.flags.bsod === 'haunted' ? -6 : s.flags.bsod === 'rebooted' ? 2 : 0;
   const afterparty = s.flags.afterparty === 'official' ? 4 : 0;
 
   const attendance = attendanceScore(f.attendees, f.expected, f.cap);
   const mood = clamp(38 + s.moodBank * 1.6 + (hasTech(s, 'snack') ? 8 : 0) + (hasTech(s, 'runofshow') ? 5 : 0) + bar(s, 'org') * 0.06 + perkMood + v.ambience * 1.5 + Math.min(10, s.operations * 1.2)
-    + traitMood + bsod + afterparty - (f.protest ? 15 : 0) - wifi * 2.5 - f.broken * 4 - (f.overflow > 0 ? 10 : 0) - (f.dumpster ? 15 : 0), 0, 100);
+    + traitMood + afterparty - (f.protest ? 15 : 0) - wifi * 2.5 - f.broken * 4 - (f.overflow > 0 ? 10 : 0) - (f.dumpster ? 15 : 0), 0, 100);
   const sponsor = s.sponsors.length
     ? clamp(s.sponsors.reduce((a, x) => a + TIER_INFO[SPONSOR_BY_ID[x.id].tier].points * (x.premium ? 1 : 0.6), 0) * 0.7 + 8, 0, 100)
     : 8;
