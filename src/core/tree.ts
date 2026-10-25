@@ -1,9 +1,9 @@
 // Tree University, the live rival (Section 6.10). Tree moves are Plague Inc-style news:
 // they pause the world with a popup and land immediately. There is no quick-time response;
-// the counterplay is the Clapback Team node in the Hype branch.
+// the counterplay is out-hyping them (and the Clapback post where Tree leads).
 import { TREE_CATCHUP, TREE_MOVES, type TreeMoveDef } from '../content/treeMoves';
 import { T } from './config';
-import { addTicker, fx, hasTech, log } from './helpers';
+import { addTicker, fx, log } from './helpers';
 import { fill, regionName } from './jokes';
 import { treeImpulse } from './map';
 import { showPopup } from './popups';
@@ -48,16 +48,15 @@ export function startTreeMove(s: GameState, id: string) {
     log(s, 'treeStumble', 'Tree stumbled');
     return;
   }
-  const mult = hasTech(s, 'clapback') ? T.clapbackMult : 1;
   for (const r of targets) {
-    treeImpulse(s, r, def.impulse * mult, def.global ? 0.2 : T.spillFactor);
+    treeImpulse(s, r, def.impulse, def.global ? 0.2 : T.spillFactor);
     fx(s, { kind: 'pulse', regionId: r, tone: 'bad' });
   }
-  s.treeHype = Math.min(100, s.treeHype + def.treeHype * mult);
+  s.treeHype = Math.min(100, s.treeHype + def.treeHype);
   const where = def.global ? 'everywhere' : targets.map((r) => regionName(s, r)).join(' and ');
   showPopup(s, {
     kind: 'tree', icon: '🌲', title: `Tree University: ${def.name}`, body: fill(s, def.text),
-    effect: `Tree hype grows in ${where}${mult < 1 ? ' (your Clapback Team took the edge off)' : ''}`, regionId: targets[0],
+    effect: `Tree hype grows in ${where}`, regionId: targets[0],
   }, false, 'TREE TIMES');
-  log(s, 'treeMove', def.name, mult);
+  log(s, 'treeMove', def.name);
 }

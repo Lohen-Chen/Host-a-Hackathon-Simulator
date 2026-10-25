@@ -31,6 +31,7 @@ export function startLiveDay(s: GameState) {
   s.tickerT = 0;
   s.popupsToday = 0;
   s.treeHype = Math.min(100, s.treeHype + T.treeHypeDaily);
+  s.flags.treeHypeStart = s.treeHype;
   s.dayStart = { signups: s.signups, confirmed: s.confirmed, budget: s.budget, rep: s.reputation, treeRegions: treeRegionCount(s), treeSignups: s.treeSignups, tp: s.techPoints };
   scheduleDay(s);
   addTicker(s, 'BEAR BEAT', joke(s, 'headline|bear'));

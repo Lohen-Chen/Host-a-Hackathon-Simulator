@@ -13,9 +13,9 @@ export interface ModeConfig { daySec: number; bubbles: number; alerts: number; t
   /** pausing popups per day before optional news is demoted to the ticker */
   popupsPerDay: number }
 export const MODES: Record<Mode, ModeConfig> = {
-  judge: { daySec: 30, bubbles: 6, alerts: 1, tickerSec: 4, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8, popupsPerDay: 2 },
+  judge: { daySec: 30, bubbles: 6, alerts: 1, tickerSec: 6.25, auctionSec: 7, label: 'Judge (~5 min)', treePower: 0.8, popupsPerDay: 2 },
   standard: { daySec: 60, bubbles: 10, alerts: 1, tickerSec: 5, auctionSec: 10, label: '~10 min', treePower: 1, popupsPerDay: 2 },
-  full: { daySec: 120, bubbles: 20, alerts: 2, tickerSec: 6, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2, popupsPerDay: 3 },
+  full: { daySec: 120, bubbles: 20, alerts: 2, tickerSec: 7.5, auctionSec: 10, label: 'Full (~17 min)', treePower: 1.2, popupsPerDay: 3 },
 };
 
 export const T = {
@@ -53,8 +53,6 @@ export const T = {
   minGap: 3,
   // Tree moves
   rubberBand: 1600,
-  /** Tree moves land at this strength once the Clapback Team node is owned */
-  clapbackMult: 0.6,
   // Rumors (Plague Inc mutations): free random nodes per run, scheduled like world news
   maxRumors: 2,
   // Sponsors
@@ -65,8 +63,7 @@ export const T = {
   equityCap: 28,
   // Confirming hackers: money turns interest into committed attendees (food, swag, travel)
   confirmBatch: 250,
-  confirmCost: 14,
-  confirmCostMin: 9,
+  confirmCost: 7,
   /** share of interested-but-unconfirmed hackers who show up anyway */
   walkInRate: 0.1,
   // Event day
@@ -74,7 +71,7 @@ export const T = {
   /** attendees needed for a full Attendance score */
   attendanceFull: 4000,
   /** Tree's off-map campus hackers: base + per point of Tree hype */
-  treeBase: 750,
+  treeBase: 550,
   treeBasePerHype: 12,
   /** interest effects in alerts are written at the old 1,200-hacker scale */
   signupScale: 8,

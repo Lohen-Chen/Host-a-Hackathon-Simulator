@@ -164,7 +164,7 @@ export function fireNews(s: GameState, id: string) {
   const n = NEWS_BY_ID[id];
   if (!n) return;
   applyEffects(s, n.fx, { filled: {} });
-  showPopup(s, { kind: 'news', icon: n.icon, title: n.title, body: n.body, effect: n.effect, regionId: 'b1g' }, false);
+  showPopup(s, { kind: 'news', icon: n.icon, title: n.title, body: n.body, effect: n.effect, regionId: n.region }, false);
   log(s, 'news', id);
 }
 

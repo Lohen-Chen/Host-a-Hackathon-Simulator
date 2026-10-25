@@ -2,6 +2,19 @@
 
 All tunable constants live in `src/core/config.ts` (`T` and `MODES`), plus two formulas in `src/core/map.ts` (`repFactor`, `treeBase`) and the category formulas in `src/core/score.ts`. `npm run sim` plays 2,000 headless games per bot on the real sim core (`-- --mode judge|standard|full`, `-- --runs N`, `-- --bot name`).
 
+## Changes2 round: new tech tree (Standard, 300 runs per bot)
+
+The Conversion bar is gone. Interest now comes from the Hype and Organization bars plus a few nodes (Application Portal +6%, Travel Reimbursement +8%, LeetCode Gate −8%). Talent is hacker talent: it feeds project quality (×0.3) and sponsor mood. Confirming starts at $7 a hacker, and Travel Reimbursement and Swag Bags each add $2 instead of discounting. Without the Clapback Team, Tree moves land at full strength, so Tree's base pull dropped from 750 to 550. Tree's attendance is now often close to the Soda venue cap (3,200), which is where good runs top out.
+
+| Bot | Median score | Beats Tree |
+| --- | --- | --- |
+| Random | 45 | 13% |
+| Balanced@0 | 53 | 49% |
+| Balanced@70 | 69 | 55% |
+| Perfect | 72 | 68% |
+
+Balanced@0 (no 💡 taps) wins more often than before because confirming is cheaper; it still scores 16 points below Balanced@70.
+
 ## UI round: automated posts (Standard, 300 runs per bot)
 
 Posts are no longer a hand of cards. Each day spawns `1 + Social members on Social` 📱 bubbles (capped at 3, +1 each for Reel Posts and Influencers), weighted toward regions where Bear is already known and Tree is strong. Tapping one fires the best-fitting card for that region; paid cards are only picked when they cost under 5% of the budget. Bots lost some precision from hand-picking cards, so Tree's base pull dropped from 900 to 750.

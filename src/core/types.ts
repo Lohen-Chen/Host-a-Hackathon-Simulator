@@ -11,12 +11,13 @@ export type TraitId =
   | 'pivoted' | 'veteran' | 'replyguy' | 'sleeper' | 'arts' | 'grass' | 'memer';
 export type TechId =
   // Hype
-  | 'website' | 'promo' | 'reelposts' | 'memes' | 'billboard' | 'clapback' | 'influencers'
+  | 'website' | 'promo' | 'sfbus' | 'influencers' | 'reelposts' | 'ugc' | 'ericou' | 'ricklee' | 'discord' | 'poker' | 'hackad' | 'travel' | 'swag'
+  // Organization
+  | 'clubfair' | 'design' | 'logistics' | 'snack' | 'reminders' | 'runofshow' | 'coordinator' | 'prestige1' | 'prestige2' | 'prestige3' | 'nepolist'
+  | 'resumebook' | 'rep2' | 'rep3' | 'training2' | 'training3'
   // Talent
-  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack' | 'nepolist' | 'mentors'
-  // Conversion
-  | 'applications' | 'discord' | 'travel' | 'aicredits' | 'swag' | 'rep2' | 'rep3' | 'reminders';
-export type TechBranch = 'hype' | 'talent' | 'conversion';
+  | 'applications' | 'highsignal' | 'leetcode' | 'mentors' | 'workshops' | 'olympiad' | 'aicredits';
+export type TechBranch = 'hype' | 'org' | 'talent';
 export type PostId = 'flyer' | 'meme_bear' | 'linkedin' | 'dance' | 'pizza' | 'reel' | 'influencer' | 'clapback' | 'countdown' | 'dog';
 export type BubbleType = 'idea' | 'eureka' | 'bsod' | 'post';
 export type Tier = 'flop' | 'meh' | 'solid' | 'viral' | 'mega' | 'ratio';
@@ -169,7 +170,7 @@ export interface Settings { relaxed: boolean }
 export interface DaySnapshot { signups: number; confirmed: number; budget: number; rep: number; treeRegions: number; treeSignups: number; tp: number }
 
 export interface GameState {
-  version: 3;
+  version: 4;
   mode: Mode;
   seed: number;
   rngState: number;
@@ -211,7 +212,7 @@ export interface GameState {
   unlockedPosts: PostId[];
   unlockedTech: TechId[];
   trainingMult: number;
-  prestigeLevel: 1 | 2 | 3;
+  prestigeLevel: 0 | 1 | 2 | 3;
 
   postsFired: number;
 

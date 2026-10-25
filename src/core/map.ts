@@ -1,6 +1,6 @@
 // The hype map: per-step virus-style spread (Section 6.3). No DOM.
 import { MODES, STEPS_PER_DAY, T } from './config';
-import { addTicker, fx, log } from './helpers';
+import { addTicker, fx, hasTech, log } from './helpers';
 import { isTreeControlled, joke } from './jokes';
 import { showPopup } from './popups';
 import { clamp, chance, rand, weighted } from './rng';
@@ -16,9 +16,10 @@ export function treeBase(s: GameState) {
   return T.treeBase + s.treeHype * T.treeBasePerHype;
 }
 
-/** How much of an aware, controlled population becomes interested. Every unlock helps a little. */
+/** How much of an aware, controlled population becomes interested. Hype and a well-run club both help; every unlock helps a little. */
 export function conversionMult(s: GameState) {
-  return 0.45 + 0.6 * (bar(s, 'conversion') / 100) + 0.015 * s.unlockedTech.length;
+  const nodes = (hasTech(s, 'applications') ? 0.06 : 0) + (hasTech(s, 'travel') ? 0.08 : 0) - (hasTech(s, 'leetcode') ? 0.08 : 0);
+  return 0.45 + 0.3 * (bar(s, 'hype') / 100) + 0.3 * (bar(s, 'org') / 100) + nodes + 0.015 * s.unlockedTech.length;
 }
 
 /** Hype bar → faster spread between neighbors. */

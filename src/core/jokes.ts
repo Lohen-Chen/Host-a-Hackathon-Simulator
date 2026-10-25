@@ -20,7 +20,8 @@ export const jokeEngine = () => engine;
 export const jokeErrors = () => loadErrors;
 
 export const RIVAL = 'Tree University';
-export const RIVAL_CEO = 'Leland Sr.';
+/** Tree University's billionaire backers. Parody names; the satire punches at tech moguls and private equity. */
+export const RIVAL_BACKERS = ['Alex Carp', 'Petros Thiel', 'Mario A. Model'];
 
 /** Hand-written safe lines used whenever a render fails (Section 8.3). */
 const FALLBACK: Record<string, string> = {
@@ -56,7 +57,7 @@ export function slotsFor(s: GameState, o: SlotOverrides = {}): RenderContext['sl
     venue: s.venue ? VENUE_BY_ID[s.venue].name : VENUES.map((v) => v.name),
     region: s.regions.map((r) => r.name),
     rival: RIVAL,
-    rivalceo: RIVAL_CEO,
+    rivalceo: RIVAL_BACKERS,
     signups: Math.round(s.signups),
     treesignups: Math.round(s.treeSignups),
     day: s.day,

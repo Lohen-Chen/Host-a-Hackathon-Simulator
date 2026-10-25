@@ -1,11 +1,17 @@
 // Audio: SFX are synthesized with WebAudio placeholders (swap in CC0 samples later, docs/CREDITS.md).
-// Music is two looping tracks: one for the title screen, one for the game.
+// Music is two looping tracks: one for the title screen, one for the game. They play through WebAudio
+// buffers so the loop is gapless (an <audio loop> element stutters at the seam and MP3 padding adds silence).
 import gameUrl from './BG_Music.mp3';
 import menuUrl from './Menu_Screen_Music.mp3';
 
 export type Track = 'menu' | 'game';
 const TRACKS: Record<Track, string> = { menu: menuUrl, game: gameUrl };
 const MUSIC_VOL = 0.35;
+/** MP3 encoder delay and real length in samples at 44.1 kHz (from each file's iTunSMPB tag), so the loop skips the padding. */
+const GAPLESS: Record<Track, { delay: number; frames: number }> = {
+  game: { delay: 0x210, frames: 0x2affc6 },
+  menu: { delay: 0x210, frames: 0x6271a },
+};
 type Voice = { f: number; t: number; d: number; type?: OscillatorType; slide?: number; vol?: number };
 
 const PATCHES: Record<string, Voice[]> = {
@@ -30,7 +36,11 @@ class Sfx {
   private muted = false;
   private musicOn = true;
   private track: Track = 'menu';
-  /** One element for both loops: once a tap has started it, browsers let it switch tracks freely. */
+  private musicGain: GainNode | null = null;
+  private buffers: Partial<Record<Track, AudioBuffer>> = {};
+  private loading: Partial<Record<Track, Promise<AudioBuffer | null>>> = {};
+  private source: { track: Track; node: AudioBufferSourceNode; gain: GainNode } | null = null;
+  /** Fallback when WebAudio is unavailable. */
   private audio: HTMLAudioElement | null = null;
   private unlocked = false;
 
@@ -38,15 +48,18 @@ class Sfx {
   unlock() {
     if (!this.unlocked) document.addEventListener('visibilitychange', () => this.syncMusic());
     this.unlocked = true;
-    this.syncMusic();
-    if (this.ctx) { void this.ctx.resume(); return; }
+    if (this.ctx) { void this.ctx.resume(); this.syncMusic(); return; }
     try {
       const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AC();
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : 0.6;
       this.master.connect(this.ctx.destination);
+      this.musicGain = this.ctx.createGain();
+      this.musicGain.gain.value = 0;
+      this.musicGain.connect(this.ctx.destination);
     } catch { this.ctx = null; }
+    this.syncMusic();
   }
 
   setMuted(m: boolean) {
@@ -92,6 +105,56 @@ class Sfx {
   private syncMusic() {
     if (typeof window === 'undefined' || typeof Audio === 'undefined') return;
     const on = this.unlocked && !this.muted && this.musicOn && document.visibilityState !== 'hidden';
+    if (!this.ctx || !this.musicGain) { this.syncElement(on); return; }
+    const now = this.ctx.currentTime;
+    this.musicGain.gain.cancelScheduledValues(now);
+    this.musicGain.gain.setTargetAtTime(on ? MUSIC_VOL : 0, now, 0.08);
+    if (on) void this.playTrack(this.track);
+  }
+
+  /** Decode a track once; later calls reuse the buffer. */
+  private load(track: Track): Promise<AudioBuffer | null> {
+    const ctx = this.ctx!;
+    this.loading[track] ??= fetch(TRACKS[track])
+      .then((r) => r.arrayBuffer())
+      .then((b) => new Promise<AudioBuffer>((res, rej) => { void ctx.decodeAudioData(b, res, rej); }))
+      .then((buf) => (this.buffers[track] = buf))
+      .catch(() => null);
+    return this.loading[track]!;
+  }
+
+  /** Start `track` looping (crossfading from the current one). */
+  private async playTrack(track: Track) {
+    if (this.source?.track === track) return;
+    const buf = this.buffers[track] ?? (await this.load(track));
+    const ctx = this.ctx;
+    if (!buf || !ctx || !this.musicGain || this.track !== track || this.source?.track === track) return;
+    const node = ctx.createBufferSource();
+    node.buffer = buf;
+    node.loop = true;
+    // Skip the encoder delay and end padding if the decoder kept them (Chrome strips them itself; others may not).
+    const g = GAPLESS[track];
+    const scale = buf.sampleRate / 44100;
+    if (buf.length > (g.frames + 64) * scale) {
+      node.loopStart = (g.delay * scale) / buf.sampleRate;
+      node.loopEnd = ((g.delay + g.frames) * scale) / buf.sampleRate;
+    }
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(1, now + 0.4);
+    node.connect(gain).connect(this.musicGain);
+    node.start(now, node.loopStart);
+    const old = this.source;
+    this.source = { track, node, gain };
+    if (old) {
+      old.gain.gain.setTargetAtTime(0.0001, now, 0.12);
+      old.node.stop(now + 0.6);
+    }
+  }
+
+  /** No WebAudio: fall back to a plain looping <audio> element. */
+  private syncElement(on: boolean) {
     if (!on) { this.audio?.pause(); return; }
     if (!this.audio) {
       this.audio = new Audio();

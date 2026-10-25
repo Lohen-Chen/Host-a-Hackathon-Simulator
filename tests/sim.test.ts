@@ -8,7 +8,7 @@ import { BRANCHES, TECH } from '../src/content/techTree';
 import { BIDDERS, VENUES } from '../src/content/venues';
 import { jokeEngine } from '../src/core';
 import {
-  advance, bar, beginGame, buyTech, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
+  advance, bar, beginGame, buyTech, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
   startLiveDay, startRumor, tickAuction, finishAuction, nextDay, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
 } from '../src/core';
 import { NEWS } from '../src/content/news';
@@ -92,19 +92,15 @@ describe('simulation core', () => {
     expect(s.t).toBeGreaterThan(t);
   });
 
-  it('Tree moves are news popups with no response, and the Clapback Team node softens them', () => {
-    const hit = (clap: boolean) => {
-      const s = newGame(12);
-      beginGame(s);
-      startLiveDay(s);
-      s.schedule = [];
-      if (clap) s.unlockedTech.push('clapback');
-      const before = s.regions.find((r) => r.id === 'twitter')!.tree;
-      startTreeMove(s, 'keynote');
-      expect(s.popups[0]?.kind).toBe('tree');
-      return s.regions.find((r) => r.id === 'twitter')!.tree - before;
-    };
-    expect(hit(true)).toBeLessThan(hit(false));
+  it('Tree moves are news popups with no response that grow Tree', () => {
+    const s = newGame(12);
+    beginGame(s);
+    startLiveDay(s);
+    s.schedule = [];
+    const before = s.regions.find((r) => r.id === 'twitter')!.tree;
+    startTreeMove(s, 'keynote');
+    expect(s.popups[0]?.kind).toBe('tree');
+    expect(s.regions.find((r) => r.id === 'twitter')!.tree).toBeGreaterThan(before);
   });
 
   it('losing every venue bid falls back to The Lawn', () => {
@@ -179,17 +175,18 @@ describe('simulation core', () => {
   it('every tech node is buyable, does something, and fills its bar', () => {
     const s = newGame(4);
     s.techPoints = 999;
-    const before = { hype: bar(s, 'hype'), talent: bar(s, 'talent'), conversion: bar(s, 'conversion') };
-    // Buy in an order that satisfies prerequisites.
-    const order = [...TECH].sort((a, b) => Number(!!a.prereq) - Number(!!b.prereq));
+    const before = { hype: bar(s, 'hype'), org: bar(s, 'org'), talent: bar(s, 'talent') };
+    // Buy in an order that satisfies prerequisites (parents before children).
+    const depth = (id?: string): number => (id ? 1 + depth(TECH.find((t) => t.id === id)?.prereq) : 0);
+    const order = [...TECH].sort((a, b) => depth(a.prereq) - depth(b.prereq));
     for (const t of order) expect(buyTech(s, t.id), t.id).toBe(true);
     expect(s.unlockedRoles).toEqual(expect.arrayContaining(['recruiter', 'designer', 'logistics', 'coordinator']));
     expect(s.trainingMult).toBe(1.7);
-    expect(s.prestigeLevel).toBe(2);
+    expect(s.prestigeLevel).toBe(3);
     expect(s.repCap).toBe(200);
     expect(s.unlockedPosts).toEqual(expect.arrayContaining(['reel', 'countdown', 'influencer']));
-    for (const b of ['hype', 'talent', 'conversion'] as const) expect(bar(s, b)).toBeGreaterThan(before[b] + 30);
-    expect(BRANCHES.map((b) => b.name)).toEqual(['Hype', 'Talent', 'Conversion']);
+    for (const b of ['hype', 'org', 'talent'] as const) expect(bar(s, b)).toBeGreaterThan(before[b] + 30);
+    expect(BRANCHES.map((b) => b.name)).toEqual(['Hype', 'Organization', 'Talent']);
   });
 
   it('a rumor unlocks a random tech node for free, with a popup', () => {
@@ -212,7 +209,7 @@ describe('simulation core', () => {
     expect(s.confirmed).toBe(T.confirmBatch);
     expect(s.budget).toBe(budget - n * T.confirmCost);
     s.unlockedTech.push('travel', 'swag');
-    expect(confirmCost(s)).toBe(T.confirmCost - 5);
+    expect(confirmCost(s)).toBe(T.confirmCost + 4);
     const a = newGame(15);
     const base = conversionMult(a);
     a.unlockedTech.push('applications');
@@ -268,7 +265,7 @@ describe('simulation core', () => {
     for (const t of ['Purdue football wins natty', 'Purdue obliterates IU in 80-2 game', 'IU falls to chaos', 'IU Kelley School named #1 in most annoying students']) expect(titles).toContain(t);
     const s = newGame(18);
     s.techPoints = 99;
-    for (const id of ['applications', 'discord', 'aicredits'] as const) buyTech(s, id);
+    for (const id of ['applications', 'aicredits'] as const) buyTech(s, id);
     expect(s.popups.some((p) => p.body.includes('increased the participation of business majors by 200%'))).toBe(true);
   });
 
@@ -291,16 +288,19 @@ describe('simulation core', () => {
     expect(calls).toBe(30);
   });
 
-  it('Nepo List is back in Talent and adds better candidates', () => {
+  it('Nepo List sits in Organization after the Club Prestige tiers', () => {
     const n = TECH.find((t) => t.id === 'nepolist')!;
-    expect(n.branch).toBe('talent');
+    expect(n.branch).toBe('org');
     expect(n.desc).toContain('direct recruitment');
     const s = newGame(31);
     s.techPoints = 99;
-    for (const id of ['clubfair', 'coordinator', 'prestige2'] as const) buyTech(s, id);
-    const before = bar(s, 'talent');
-    buyTech(s, 'nepolist');
-    expect(bar(s, 'talent')).toBeGreaterThan(before);
+    expect(candidateCount(s)).toBe(3);
+    for (const id of ['clubfair', 'coordinator', 'prestige1', 'prestige2', 'prestige3'] as const) expect(buyTech(s, id), id).toBe(true);
+    expect(candidateCount(s)).toBe(9);
+    const before = bar(s, 'org');
+    expect(buyTech(s, 'nepolist')).toBe(true);
+    expect(bar(s, 'org')).toBeGreaterThan(before);
+    expect(candidateCount(s)).toBe(11);
   });
 
   it('the crew has no cap, hires get pricier, and a burned-out member who keeps working quits', () => {

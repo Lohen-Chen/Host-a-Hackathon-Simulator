@@ -1,4 +1,4 @@
-// SVG hype map: each region is a block of squares (one per 50 students) colored Bear / Tree / neutral,
+// SVG hype map: each region is a block of dots (one per 50 students) colored Bear / Tree / neutral,
 // plus a DOM overlay for bubbles, floaters and the Tree move icon.
 import { BUBBLE_ICON, isTreeControlled, tapBubble, type GameState, type RegionId } from '../core';
 import { store, type UiFx } from './store';
@@ -6,7 +6,7 @@ import { store, type UiFx } from './store';
 const W = 360;
 const H = 300;
 
-/** One square = this many students. 10,000 students → 200 squares across the eight regions. */
+/** One dot = this many students. 10,000 students → 200 dots across the eight regions. */
 export const PER_SQUARE = 50;
 const CELL = 8;
 const SQ = 7;
@@ -14,7 +14,7 @@ const SQ = 7;
 interface Block { n: number; cols: number; rows: number; x0: number; y0: number; w: number; h: number; order: number[] }
 const blocks = new Map<string, Block>();
 
-/** Each region is a compact block of squares around its map point. The fill order grows from the
+/** Each region is a compact block of dots around its map point. The fill order grows from the
  *  middle outward, so Bear spreads like an infection from the center and Tree closes in from the edges. */
 function blockFor(r: { id: string; pop: number; x: number; y: number }): Block {
   const key = `${r.id}:${r.pop}`;
@@ -71,8 +71,8 @@ export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegi
         return (
           <g key={r.id} class={`region-hit ${sel ? 'sel' : ''}`} onClick={() => onRegion?.(r.id)} role="button"
             aria-label={`${r.name}: ${Math.round(r.signups)} for Bear, ${Math.round(r.treeSignups)} for Tree, of ${r.pop}`}>
-            <rect class="block-bg" x={b.x0 - 3} y={b.y0 - 3} width={b.w + 6} height={b.h + 6} rx="3" />
-            {color.map((c, i) => <rect key={i} class={`sq ${c}`} x={b.x0 + (i % b.cols) * CELL} y={b.y0 + Math.floor(i / b.cols) * CELL} width={SQ} height={SQ} rx="1" />)}
+            <rect class="block-bg" x={b.x0 - 3} y={b.y0 - 3} width={b.w + 6} height={b.h + 6} rx="6" />
+            {color.map((c, i) => <circle key={i} class={`sq ${c}`} cx={b.x0 + (i % b.cols) * CELL + SQ / 2} cy={b.y0 + Math.floor(i / b.cols) * CELL + SQ / 2} r={SQ / 2} />)}
             {pulse && <rect key={pulse.id} class={`pulse ${pulse.tone === 'bad' ? 'bad' : ''}`} x={b.x0 - 4} y={b.y0 - 4} width={b.w + 8} height={b.h + 8} rx="4" />}
             <text class={`region-label ${treeOwned ? 'tree-owned' : ''}`} x={r.x} y={b.y0 - 6} text-anchor="middle">{short(r.name)}</text>
             <text class="region-sub" x={r.x} y={b.y0 + b.h + 11} text-anchor="middle"><tspan class="rs-b">{compact(r.signups)}</tspan> <tspan class="rs-t">{compact(r.treeSignups)}</tspan></text>

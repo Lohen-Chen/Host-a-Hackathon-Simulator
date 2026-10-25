@@ -40,7 +40,7 @@ export function viralChance(s: GameState, card: PostCard): number {
   let p = card.viralBase + 0.02 * sss;
   if (s.sponsors.some((x) => x.id === 'wrinkle')) p += SPONSOR_BY_ID.wrinkle.perkFx.viral ?? 0;
   if (s.members.some((m) => m.task === 'social' && m.trait === 'memer') && card.id !== 'linkedin') p += 0.04;
-  if (s.unlockedTech.includes('memes')) p += 0.06;
+  if (s.unlockedTech.includes('ricklee')) p += 0.08;
   return Math.min(0.85, p);
 }
 
@@ -89,7 +89,7 @@ export function firePost(s: GameState, cardId: PostId, regionId: RegionId): Tier
   const tier = rollTier(s, card);
   const sss = socialSkillSum(s);
   const lunatic = s.members.some((m) => m.task === 'social' && m.trait === 'linkedin') ? 1.2 : 1;
-  const impulse = card.power * TIER_MULT[tier] * affinity(card, regionId) * (1 + 0.1 * sss) * partyMult(card, regionId) * lunatic * (1 + bar(s, 'hype') / 200) * IMPULSE_SCALE;
+  const impulse = card.power * TIER_MULT[tier] * affinity(card, regionId) * (1 + 0.1 * sss) * partyMult(card, regionId) * lunatic * (1 + bar(s, 'hype') / 200) * (regionId === 'uc' && hasTech(s, 'ericou') ? 1.5 : 1) * IMPULSE_SCALE;
   if (card.fullSpill) bearImpulse(s, regionId, impulse, 1);
   else if (card.party && regionId === 'frat') bearImpulse(s, regionId, impulse, 1);
   else bearImpulse(s, regionId, impulse, T.spillFactor * (hasTech(s, 'influencers') ? 1.5 : 1));
