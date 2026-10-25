@@ -8,6 +8,7 @@ import { CrewSheet } from './sheets';
 import { store } from './store';
 import { ConfirmButton, MuteButton, Ticker, TopBar } from './Live';
 import { flavor } from './flavor';
+import { FullscreenButton } from './fullscreen';
 
 function loadingLine(): string {
   const e = jokeEngine();
@@ -36,6 +37,7 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
       <div class="toggles">
         <button class="tab" onClick={() => store.setSettings({ music: !store.settings.music })}>🎵 Music: {store.settings.music ? 'on' : 'off'}</button>
         <MuteButton />
+        <FullscreenButton className="tab" />
       </div>
       <div class="loading-line">{line}</div>
       {offlineReady ? <span class="chip chip-good">Offline ready ✓</span> : <span class="chip">Caching for offline…</span>}
@@ -123,6 +125,7 @@ export function PauseMenu() {
         <div class="small dim">The clock is stopped. Tree University is also, presumably, on a break.</div>
         <button class="btn btn-gold" onClick={() => { store.paused = false; store.emit(); }}>▶ Resume</button>
         <button class="btn" onClick={() => store.setSettings({ music: !store.settings.music })}>🎵 Music: {store.settings.music ? 'on' : 'off'}</button>
+        <FullscreenButton />
         <button class="btn btn-red" onClick={() => { store.paused = false; store.save(); store.quit(); }}>Quit to title</button>
         <div class="tiny dim">Seed {store.state?.seed} · {store.state ? flavor(store.state, 'loading', 'pause') : ''}</div>
       </div>

@@ -8,7 +8,7 @@ Built with Vite, TypeScript and Preact. It plays in portrait or landscape (map o
 
 ## Play
 
-One playthrough takes about 10 minutes (seven 60-second days, plus mornings, the venue auction and hackathon day). The world pauses for news popups and while the Evolve menu is open.
+On iPhone, add it to the Home Screen to play without the Safari address bar (the ⛶ Full screen button explains how); Android and iPad can go full screen directly. One playthrough takes about 10 minutes (seven 60-second days, plus mornings, the venue auction and hackathon day). The world pauses for news popups and while the Evolve menu is open.
 
 The game saves at day boundaries in `localStorage`. Settings include mute and music.
 
