@@ -49,7 +49,7 @@ export function Title({ offlineReady }: { offlineReady: boolean }) {
 
 const INTRO = [
   { icon: <BearMascot size={64} />, text: 'You are the president of a club at Bear University. You will host the greatest hackathon of all time.' },
-  { icon: <TreeMascot size={64} />, text: 'Tree University is hosting one the SAME weekend. Their CEO, Leland Sr., is on his phone. He says "synergy."' },
+  { icon: <TreeMascot size={64} />, text: 'Tree University is hosting one the SAME weekend. Their president, Leland Sr., is on his phone. He says "synergy."' },
   { icon: <span style={{ fontSize: '54px' }}>🗺️</span>, text: 'Bear Hacks spreads across the country like a virus. 10,000 students. Tap 📱 bubbles to post in regions, tap 💡 bubbles for tech points, evolve your Hype, Organization and Talent.' },
   { icon: <span style={{ fontSize: '54px' }}>✅</span>, text: 'Interest is free. Attendance is not. Spend your budget (and sponsor money) to confirm hackers. Seven days. Go.' },
 ];
