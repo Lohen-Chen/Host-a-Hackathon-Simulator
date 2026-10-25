@@ -1,42 +1,81 @@
-// SVG campus hype map + DOM overlay for bubbles, floaters and the Tree move icon.
+// SVG hype map: each region is a block of squares (one per 50 students) colored Bear / Tree / neutral,
+// plus a DOM overlay for bubbles, floaters and the Tree move icon.
 import { BUBBLE_ICON, isTreeControlled, tapBubble, type GameState, type RegionId } from '../core';
 import { store, type UiFx } from './store';
 
 const W = 360;
 const H = 300;
 
-export function regionRadius(pop: number) { return 10 + Math.sqrt(pop) * 0.5; }
+/** One square = this many students. 10,000 students → 200 squares across the eight regions. */
+export const PER_SQUARE = 50;
+const CELL = 8;
+const SQ = 7;
 
-/** A very rough continental-US silhouette behind the nodes, Plague Inc world-map style. */
+interface Block { n: number; cols: number; rows: number; x0: number; y0: number; w: number; h: number; order: number[] }
+const blocks = new Map<string, Block>();
+
+/** Each region is a compact block of squares around its map point. The fill order grows from the
+ *  middle outward, so Bear spreads like an infection from the center and Tree closes in from the edges. */
+function blockFor(r: { id: string; pop: number; x: number; y: number }): Block {
+  const key = `${r.id}:${r.pop}`;
+  const hit = blocks.get(key);
+  if (hit) return hit;
+  const n = Math.max(1, Math.round(r.pop / PER_SQUARE));
+  const cols = Math.ceil(Math.sqrt(n * 1.3));
+  const rows = Math.ceil(n / cols);
+  const w = cols * CELL - (CELL - SQ);
+  const h = rows * CELL - (CELL - SQ);
+  const cx = (cols - 1) / 2;
+  const cy = (rows - 1) / 2;
+  let seed = [...r.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const jitter = () => { seed = (seed * 1103515245 + 12345) >>> 0; return (seed % 1000) / 1000; };
+  const order = Array.from({ length: n }, (_, i) => i)
+    .map((i) => ({ i, d: Math.hypot((i % cols) - cx, Math.floor(i / cols) - cy) + jitter() * 1.4 }))
+    .sort((a, b) => a.d - b.d).map((o) => o.i);
+  const b = { n, cols, rows, x0: r.x - w / 2, y0: r.y - h / 2, w, h, order };
+  blocks.set(key, b);
+  return b;
+}
+
+/** Square colors for a region: [bear, tree] counts out of block.n. */
+export function squareSplit(r: { signups: number; treeSignups: number }, n: number): [number, number] {
+  const bear = Math.min(n, Math.round(r.signups / PER_SQUARE));
+  const tree = Math.min(n - bear, Math.round(r.treeSignups / PER_SQUARE));
+  return [bear, tree];
+}
+
+/** A very rough continental-US silhouette behind the regions, Plague Inc world-map style. */
 const US_PATH = 'M18 92 L40 64 L70 52 L120 48 L170 44 L230 46 L262 58 L300 60 L332 70 L346 92 L336 120 L344 150 L330 182 L306 210 L284 238 L262 250 L238 268 L214 262 L188 246 L150 244 L118 232 L84 222 L56 204 L30 178 L20 140 Z';
 
-export function MapSvg({ s, onRegion, armed, pulses }: { s: GameState; onRegion?: (id: RegionId) => void; armed?: boolean; pulses?: UiFx[] }) {
+export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegion?: (id: RegionId) => void; selected?: RegionId | null; pulses?: UiFx[] }) {
   const pos = new Map(s.regions.map((r) => [r.id, r]));
   const edges: [RegionId, RegionId][] = [];
   for (const r of s.regions) for (const n of r.neighbors) if (r.id < n) edges.push([r.id, n]);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} class={armed ? 'armed' : ''} role="group" aria-label="Hype map">
+    <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Hype map">
       <defs>
         <pattern id="grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#1a2740" stroke-width="1" /></pattern>
       </defs>
       <rect width={W} height={H} fill="url(#grid)" />
       <path d={US_PATH} fill="#16243c" stroke="#2b3f62" stroke-width="2" stroke-linejoin="round" />
-      {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round" />; })}
+      {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" />; })}
       {s.regions.map((r) => {
-        const rad = regionRadius(r.pop);
+        const b = blockFor(r);
+        const [bear, tree] = squareSplit(r, b.n);
+        const color = new Array<string>(b.n).fill('sq-n');
+        for (let k = 0; k < bear; k++) color[b.order[k]] = 'sq-b';
+        for (let k = 0; k < tree; k++) color[b.order[b.n - 1 - k]] = 'sq-t';
         const treeOwned = isTreeControlled(r);
         const pulse = pulses?.find((p) => p.regionId === r.id);
+        const sel = selected === r.id;
         return (
-          <g key={r.id} class="region-hit" onClick={() => onRegion?.(r.id)} role="button" aria-label={`${r.name}: Bear ${Math.round(r.bear * 100)}%, Tree ${Math.round(r.tree * 100)}%, ${Math.round(r.signups)} signups`}>
-            <circle class="base" cx={r.x} cy={r.y} r={rad} fill="#141e30" stroke="#000" stroke-width="2" />
-            <circle class="region-fill" cx={r.x} cy={r.y} r={rad - 2} fill="var(--bear-hi)" fill-opacity={Math.min(0.92, r.bear * 0.95)} />
-            <circle class="region-ring" cx={r.x} cy={r.y} r={rad - 1} fill="none" stroke="var(--tree-hi)" stroke-opacity={Math.min(1, r.tree * 1.1)} stroke-width={2 + r.tree * 6} />
-            {pulse && <circle key={pulse.id} class="pulse" cx={r.x} cy={r.y} r={rad} fill="none" stroke={pulse.tone === 'bad' ? 'var(--tree-hi)' : 'var(--gold)'} stroke-width="4" />}
-            <text class="region-label" x={r.x} y={r.y - 1} text-anchor="middle">{short(r.name)}</text>
-            <text class="region-sub" x={r.x} y={r.y + 11} text-anchor="middle">{compact(r.signups)}{treeOwned ? ' 🌲' : ''}</text>
-            <rect x={r.x - 16} y={r.y + rad + 2} width="32" height="4" fill="#0b1220" />
-            <rect x={r.x - 16} y={r.y + rad + 2} width={32 * r.bear} height="2" fill="var(--bear-hi)" />
-            <rect x={r.x - 16} y={r.y + rad + 4} width={32 * r.tree} height="2" fill="var(--tree-hi)" />
+          <g key={r.id} class={`region-hit ${sel ? 'sel' : ''}`} onClick={() => onRegion?.(r.id)} role="button"
+            aria-label={`${r.name}: ${Math.round(r.signups)} for Bear, ${Math.round(r.treeSignups)} for Tree, of ${r.pop}`}>
+            <rect class="block-bg" x={b.x0 - 3} y={b.y0 - 3} width={b.w + 6} height={b.h + 6} rx="3" />
+            {color.map((c, i) => <rect key={i} class={`sq ${c}`} x={b.x0 + (i % b.cols) * CELL} y={b.y0 + Math.floor(i / b.cols) * CELL} width={SQ} height={SQ} rx="1" />)}
+            {pulse && <rect key={pulse.id} class={`pulse ${pulse.tone === 'bad' ? 'bad' : ''}`} x={b.x0 - 4} y={b.y0 - 4} width={b.w + 8} height={b.h + 8} rx="4" />}
+            <text class={`region-label ${treeOwned ? 'tree-owned' : ''}`} x={r.x} y={b.y0 - 6} text-anchor="middle">{short(r.name)}</text>
+            <text class="region-sub" x={r.x} y={b.y0 + b.h + 11} text-anchor="middle"><tspan class="rs-b">{compact(r.signups)}</tspan> <tspan class="rs-t">{compact(r.treeSignups)}</tspan></text>
           </g>
         );
       })}
@@ -57,14 +96,13 @@ export function pct(r: { x: number; y: number }) {
   return { left: `${(r.x / W) * 100}%`, top: `${(r.y / H) * 100}%` };
 }
 
-export function HypeMap({ s, onRegion }: { s: GameState; onRegion: (id: RegionId) => void }) {
+export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id: RegionId) => void; selected?: RegionId | null }) {
   const fx = store.fx;
   const shaking = fx.some((f) => f.kind === 'shake');
   const regionOf = (id?: RegionId) => s.regions.find((r) => r.id === id);
-  const armed = s.armedPost !== null;
   return (
     <div class={`map ${shaking ? 'shake' : ''}`}>
-      <MapSvg s={s} onRegion={onRegion} armed={armed} pulses={fx.filter((f) => f.kind === 'pulse')} />
+      <MapSvg s={s} onRegion={onRegion} selected={selected} pulses={fx.filter((f) => f.kind === 'pulse')} />
       <div class="overlay">
         {s.bubbles.map((b) => {
           const r = regionOf(b.regionId)!;
@@ -72,7 +110,7 @@ export function HypeMap({ s, onRegion }: { s: GameState; onRegion: (id: RegionId
           const hazard = b.type === 'bsod';
           const jitter = ((b.id * 37) % 30) - 15;
           return (
-            <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
+            <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''} ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
               onPointerDown={(e) => { e.stopPropagation(); store.act((st) => tapBubble(st, b.id)); }}
               aria-label={`${b.type} bubble`}>
               {b.type === 'bsod' ? <span class="bsod" style={{ width: '40px', height: '30px' }}><span class="bsod-face">:(</span></span> : BUBBLE_ICON[b.type]}
@@ -93,16 +131,20 @@ export function HypeMap({ s, onRegion }: { s: GameState; onRegion: (id: RegionId
           const p = r ? pct(r) : { left: '50%', top: '45%' };
           if (f.kind === 'pop' || f.kind === 'defect') return <div key={f.id} class={`floater ${f.tone ?? ''}`} style={p}>{f.text}</div>;
           if (f.kind === 'banner' && r) return <div key={f.id} class={`tier-banner ${f.tone === 'bad' ? 'bad' : ''}`} style={p}>{f.text}</div>;
-          if (f.kind === 'comment' && r) {
-            const k = f.id % 3;
-            return <div key={f.id} class="comment" style={{ left: p.left, top: `calc(${p.top} + ${-18 + k * 22}px)`, animationDelay: `${k * 0.25}s` }}>{f.text}</div>;
-          }
           if (f.kind === 'confetti') return <Confetti key={f.id} at={p} />;
           return null;
         })}
+        {[...new Set(fx.filter((f) => f.kind === 'comment' && f.regionId).map((f) => f.regionId!))].map((id) => {
+          // One stacked column per region so replies never pile on top of each other.
+          const r = regionOf(id)!;
+          const cs = fx.filter((f) => f.kind === 'comment' && f.regionId === id).slice(-3);
+          return (
+            <div key={id} class="comments" style={{ left: `clamp(30%, ${pct(r).left}, 70%)`, top: pct(r).top }}>
+              {cs.map((f, k) => <div key={f.id} class="comment" style={{ animationDelay: `${k * 0.25}s` }}>{f.text}</div>)}
+            </div>
+          );
+        })}
       </div>
-      {armed && <button class="arm-hint" onClick={() => store.act((st) => { st.armedPost = null; })}>📣 Tap a region to post · ✕</button>}
-      <div class="legend"><span><span style={{ color: 'var(--bear-hi)' }}>●</span> Bear</span><span><span style={{ color: 'var(--tree-hi)' }}>◯</span> Tree</span></div>
     </div>
   );
 }

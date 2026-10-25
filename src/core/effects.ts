@@ -22,7 +22,6 @@ export interface Effects {
   memberSkill?: number;
   allIdleSteps?: number;
   siteDown?: number;
-  charges?: number;
 }
 
 export interface Outcome extends Effects { text: string }

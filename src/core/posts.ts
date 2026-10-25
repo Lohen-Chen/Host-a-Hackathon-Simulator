@@ -1,10 +1,10 @@
-// Social posts: arm a card, tap a region (Section 6.4).
+// Social posts are automated: 📱 bubbles pop up on regions; tapping one posts the best-fitting card there.
 import { POST_BY_ID, TIER_LABEL, TIER_MULT, type PostCard } from '../content/posts';
 import { SPONSOR_BY_ID } from '../content/sponsors';
-import { addRep, addTicker, chargesLeft, fx, log, socialSkillSum } from './helpers';
+import { T } from './config';
+import { addRep, addTicker, fx, hasTech, log, socialSkillSum } from './helpers';
 import { joke } from './jokes';
 import { bearImpulse, milestone } from './map';
-import { dealHand } from './state';
 import { rand } from './rng';
 import { bar } from './tech';
 import type { GameState, PostId, RegionId, Tier } from './types';
@@ -64,40 +64,35 @@ export function rollTier(s: GameState, card: PostCard): Tier {
   return 'solid';
 }
 
-export function canFire(s: GameState, handIdx: number): boolean {
-  const id = s.hand[handIdx];
-  if (!id) return false;
-  return chargesLeft(s) > 0 && s.budget >= POST_BY_ID[id].cost;
+/** Automated posting: the social team picks the card that fits this region best (with some variety). */
+export function pickCard(s: GameState, regionId: RegionId): PostCard {
+  const r = s.regions.find((x) => x.id === regionId)!;
+  const scored = s.unlockedPosts.map((id) => POST_BY_ID[id])
+    .filter((c) => c.cost * 20 <= s.budget) // paid posts only when they're pocket change
+    .map((c) => {
+      let v = c.power * (1 + c.viralBase) * (1 - c.risk * 0.5) * affinity(c, regionId) * partyMult(c, regionId);
+      if (c.id === 'clapback') v *= r.tree > r.bear ? 1.6 : 0.6;
+      return { c, v: v * (0.85 + rand(s) * 0.3) };
+    })
+    .sort((a, b) => b.v - a.v);
+  return scored[0]?.c ?? POST_BY_ID.flyer;
 }
 
-export function armPost(s: GameState, handIdx: number | null) {
-  s.armedPost = handIdx !== null && canFire(s, handIdx) ? handIdx : null;
-}
-
-export function reroll(s: GameState): boolean {
-  if (s.rerollsLeft <= 0) return false;
-  s.rerollsLeft--;
-  dealHand(s);
-  return true;
-}
-
-export function firePost(s: GameState, handIdx: number, regionId: RegionId): Tier | null {
-  if (!canFire(s, handIdx)) return null;
-  const card = POST_BY_ID[s.hand[handIdx]];
-  s.budget -= card.cost;
-  s.chargesUsed++;
+/** Fire a post at a region (from a tapped 📱 bubble). The result goes to the news feed. */
+export function firePost(s: GameState, cardId: PostId, regionId: RegionId): Tier {
+  const card = POST_BY_ID[cardId];
+  s.budget -= Math.min(s.budget, card.cost);
   s.postsFired++;
-  s.hand.splice(handIdx, 1);
-  s.armedPost = null;
+  const r = s.regions.find((x) => x.id === regionId)!;
+  const awareBefore = r.bear;
 
   const tier = rollTier(s, card);
   const sss = socialSkillSum(s);
   const lunatic = s.members.some((m) => m.task === 'social' && m.trait === 'linkedin') ? 1.2 : 1;
   const impulse = card.power * TIER_MULT[tier] * affinity(card, regionId) * (1 + 0.1 * sss) * partyMult(card, regionId) * lunatic * (1 + bar(s, 'hype') / 200) * IMPULSE_SCALE;
-  const r = s.regions.find((x) => x.id === regionId)!;
   if (card.fullSpill) bearImpulse(s, regionId, impulse, 1);
   else if (card.party && regionId === 'frat') bearImpulse(s, regionId, impulse, 1);
-  else bearImpulse(s, regionId, impulse);
+  else bearImpulse(s, regionId, impulse, T.spillFactor * (hasTech(s, 'influencers') ? 1.5 : 1));
 
   if (tier === 'ratio') addRep(s, -3);
   if (tier === 'viral') addRep(s, 2);
@@ -124,6 +119,8 @@ export function firePost(s: GameState, handIdx: number, regionId: RegionId): Tie
   } else {
     fx(s, { kind: 'sfx', sfx: 'tap' });
   }
+  const gain = Math.round((r.bear - awareBefore) * 100);
+  addTicker(s, 'POSTS', `${card.icon} ${card.name} → ${r.name}: ${TIER_LABEL[tier]}${gain > 0 ? ` · +${gain}% aware` : gain < 0 ? ` · ${gain}% aware` : ''}${card.cost ? ` · $${card.cost}` : ''}`.slice(0, 100));
   log(s, `post:${tier}`, card.name, impulse);
   return tier;
 }

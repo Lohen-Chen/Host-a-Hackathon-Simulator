@@ -1,10 +1,10 @@
 # Host a Hackathon Simulator
 
-A real-time comedy tycoon game in the spirit of Plague Inc. You run Bear Hacks for one chaotic week and try to get more hackers than Tree University. Hype spreads across a map of 10,000 students in eight regions (Twitter, Frat Row, Local Highschool, International students, B1G, SEC, UC and ACC). Pop bubbles for tech points and spend them in the Evolve menu on three bars: Hype, Talent and Conversion. Rumors can mutate your tech tree for free ("rumor started of free pizza party").
+A real-time comedy tycoon game in the spirit of Plague Inc. You run Bear Hacks for one chaotic week and try to get more hackers than Tree University. Hype spreads across a map of 10,000 students in eight regions (Twitter, Frat Row, Local Highschool, International students, B1G, SEC, UC and ACC). Each region is drawn as squares, one per 50 students: blue for Bear, red for Tree, gray for undecided. Tap 💡 bubbles for tech points and 📱 bubbles to post in that region; your social team picks the post and the result lands in the news feed. Spend tech points in the Evolve screen, a branching tree across three bars: Hype, Talent and Conversion. Rumors can mutate your tech tree for free ("rumor started of free pizza party").
 
 Interest is free, but attendance is not. Tap **Confirm** to pay for hackers in batches; your money comes only from the starting budget and sponsors. World news, rumors and Tree University's moves arrive as newspaper popups that pause the world, about twice a day. Court sponsors, win the venue auction, and survive hackathon day.
 
-Built with Vite, TypeScript and Preact. It is designed for phones first, runs offline after the first visit, and the whole build (including about 1.7 MB of music) is under 2 MB.
+Built with Vite, TypeScript and Preact. It plays in portrait or landscape (map on the left, news feed on the right), runs offline after the first visit, and the whole build (including about 1.7 MB of music) is under 2 MB.
 
 ## Play
 

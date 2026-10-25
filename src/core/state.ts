@@ -8,7 +8,7 @@ import { hireCost } from './crew';
 import { hasTech, taskSkillSum } from './helpers';
 import { joke } from './jokes';
 import { clamp, normal, pick, rand, randInt, seedState, shuffle } from './rng';
-import type { GameState, Member, Mode, PostId, Role, Task, TraitId } from './types';
+import type { GameState, Member, Mode, Role, Task, TraitId } from './types';
 
 const TRAIT_IDS = Object.keys(TRAITS) as TraitId[];
 const ALL_TASKS: Task[] = ['research', 'social', 'website', 'venue', 'sponsors', 'recruit'];
@@ -17,7 +17,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
   const cfg = MODES[mode];
   const nb = symmetricNeighbors();
   const s: GameState = {
-    version: 2,
+    version: 3,
     mode,
     seed,
     rngState: seedState(seed),
@@ -54,10 +54,6 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     unlockedTech: [],
     trainingMult: 1,
     prestigeLevel: 1,
-    hand: [],
-    rerollsLeft: 1,
-    chargesUsed: 0,
-    armedPost: null,
     postsFired: 0,
     bubbles: [],
     alertQueue: [],
@@ -133,13 +129,7 @@ export function candidateCount(s: GameState): number {
   return base + (hasTech(s, 'nepolist') ? 2 : 0) + Math.min(5, Math.floor(recruit / 3));
 }
 
-export function dealHand(s: GameState) {
-  const pool: PostId[] = shuffle(s, [...s.unlockedPosts]);
-  s.hand = pool.slice(0, 3);
-  s.armedPost = null;
-}
-
-/** Morning setup: candidates, hand, daily trait rolls (Section 4). */
+/** Morning setup: candidates, daily trait rolls (Section 4). */
 export function prepareMorning(s: GameState) {
   s.phase = 'morning';
   const recruitQuality = Math.min(1.5, Number(s.flags.recruitPts ?? 0) * 0.05) + (hasTech(s, 'nepolist') ? 1.5 : 0);
@@ -147,9 +137,6 @@ export function prepareMorning(s: GameState) {
   s.candidates = [];
   for (let i = 0; i < n; i++) s.candidates.push(genMember(s, s.unlockedRoles, recruitQuality));
   s.flags.recruitPts = 0;
-  dealHand(s);
-  s.rerollsLeft = 1;
-  s.chargesUsed = 0;
   s.outputMult = 1;
   s.inviteBonus = 0;
   for (const m of s.members) {

@@ -48,6 +48,7 @@ export const T = {
   spillFactor: 0.5,
   // Bubbles
   bubbleTtl: 6,
+  postBubbleTtl: 9,
   maxBubbles: 4,
   minGap: 3,
   // Tree moves
@@ -73,7 +74,7 @@ export const T = {
   /** attendees needed for a full Attendance score */
   attendanceFull: 4000,
   /** Tree's off-map campus hackers: base + per point of Tree hype */
-  treeBase: 900,
+  treeBase: 750,
   treeBasePerHype: 12,
   /** interest effects in alerts are written at the old 1,200-hacker scale */
   signupScale: 8,

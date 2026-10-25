@@ -22,9 +22,9 @@ export const ALERTS: AlertDef[] = [
     when: (s) => s.sponsors.length > 0, defaultChoice: 2,
     choices: [
       { label: 'Counter-offer', cost: 2000, out: { text: 'You matched the boat with a slightly bigger boat. {sponsor} stays.', sponsorMood: 5 } },
-      { label: 'Clapback', hint: 'Uses a post charge', requires: (s) => s.chargesUsed < 3,
-        odds: { p: 0.55, win: { text: 'The clapback went viral. {sponsor} is too embarrassed to leave.', charges: -1, treeHype: -4, rep: 2 },
-          lose: { text: "The clapback flopped. {sponsor} left a 'thanks for the memories' email.", charges: -1 } },
+      { label: 'Clapback',
+        odds: { p: 0.55, win: { text: 'The clapback went viral. {sponsor} is too embarrassed to leave.', treeHype: -4, rep: 2 },
+          lose: { text: "The clapback flopped. {sponsor} left a 'thanks for the memories' email." } },
         run: (s, c) => { if (s.flags._lastOdds === 'lose' && c.sponsorId) removeSponsor(s, c.sponsorId); } },
       { label: 'Let them go', out: { text: '{sponsor} is now a Tree sponsor. Their banner already says "synergy."', treeHype: 6 },
         run: (s, c) => { if (c.sponsorId) removeSponsor(s, c.sponsorId); } },
@@ -465,10 +465,10 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
-    id: 'tree_stumble', icon: '🌲', title: '{rivalceo} livestreamed his password', weight: 0, max: 2,
-    body: 'Tree University is stumbling. {rivalceo} is still on his phone. Opportunity?', defaultChoice: 0,
+    id: 'tree_stumble', icon: '🌲', title: '{rivalceo} replied-all to 4,000 applicants', weight: 0, max: 2,
+    body: 'The email was meant for his assistant. It says "lol they think the prizes are real." Opportunity?', defaultChoice: 0,
     choices: [
-      { label: 'Screenshot it (ethically)', out: { text: 'You did not log in. You did post the screenshot. Tree hype dropped.', treeHype: -8, rep: 1 } },
+      { label: 'Quote-tweet it (politely)', out: { text: 'You just added "oof." It did numbers. Tree hype dropped.', treeHype: -8, rep: 1 } },
       { label: 'Send a get-well card', out: { text: 'The card said "synergy." Tree U is deeply confused. Their fans switched sides.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
     ],
   },

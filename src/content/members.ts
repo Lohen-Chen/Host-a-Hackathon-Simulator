@@ -2,7 +2,7 @@ import type { Role, Task, TraitId } from '../core/types';
 
 export const ROLE_INFO: Record<Role, { name: string; icon: string; task: Task; blurb: string }> = {
   organizer: { name: 'Organizer', icon: '📋', task: 'research', blurb: 'Generates Tech Points on Research.' },
-  social: { name: 'Social Media', icon: '📱', task: 'social', blurb: 'More post charges, more virality.' },
+  social: { name: 'Social Media', icon: '📱', task: 'social', blurb: 'More 📱 post bubbles, more virality.' },
   recruiter: { name: 'Recruiter', icon: '🤝', task: 'recruit', blurb: 'Bigger, better candidate pools.' },
   designer: { name: 'Designer', icon: '🎨', task: 'website', blurb: 'Builds the website and venue ambience.' },
   logistics: { name: 'Logistics', icon: '📦', task: 'venue', blurb: 'Venue operations. Fewer disasters.' },
@@ -11,7 +11,7 @@ export const ROLE_INFO: Record<Role, { name: string; icon: string; task: Task; b
 
 export const TASK_INFO: Record<Task, { name: string; icon: string; blurb: string }> = {
   research: { name: 'Research', icon: '🔬', blurb: 'Tech Points. Organizers are best at it.' },
-  social: { name: 'Social', icon: '📣', blurb: '+1 post charge per Social member, virality up.' },
+  social: { name: 'Social', icon: '📣', blurb: '+1 📱 post bubble a day per Social Media member, virality up.' },
   website: { name: 'Website', icon: '🌐', blurb: 'Website score (needs the Website node).' },
   venue: { name: 'Venue', icon: '🏟️', blurb: 'Before Day 3: scout the auction. After: venue prep.' },
   sponsors: { name: 'Sponsors', icon: '💼', blurb: 'Raises sponsor invite chance and quality.' },

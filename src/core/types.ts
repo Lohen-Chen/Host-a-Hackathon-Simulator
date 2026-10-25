@@ -11,20 +11,20 @@ export type TraitId =
   | 'pivoted' | 'veteran' | 'replyguy' | 'sleeper' | 'arts' | 'grass' | 'memer';
 export type TechId =
   // Hype
-  | 'website' | 'promo' | 'reelposts' | 'memes' | 'billboard' | 'clapback'
+  | 'website' | 'promo' | 'reelposts' | 'memes' | 'billboard' | 'clapback' | 'influencers'
   // Talent
-  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack' | 'nepolist'
+  | 'clubfair' | 'design' | 'logistics' | 'coordinator' | 'training2' | 'training3' | 'prestige2' | 'snack' | 'nepolist' | 'mentors'
   // Conversion
-  | 'applications' | 'discord' | 'travel' | 'aicredits' | 'swag' | 'rep2' | 'rep3';
+  | 'applications' | 'discord' | 'travel' | 'aicredits' | 'swag' | 'rep2' | 'rep3' | 'reminders';
 export type TechBranch = 'hype' | 'talent' | 'conversion';
 export type PostId = 'flyer' | 'meme_bear' | 'linkedin' | 'dance' | 'pizza' | 'reel' | 'influencer' | 'clapback' | 'countdown' | 'dog';
-export type BubbleType = 'idea' | 'eureka' | 'bsod';
+export type BubbleType = 'idea' | 'eureka' | 'bsod' | 'post';
 export type Tier = 'flop' | 'meh' | 'solid' | 'viral' | 'mega' | 'ratio';
 export type Vibe = 'corporate' | 'techbro' | 'startup' | 'defense' | 'vc' | 'genz';
 export type SponsorTier = 'bronze' | 'silver' | 'golden' | 'partner';
 export type VenueId = 'lawn' | 'soda' | 'parking' | 'stadium' | 'palace';
 export type BidderId = 'tree' | 'furcon' | 'spreadsheet' | 'tammy';
-export type TickerCat = 'BEAR BEAT' | 'TREE TIMES' | 'SPONSOR WIRE' | 'CAMPUS' | 'BREAKING';
+export type TickerCat = 'BEAR BEAT' | 'TREE TIMES' | 'SPONSOR WIRE' | 'CAMPUS' | 'BREAKING' | 'POSTS';
 
 export interface Member {
   id: number;
@@ -169,7 +169,7 @@ export interface Settings { relaxed: boolean }
 export interface DaySnapshot { signups: number; confirmed: number; budget: number; rep: number; treeRegions: number; treeSignups: number; tp: number }
 
 export interface GameState {
-  version: 2;
+  version: 3;
   mode: Mode;
   seed: number;
   rngState: number;
@@ -213,10 +213,6 @@ export interface GameState {
   trainingMult: number;
   prestigeLevel: 1 | 2 | 3;
 
-  hand: PostId[];
-  rerollsLeft: number;
-  chargesUsed: number;
-  armedPost: number | null; // index into hand
   postsFired: number;
 
   bubbles: Bubble[];
