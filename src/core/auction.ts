@@ -2,7 +2,7 @@
 import { BIDDERS, BIDDER_BY_ID, VENUE_BY_ID } from '../content/venues';
 import { MODES } from './config';
 import { addTicker, fx, log } from './helpers';
-import { RIVAL_CEO, joke } from './jokes';
+import { RIVAL_BACKERS, joke } from './jokes';
 import { pick, rand, randRange, shuffle } from './rng';
 import type { Auction, BidderId, GameState, VenueId } from './types';
 
@@ -35,7 +35,7 @@ function setupLot(s: GameState) {
   const scout = Math.min(0.15, s.scoutPoints * 0.025);
   a.bidders = BIDDERS.filter((b) => !(b.id === 'tree' && s.treeVenue)).map((b) => {
     let th = randRange(s, b.fold[0], b.fold[1]) + (b.venueBias?.[v.id] ?? 0);
-    if (b.id === 'tree') th += 0.25 * (s.unlockedTech.includes('clapback') ? 0.5 : 1); // Tree always bids aggressively
+    if (b.id === 'tree') th += 0.25; // Tree always bids aggressively
     if (b.id === 'tammy' && s.flags.tammy === 'angry') th += 0.25;
     if (b.id === 'tammy' && s.flags.tammy === 'calm') th -= 0.1;
     th *= 1 - scout;
@@ -118,7 +118,7 @@ function sell(s: GameState, winner: BidderId | 'you') {
     if (winner === 'tree' && !s.treeVenue) s.treeVenue = vid;
     a.speech = { who: 'Auctioneer', text: `SOLD to ${a.soldTo}!` };
     fx(s, { kind: 'sfx', sfx: 'gavel' });
-    if (winner === 'tree') addTicker(s, 'TREE TIMES', `Tree Hacks wins ${v.name}; {rivalceo} "humbled"`.replace('{rivalceo}', RIVAL_CEO));
+    if (winner === 'tree') addTicker(s, 'TREE TIMES', `Tree Hacks wins ${v.name}; {rivalceo} "humbled"`.replace('{rivalceo}', pick(s, RIVAL_BACKERS)));
     if (winner === 'furcon') addTicker(s, 'CAMPUS', `Bay Area FurCon wins ${v.name}; plans "the most wholesome dance-off ever"`.slice(0, 100));
     if (winner === 'tammy') addTicker(s, 'CAMPUS', `Wedding planner Tammy wins ${v.name}; "the bride will be thrilled," she says, menacingly`.slice(0, 100));
   }

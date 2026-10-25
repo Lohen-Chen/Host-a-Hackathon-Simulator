@@ -64,7 +64,7 @@ export function socialSkillSum(s: GameState): number {
 /** 📱 post bubbles per day: one, plus one per Social Media member on Social (Content Calendar raises the cap). */
 export function postsPerDay(s: GameState): number {
   const socials = s.members.filter((m) => m.task === 'social' && m.role === 'social' && m.benchedDays === 0).length;
-  const cap = 3 + (hasTech(s, 'reelposts') ? 1 : 0) + (hasTech(s, 'influencers') ? 1 : 0);
+  const cap = 3 + (hasTech(s, 'reelposts') ? 1 : 0) + (hasTech(s, 'influencers') ? 1 : 0) + (hasTech(s, 'ugc') ? 1 : 0);
   return Math.min(cap, 1 + socials);
 }
 

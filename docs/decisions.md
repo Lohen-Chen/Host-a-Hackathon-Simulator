@@ -67,3 +67,15 @@ Other choices:
 - **Landscape layout.** Phones in landscape and desktops put the map on the left and objective, world bar, Confirm and the news feed on the right. Portrait keeps the stacked layout and uses spare height under the map for a short news feed. Hints and region info sit in the layout flow instead of floating over the map, and map comments stack instead of overlapping.
 - **Leland screenshot joke replaced** with a Tree reply-all blunder. The rubber-band alert stays.
 - **Tree is red** (`--tree-hi`) so the map reads as blue against red.
+
+## Changes2 round
+
+- **Tech tree: Hype, Organization, Talent.** Conversion is gone. Hype is how quickly word spreads, Organization is how well the event is run (the old crew nodes), and Talent is how good the hackers are (project quality, sponsor mood). Meme Lord, Clapback Team and Billboard are out. New: SF Bus Ad, Advertise at a Hackathon, a Content Calendar → UGC Creators → Eric Ou → Rick Lee of Bluely chain, Poker Tournament, Resume Book, It's "High Signal" bro, LeetCode Gate, Beginner Workshops, Olympiad Outreach and Run of Show. Discord moved to Hype.
+- **Club Prestige is tiered.** We read "I: 3; II: 5; III: 7" as TP costs. The tiers give 5, 7 and 9 candidates a morning (3 without), and Nepo List needs all three.
+- **Swag and travel cost money.** They now add $2 each to confirming a hacker and the base dropped to $7, so they're a trade: more interest and a better show rate for a higher cost per hacker. Poker gives hype and mood, not cash, so money still only comes from the budget and sponsors.
+- **Tree University performance bar.** Tree's hype (0–100) shown as a red bar, with today's change. It is the number that drives Tree's spread, turnout and judging, like Plague Inc's cure bar.
+- **Dots instead of squares** on the map.
+- **News feed at the top.** The ticker runs across the top in every layout; tapping it opens the full feed as a side menu. About 20% fewer ticker items (one every 6.25 s instead of 5 s).
+- **New satire targets.** Leland Sr. is gone. Tree University is backed by parody moguls (Alex Carp, Petros Thiel, Mario A. Model) and private equity firms (Blackstump Capital and friends). New world news: the snack bar drones, flying cars, 21 (2008), the permanent underclass, the Pope and Mario A. Model on AI sentience, AI-native crabs, Lord of the Rings names, an AI-native laundromat and private equity buying the dining hall. New sponsor: Short Ocean, an AI-native holding company.
+- **Gapless music.** Music plays from decoded WebAudio buffers that loop sample-exactly and skip the MP3 encoder padding, instead of an `<audio loop>` element that stuttered at the seam.
+- **Tips pause the game.** On Day 1 each of Beary's tips stops the clock until you tap "Got it." Tips appear when they're relevant (the post tip when the first 📱 bubble shows up, the Confirm tip once you can confirm).

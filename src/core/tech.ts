@@ -1,7 +1,8 @@
-// The Plague Inc-style evolution menu: three branches feeding three bars (Hype, Talent, Conversion).
+// The Plague Inc-style evolution menu: three branches feeding three bars (Hype, Organization, Talent).
 // Buying does not pause the clock. Rumors unlock a random node for free ("mutations").
 import { TECH, TECH_BY_ID } from '../content/techTree';
 import { fx, log } from './helpers';
+import { bearImpulse } from './map';
 import { showPopup } from './popups';
 import { pick } from './rng';
 import type { GameState, TechBranch, TechId } from './types';
@@ -43,12 +44,22 @@ function unlock(s: GameState, id: TechId) {
     case 'coordinator': s.unlockedRoles.push('coordinator'); break;
     case 'training2': s.trainingMult = Math.max(s.trainingMult, 1.5); break;
     case 'training3': s.trainingMult = 1.7; break;
+    case 'prestige1': s.prestigeLevel = 1; break;
     case 'prestige2': s.prestigeLevel = 2; break;
+    case 'prestige3': s.prestigeLevel = 3; break;
     case 'website': s.unlockedPosts.push('reel', 'countdown'); break;
     case 'promo': s.unlockedPosts.push('influencer'); break;
     case 'rep2': s.repCap = 150; break;
     case 'rep3': s.repCap = 200; break;
-    case 'billboard': s.reputation = Math.min(s.repCap, s.reputation + 10); break;
+    case 'sfbus': s.reputation = Math.min(s.repCap, s.reputation + 8); bearImpulse(s, 'twitter', 0.12); break;
+    case 'poker': bearImpulse(s, 'frat', 0.12); bearImpulse(s, 'twitter', 0.06); s.moodBank += 2; break;
+    case 'hackad': s.bonusSignups += 150; break;
+    case 'olympiad': s.qualityBonus += 4; bearImpulse(s, 'highschools', 0.12); break;
+    case 'workshops': s.qualityBonus += 3; s.moodBank += 2.5; break;
+    case 'highsignal': s.qualityBonus += 6; break;
+    case 'leetcode': s.qualityBonus += 6; break;
+    case 'resumebook': s.sponsorMoodDelta += 5; for (const sp of s.sponsors) sp.mood += 5; break;
+    case 'swag': s.moodBank += 2.5; break;
     case 'aicredits': aiCreditsNews(s); break;
     default: break;
   }

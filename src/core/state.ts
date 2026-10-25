@@ -17,7 +17,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
   const cfg = MODES[mode];
   const nb = symmetricNeighbors();
   const s: GameState = {
-    version: 3,
+    version: 4,
     mode,
     seed,
     rngState: seedState(seed),
@@ -53,7 +53,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     unlockedPosts: POSTS.filter((p) => !p.unlock).map((p) => p.id),
     unlockedTech: [],
     trainingMult: 1,
-    prestigeLevel: 1,
+    prestigeLevel: 0,
     postsFired: 0,
     bubbles: [],
     alertQueue: [],
@@ -124,7 +124,7 @@ export function genMember(s: GameState, roles: Role[], quality: number): Member 
 }
 
 export function candidateCount(s: GameState): number {
-  const base = s.prestigeLevel === 3 ? 12 : s.prestigeLevel === 2 ? 7 : 3;
+  const base = [3, 5, 7, 9][s.prestigeLevel];
   const recruit = Number(s.flags.recruitPts ?? 0);
   return base + (hasTech(s, 'nepolist') ? 2 : 0) + Math.min(5, Math.floor(recruit / 3));
 }

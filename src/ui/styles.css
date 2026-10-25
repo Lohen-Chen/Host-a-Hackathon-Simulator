@@ -74,6 +74,11 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 /* ── Ticker ── */
 .ticker { position: relative; height: 26px; overflow: hidden; background: #000; border-bottom: 2px solid #222; font-size: 12px; white-space: nowrap; }
 .ticker-item { position: absolute; left: 0; top: 4px; display: flex; gap: 6px; animation: tick-in 0.35s ease-out; padding: 0 8px; will-change: transform; }
+.ticker-track { position: absolute; inset: 0; overflow: hidden; }
+.ticker-btn { display: block; width: 100%; flex-shrink: 0; padding: 0; text-align: left; color: inherit; font: inherit; border-left: none; border-right: none; border-top: none; border-radius: 0; cursor: pointer; }
+.ticker-btn .ticker-track { right: 118px; }
+.ticker-more { position: absolute; right: 0; top: 0; bottom: 0; width: 118px; display: grid; place-items: center; background: #111a2b; border-left: 2px solid #222; color: var(--gold); font-weight: 800; font-size: 11px; }
+.ticker-btn:hover .ticker-more { background: #1b2740; }
 .ticker-scroll { animation: tick-scroll var(--dur, 8s) linear forwards; }
 .ticker-cat { font-weight: 800; padding: 0 4px; border-radius: 3px; }
 .cat-BEAR { background: var(--bear); }
@@ -244,7 +249,7 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .bar-val { text-align: right; color: var(--ink-dim); }
 .bar-hype .bar-fill, .bar-chip.bar-hype { background: #e0457b; }
 .bar-talent .bar-fill, .bar-chip.bar-talent { background: #4f9cf9; }
-.bar-conversion .bar-fill, .bar-chip.bar-conversion { background: var(--gold); color: #000; }
+.bar-org .bar-fill, .bar-chip.bar-org { background: var(--gold); color: #000; }
 .member .burnout { color: var(--bad, #ff6b6b); font-weight: 700; }
 
 /* ── Layout: portrait (phones upright) stacks map + strip; landscape puts a side panel next to the map ── */
@@ -298,7 +303,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 
 /* News feed (landscape side panel) */
 .feed { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
-.feed-head { position: sticky; top: 0; background: #0d1626; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 2px; }
 .feed-item { display: flex; gap: 6px; font-size: 12px; line-height: 1.3; padding: 5px 6px; border-radius: 6px; background: var(--panel-2); border-left: 4px solid #46587a; }
 .feed-item.new { animation: feed-in 0.35s ease-out; }
 .feed-item.cat-POSTS { border-left-color: var(--bear-hi); }
@@ -307,8 +311,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .feed-item.cat-BREAKING { border-left-color: var(--bad); }
 .feed-ico { flex-shrink: 0; }
 /* Portrait: the map is width-bound, so the spare height below it becomes a short news feed. */
-.feed.feed-mini { flex: 0 1 132px; padding: 0 8px 6px; background: #0d1626; }
-.feed.feed-mini .feed-item { font-size: 11px; padding: 3px 6px; }
 @keyframes feed-in { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 
 /* Evolve screen: each branch is a tree; links show what unlocks what */
@@ -321,7 +323,7 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .evo-band-head { margin-bottom: 6px; font-size: 13px; }
 .band-hype { border-left: 6px solid #e0457b; }
 .band-talent { border-left: 6px solid #4f9cf9; }
-.band-conversion { border-left: 6px solid var(--gold); }
+.band-org { border-left: 6px solid var(--gold); }
 .evo-canvas { position: relative; }
 .evo-links { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
 .evo-link { fill: none; stroke-width: 3; }
@@ -368,3 +370,16 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .region-sub .rs-t { fill: var(--tree-hi); }
 .region-label.tree-owned { fill: #ffb3b3; }
 .sheet-head { flex-wrap: wrap; }
+/* Tree University performance (the rival's "cure bar") */
+.tree-perf { display: flex; flex-direction: column; gap: 3px; }
+.tree-perf-head { display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
+.tree-perf-head b { color: var(--tree-hi); }
+.tree-perf-bar { height: 8px; border: 2px solid #000; border-radius: 99px; background: #2a1d24; overflow: hidden; }
+.tree-perf-bar span { display: block; height: 100%; background: repeating-linear-gradient(45deg, var(--tree-hi) 0 8px, #d94848 8px 16px); transition: width 0.6s ease-out; }
+/* The full news feed opens as a side menu from the right, in every orientation. */
+.sheet.side { left: auto; top: 0; bottom: 0; width: min(88%, 380px); max-height: none; border-radius: 0; border-top: none; border-left: 2px solid #000; box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5); animation: side-in 0.2s ease-out; }
+@keyframes side-in { from { transform: translateX(100%); } to { transform: none; } }
+.bars-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.hint-paused { font-weight: 800; color: #b5361f; }
+.hint-ok { flex-shrink: 0; padding: 6px 12px; font-size: 12px; }
+.sheet.side .sheet-head { min-height: 46px; margin-bottom: 4px; }

@@ -160,7 +160,7 @@ export const ALERTS: AlertDef[] = [
     ],
   },
   {
-    id: 'billboard_prank', icon: '🪧', title: 'Someone edited the billboard to "Cal Hack$"', weight: (s) => (hasTech(s, 'billboard') ? 2 : 0), max: 1,
+    id: 'billboard_prank', icon: '🚌', title: 'Someone edited the bus ad to "Cal Hack$"', weight: (s) => (hasTech(s, 'sfbus') ? 2 : 0), max: 1,
     body: 'The dollar sign is very professionally done.', defaultChoice: 0,
     choices: [
       { label: 'Leave it', out: { text: '"Cal Hack$" is the brand now. Sponsors are oddly into it.', inviteBonus: 0.1 } },

@@ -30,6 +30,7 @@ export const SPONSORS: SponsorDef[] = [
   { id: 'snowblake', name: 'SnowBlake', tier: 'bronze', money: 6000, perk: 'Data-lake workshop', perkFx: { quality: 2 }, vibe: 'corporate', promise: 'data_lake', pitch: '"Your data, but in a lake. A very cold lake."' },
   { id: 'ysee', name: 'YSee', tier: 'silver', money: 15000, perk: '"Batch 2026" workshop', perkFx: { quality: 3, rep: 5 }, vibe: 'startup', promise: 'pre_seed', pitch: '"We invest in founders who are pre-idea. You\'re perfect."' },
   { id: 'wrinkle', name: 'Wrinkle', tier: 'bronze', money: 4000, perk: 'Post viral chance up', perkFx: { viral: 0.05 }, vibe: 'genz', promise: 'daily_post', pitch: '"Ironing out social media, one wrinkle at a time."' },
+  { id: 'shortocean', name: 'Short Ocean', tier: 'golden', money: 18000, perk: 'AI-native workshop', perkFx: { quality: 4 }, vibe: 'vc', promise: 'vc_slot', pitch: '"We\'re an AI-native holding company. We hold companies. Natively."' },
   { id: 'bubbletrouble', name: 'Bubble Trouble Boba', tier: 'partner', money: 0, perk: 'Boba', perkFx: { mood: 6 }, vibe: 'genz', promise: 'boba', pitch: '"Tapioca is a lifestyle."' },
 ];
 

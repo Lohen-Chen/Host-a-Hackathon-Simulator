@@ -13,6 +13,6 @@ export { buyTech, techState, bar, startRumor } from './tech';
 export { dismissPopup, showPopup } from './popups';
 export { confirmHackers, confirmCost, confirmBatch, canConfirm, unconfirmed } from './confirm';
 export { expectedAttendees, showRate } from './score';
-export { initJokes, joke, fill, jokeEngine, jokeErrors, treeRegionCount, isTreeControlled, RIVAL, RIVAL_CEO } from './jokes';
+export { initJokes, joke, fill, jokeEngine, jokeErrors, treeRegionCount, isTreeControlled, RIVAL, RIVAL_BACKERS } from './jokes';
 export { postsPerDay, effectiveSkill, isMatch, socialSkillSum, equityCut, hasTech } from './helpers';
 export { serialize, deserialize } from './save';

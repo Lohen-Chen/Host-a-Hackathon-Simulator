@@ -159,7 +159,7 @@ export function TechSheet({ s, close }: { s: GameState; close?: () => void }) {
         <div class="evo-detail card">
           {n && st ? (
             <>
-              <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {k}</span>)}</div>
+              <div class="row"><b class="grow">{n.name}</b>{Object.entries(n.bars).map(([k, v]) => <span key={k} class={`chip bar-chip bar-${k}`}>+{v} {BRANCHES.find((b) => b.id === k)?.name ?? k}</span>)}</div>
               <div class="small">{n.effect}</div>
               <div class="tiny dim">{n.desc ?? flavor(s, `techjoke|${n.joke}`, `tech:${n.id}`)}</div>
               {st !== 'owned' && (

@@ -3,7 +3,7 @@
 # Format:  [category|subtag needs=key>n,key<n]   template text
 # Slots:   {noun} {verb:past} {verb:ing} {verb:3s} {noun:pl} {a:adj} {Noun} {noun#1}
 #          plus any [category] from wordbank.txt, plus state slots:
-#          {sponsor} {sponsor2} {member} {role} {venue} {region} {rival} {rivalceo}
+#          {sponsor} {sponsor2} {member} {role} {venue} {region} {rival} {rivalceo} (Tree's billionaire backers) {pe}
 #          {signups} {day} {treeRegions} {score} {equitySold} {treesignups} {budget}
 # needs keys: signups day treeRegions rep budget sponsors website treesignups lead equitySold wifiPain
 # Lines must render to <= 100 characters. Keep it PG-13 and punch up.
@@ -36,6 +36,10 @@
 [headline|tree needs=treesignups>2500]   {rival} hits {treesignups} signups; {rivalceo} buys a second phone
 [headline|tree]   {rival} offers {food} to anyone who says "{buzzword}"
 [headline|tree]   Tree swag bag leaked: one {gadget} and a QR code to {a:noun}
+[headline|tree]   {rivalceo} funds Tree's grand prize: a drone that follows you to the snack bar
+[headline|tree]   {pe} buys into Tree Hacks; will "unlock value" from the extension cords
+[headline|tree]   {rivalceo} keynotes Tree Hacks in a puffer vest; says "lethality" 11 times
+[headline|tree]   {rivalceo} tells Tree hackers to "drop out and build"; Tree registrar faints
 [headline|sponsor]   {sponsor} unveils {a:noun} for hackers who {verb} too much
 [headline|sponsor]   {sponsor} pledges {food} and a tasteful amount of {buzzword}
 [headline|sponsor]   {sponsor} denies rumor its CEO is three {animal:pl} in a blazer
@@ -48,6 +52,11 @@
 [headline|sponsor]   {sponsor} demands booth "at least {number} feet from {sponsor2}"
 [headline|sponsor]   {sponsor} pivots to {buzzword}; nobody knows what they did before
 [headline|sponsor]   {sponsor} accidentally sponsors {a:animal}; it gets a lanyard
+[headline|sponsor]   {startup_name} rebrands as "AI-native"; product is still a spreadsheet
+[headline|sponsor]   Short Ocean acquires {a:noun}; calls it "an AI-native holding"
+[headline|sponsor]   {pe} buys a laundromat; the laundromat is now "AI-native"
+[headline|sponsor]   AI-native startup names itself after a Tolkien sword; Tolkien estate stretches
+[headline|sponsor]   {pe} rolls up every campus vending machine; chips now need a subscription
 [headline|campus]   Local founder raises {round} on {a:noun}; product "coming soon"
 [headline|campus]   {member} announces {codebase} rewrite in {language}
 [headline|campus]   Venue WiFi reported "{wifi_excuse}"; hackers flee to their phones
@@ -73,6 +82,9 @@
 [headline|breaking]   BREAKING: Dave from Sponsorship has sent another email
 [headline|breaking]   BREAKING: someone asked what the product is; the founder said "platform"
 [headline|breaking]   {member} rewrote the {codebase} in {language}, told nobody
+[headline|breaking]   "AI-native" named word of the year; runner-up "agentic," third place "vibes"
+[headline|breaking]   Transhumanist meetup ends early; the crabs had a prior commitment
+[headline|breaking]   {rivalceo} says AI will replace {department:pl}; {department:pl#1} reply-all
 
 # Foreshadowing headlines (alerts land 5–8 s later). Alert data points at these subtags.
 [headline|fs_bsod]       BREAKING: Club laptop reports "a problem has occurred" near {place}

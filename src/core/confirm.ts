@@ -5,7 +5,7 @@ import { fx, hasTech, log } from './helpers';
 import type { GameState } from './types';
 
 export function confirmCost(s: GameState): number {
-  return Math.max(T.confirmCostMin, T.confirmCost - (hasTech(s, 'travel') ? 3 : 0) - (hasTech(s, 'swag') ? 2 : 0));
+  return T.confirmCost + (hasTech(s, 'travel') ? 2 : 0) + (hasTech(s, 'swag') ? 2 : 0);
 }
 
 /** Interested hackers not yet confirmed. */
