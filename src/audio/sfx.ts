@@ -30,7 +30,8 @@ class Sfx {
   private muted = false;
   private musicOn = true;
   private track: Track = 'menu';
-  private audio: Partial<Record<Track, HTMLAudioElement>> = {};
+  /** One element for both loops: once a tap has started it, browsers let it switch tracks freely. */
+  private audio: HTMLAudioElement | null = null;
   private unlocked = false;
 
   /** Must be called from a user gesture (first tap). */
@@ -90,17 +91,20 @@ class Sfx {
 
   private syncMusic() {
     if (typeof window === 'undefined' || typeof Audio === 'undefined') return;
-    const want = this.unlocked && !this.muted && this.musicOn && document.visibilityState !== 'hidden' ? this.track : null;
-    for (const [t, el] of Object.entries(this.audio) as [Track, HTMLAudioElement][]) if (t !== want) el.pause();
-    if (!want) return;
-    let el = this.audio[want];
-    if (!el) {
-      el = new Audio(TRACKS[want]);
-      el.loop = true;
-      el.volume = MUSIC_VOL;
-      this.audio[want] = el;
+    const on = this.unlocked && !this.muted && this.musicOn && document.visibilityState !== 'hidden';
+    if (!on) { this.audio?.pause(); return; }
+    if (!this.audio) {
+      this.audio = new Audio();
+      this.audio.loop = true;
+      this.audio.volume = MUSIC_VOL;
     }
-    if (el.paused) void el.play().catch(() => { /* blocked until the next tap */ });
+    const el = this.audio;
+    if (el.dataset.track !== this.track) {
+      el.dataset.track = this.track;
+      el.src = TRACKS[this.track];
+    }
+    // If the browser still blocks it, the next tap (unlock) tries again.
+    if (el.paused) void el.play().catch(() => {});
   }
 }
 

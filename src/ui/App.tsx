@@ -14,10 +14,10 @@ export function App() {
   const st = useStore();
   const [ready, setReady] = useState(offlineReady());
   useEffect(() => onOfflineReady(() => setReady(true)), []);
-  // Browsers only allow audio after a gesture: the first tap anywhere starts the music.
+  // Browsers only allow audio after a gesture: every tap (re)starts the music if it was blocked.
   useEffect(() => {
     const go = () => sfx.unlock();
-    window.addEventListener('pointerdown', go, { once: true });
+    window.addEventListener('pointerdown', go);
     return () => window.removeEventListener('pointerdown', go);
   }, []);
   const s = st.state;
