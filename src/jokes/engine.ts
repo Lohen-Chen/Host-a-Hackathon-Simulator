@@ -4,7 +4,7 @@ import { parseJokes, parseWordbank, type Need, type Template, type WordEntry } f
 
 /** Slots filled from GameState, never from the wordbank (Section 8.3). */
 export const STATE_SLOTS = [
-  'sponsor', 'sponsor2', 'member', 'role', 'venue', 'region', 'rival', 'rivalceo',
+  'sponsor', 'sponsor2', 'member', 'role', 'venue', 'region', 'rival', 'rivalceo', 'mogul',
   'signups', 'day', 'treeRegions', 'score', 'equitySold', 'treesignups', 'budget', 'lead',
 ] as const;
 export type StateSlot = (typeof STATE_SLOTS)[number];

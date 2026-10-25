@@ -258,7 +258,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .map-wrap { position: relative; flex: 1 1 auto; min-height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden; container-type: size; }
 /* Keep the map's aspect ratio exact so the bubble overlay lines up with the SVG. */
 .map { position: relative; width: min(100cqw, 120cqh); aspect-ratio: 360 / 300; }
-.hint { display: flex; gap: 8px; align-items: center; background: #fff; color: #111; border: 2px solid #000; border-radius: 10px; padding: 6px 8px; font-size: 12px; box-shadow: 0 3px 0 #000; margin: 6px 8px 0; flex-shrink: 0; }
 .strip { display: flex; gap: 6px; padding: 6px 8px; align-items: center; flex-shrink: 0; border-top: 2px solid #000; background: #0d1626; }
 .strip > .world, .strip > .region-info { flex: 1 1 auto; min-width: 0; }
 .confirm-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 6px 10px; font-size: 13px; }
@@ -380,6 +379,6 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .sheet.side { left: auto; top: 0; bottom: 0; width: min(88%, 380px); max-height: none; border-radius: 0; border-top: none; border-left: 2px solid #000; box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5); animation: side-in 0.2s ease-out; }
 @keyframes side-in { from { transform: translateX(100%); } to { transform: none; } }
 .bars-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.hint-paused { font-weight: 800; color: #b5361f; }
-.hint-ok { flex-shrink: 0; padding: 6px 12px; font-size: 12px; }
+.tip-row { display: flex; gap: 12px; align-items: center; margin: 6px 0 10px; }
+.tip-row p { margin: 0; }
 .sheet.side .sheet-head { min-height: 46px; margin-bottom: 4px; }

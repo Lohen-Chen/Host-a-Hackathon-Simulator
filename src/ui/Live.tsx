@@ -170,11 +170,14 @@ function tipShowing(s: GameState): boolean {
 
 function Tutorial({ s }: { s: GameState }) {
   if (!tipShowing(s)) return null;
+  const next = () => store.act((st) => { st.tutorialStep++; });
   return (
-    <div class="hint" role="note">
-      <BearMascot size={32} />
-      <div class="grow"><span class="hint-paused">⏸ Paused</span> <b>Beary:</b> {HINTS[s.tutorialStep]}</div>
-      <button class="btn btn-gold hint-ok" onClick={() => store.act((st) => { st.tutorialStep++; })}>Got it</button>
+    <div class="modal-back news-back">
+      <div class="news-card tip-card" role="alertdialog" aria-label="Tip">
+        <div class="news-kicker">⏸ World paused · Tip {s.tutorialStep + 1}/{HINTS.length}</div>
+        <div class="tip-row"><BearMascot size={56} /><p><b>Beary:</b> {HINTS[s.tutorialStep]}</p></div>
+        <button class="btn btn-gold" onClick={next}>Got it</button>
+      </div>
     </div>
   );
 }
@@ -257,7 +260,6 @@ export function Live({ s }: { s: GameState }) {
       <div class="live-body">
         <div class="live-main">
           <div class="portrait-only"><Objective s={s} /></div>
-          <Tutorial s={s} />
           <div class="map-wrap">
             <HypeMap s={s} onRegion={onRegion} selected={info} />
             <Toasts />
@@ -284,6 +286,7 @@ export function Live({ s }: { s: GameState }) {
         )}
         {sheet === 'tech' && <TechSheet s={s} close={() => setSheet(null)} />}
       </div>
+      <Tutorial s={s} />
       <AlertModal s={s} />
       <PopupModal s={s} />
       <div class="dock live-dock">

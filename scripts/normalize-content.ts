@@ -10,7 +10,7 @@ const { engine, errors } = JokeEngine.load(jokes, wordbank);
 
 // Longest plausible values for state slots.
 const STATE_MAX: Record<string, number> = {
-  sponsor: 21, sponsor2: 21, member: 27, role: 12, venue: 43, region: 18, rival: 15, rivalceo: 14,
+  sponsor: 21, sponsor2: 21, member: 27, role: 12, venue: 43, region: 18, rival: 15, rivalceo: 10, mogul: 14,
   signups: 4, day: 1, treeRegions: 1, score: 3, equitySold: 2, treesignups: 4, budget: 7, lead: 4,
 };
 

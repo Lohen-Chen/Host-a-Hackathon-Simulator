@@ -6,41 +6,52 @@ import { store, type UiFx } from './store';
 const W = 360;
 const H = 300;
 
-/** One dot = this many students. 10,000 students → 200 dots across the eight regions. */
+/** About this many students per dot. Each region's block is a full rectangle, so the exact number per dot varies a little by region. */
 export const PER_SQUARE = 50;
 const CELL = 8;
 const SQ = 7;
 
-interface Block { n: number; cols: number; rows: number; x0: number; y0: number; w: number; h: number; order: number[] }
+interface Block { n: number; cols: number; rows: number; per: number; x0: number; y0: number; w: number; h: number; order: number[] }
 const blocks = new Map<string, Block>();
 
-/** Each region is a compact block of dots around its map point. The fill order grows from the
+/** The rectangle closest to pop / 50 dots with a pleasant aspect (about 4:3), so every block is symmetrical. */
+function grid(pop: number): [number, number] {
+  const target = pop / PER_SQUARE;
+  let best: [number, number] = [1, 1];
+  let bestCost = Infinity;
+  for (let rows = 1; rows <= 10; rows++) {
+    for (let cols = rows; cols <= rows * 2; cols++) {
+      const cost = (Math.abs(cols * rows - target) / target) * 8 + Math.abs(cols / rows - 1.3);
+      if (cost < bestCost) { bestCost = cost; best = [cols, rows]; }
+    }
+  }
+  return best;
+}
+
+/** Each region is a compact block of dots around its map point. The fill order grows in rings from the
  *  middle outward, so Bear spreads like an infection from the center and Tree closes in from the edges. */
 function blockFor(r: { id: string; pop: number; x: number; y: number }): Block {
   const key = `${r.id}:${r.pop}`;
   const hit = blocks.get(key);
   if (hit) return hit;
-  const n = Math.max(1, Math.round(r.pop / PER_SQUARE));
-  const cols = Math.ceil(Math.sqrt(n * 1.3));
-  const rows = Math.ceil(n / cols);
+  const [cols, rows] = grid(r.pop);
+  const n = cols * rows;
   const w = cols * CELL - (CELL - SQ);
   const h = rows * CELL - (CELL - SQ);
   const cx = (cols - 1) / 2;
   const cy = (rows - 1) / 2;
-  let seed = [...r.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
-  const jitter = () => { seed = (seed * 1103515245 + 12345) >>> 0; return (seed % 1000) / 1000; };
   const order = Array.from({ length: n }, (_, i) => i)
-    .map((i) => ({ i, d: Math.hypot((i % cols) - cx, Math.floor(i / cols) - cy) + jitter() * 1.4 }))
-    .sort((a, b) => a.d - b.d).map((o) => o.i);
-  const b = { n, cols, rows, x0: r.x - w / 2, y0: r.y - h / 2, w, h, order };
+    .map((i) => { const dx = (i % cols) - cx; const dy = Math.floor(i / cols) - cy; return { i, d: Math.hypot(dx, dy), a: Math.atan2(dy, dx) }; })
+    .sort((a, b) => a.d - b.d || a.a - b.a).map((o) => o.i);
+  const b = { n, cols, rows, per: r.pop / n, x0: r.x - w / 2, y0: r.y - h / 2, w, h, order };
   blocks.set(key, b);
   return b;
 }
 
-/** Square colors for a region: [bear, tree] counts out of block.n. */
-export function squareSplit(r: { signups: number; treeSignups: number }, n: number): [number, number] {
-  const bear = Math.min(n, Math.round(r.signups / PER_SQUARE));
-  const tree = Math.min(n - bear, Math.round(r.treeSignups / PER_SQUARE));
+/** Dot colors for a region: [bear, tree] counts out of block.n. */
+export function squareSplit(r: { signups: number; treeSignups: number }, b: { n: number; per: number }): [number, number] {
+  const bear = Math.min(b.n, Math.round(r.signups / b.per));
+  const tree = Math.min(b.n - bear, Math.round(r.treeSignups / b.per));
   return [bear, tree];
 }
 
@@ -61,7 +72,7 @@ export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegi
       {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" />; })}
       {s.regions.map((r) => {
         const b = blockFor(r);
-        const [bear, tree] = squareSplit(r, b.n);
+        const [bear, tree] = squareSplit(r, b);
         const color = new Array<string>(b.n).fill('sq-n');
         for (let k = 0; k < bear; k++) color[b.order[k]] = 'sq-b';
         for (let k = 0; k < tree; k++) color[b.order[b.n - 1 - k]] = 'sq-t';

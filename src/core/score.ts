@@ -131,7 +131,7 @@ export function scoreTree(s: GameState): ScoreBreakdown {
   const TREE_LINES: Record<string, string> = {
     attendance: 'Tree U filled the room. Half of it was a private equity firm "exploring the space."',
     mood: 'Tree hackers rated the vibes "synergistic." Nobody knows what that means.',
-    sponsor: 'Tree had sponsors. All of them were Petros Thiel\'s portfolio companies.',
+    sponsor: 'Tree had sponsors. All of them were in Leland Sr.\'s group chat.',
     sponsormood: 'Tree sponsors were "aligned." They seemed tired.',
     amenities: 'Tree had catering. On a boat. The boat left early.',
     promises: 'Tree promised synergy. Delivered a keynote about synergy.',
