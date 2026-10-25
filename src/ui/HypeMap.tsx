@@ -3,6 +3,7 @@
 import { BUBBLE_ICON, isTreeControlled, tapBubble, type GameState, type RegionId } from '../core';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { store, type UiFx } from './store';
+import { burst } from './juice';
 
 const W = 360;
 const H = 300;
@@ -170,7 +171,12 @@ export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id
           const jitter = ((b.id * 37) % 30) - 15;
           return (
             <button key={b.id} class={`bubble ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
-              onPointerDown={(e) => { e.stopPropagation(); bubbleTapAt = performance.now(); store.act((st) => tapBubble(st, b.id)); }}
+              onPointerDown={(e) => {
+                e.stopPropagation(); bubbleTapAt = performance.now();
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                burst({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }, b.type === 'eureka' ? 11 : 7);
+                store.act((st) => tapBubble(st, b.id));
+              }}
               aria-label={`${b.type} bubble`}>
               {BUBBLE_ICON[b.type]}
               <span class="ttl" style={{ animationDuration: `${left}s` }} />
