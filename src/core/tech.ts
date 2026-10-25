@@ -1,6 +1,7 @@
 // The Plague Inc-style evolution menu: three branches feeding three bars (Hype, Organization, Talent).
 // Buying does not pause the clock. Rumors unlock a random node for free ("mutations").
 import { TECH, TECH_BY_ID } from '../content/techTree';
+import { T } from './config';
 import { fx, log } from './helpers';
 import { bearImpulse } from './map';
 import { showPopup } from './popups';
@@ -18,20 +19,43 @@ export function bar(s: GameState, b: TechBranch): number {
   return Math.min(100, v);
 }
 
+/** Plague Inc rule: every node you evolve makes the rest pricier, so you can't buy the whole tree and have to pick a direction.
+ * Rumor unlocks are free and don't count. */
+export function techMarkup(s: GameState): number {
+  return Math.floor(Number(s.flags.evolved ?? 0) / T.techMarkupEvery);
+}
+
+export function techCost(s: GameState, id: TechId): number {
+  return TECH_BY_ID[id].cost + techMarkup(s);
+}
+
+/** Your build: the share of evolved nodes (by base cost) in each branch, as whole percents that sum to 100. */
+export function buildSplit(s: GameState): Record<TechBranch, number> {
+  const w: Record<TechBranch, number> = { hype: 0, org: 0, talent: 0 };
+  for (const id of s.unlockedTech) { const n = TECH_BY_ID[id]; if (n) w[n.branch] += n.cost; }
+  const total = w.hype + w.org + w.talent;
+  if (!total) return { hype: 0, org: 0, talent: 0 };
+  const hype = Math.round((100 * w.hype) / total);
+  const org = Math.round((100 * w.org) / total);
+  return { hype, org, talent: 100 - hype - org };
+}
+
 export function techState(s: GameState, id: TechId): TechState {
   const n = TECH_BY_ID[id];
   if (s.unlockedTech.includes(id)) return 'owned';
   if (n.prereq && !s.unlockedTech.includes(n.prereq)) return 'locked';
-  return s.techPoints >= n.cost ? 'available' : 'poor';
+  return s.techPoints >= techCost(s, id) ? 'available' : 'poor';
 }
 
 export function buyTech(s: GameState, id: TechId): boolean {
   if (techState(s, id) !== 'available') return false;
   const n = TECH_BY_ID[id];
-  s.techPoints -= n.cost;
+  const cost = techCost(s, id);
+  s.techPoints -= cost;
+  s.flags.evolved = Number(s.flags.evolved ?? 0) + 1;
   unlock(s, id);
   fx(s, { kind: 'toast', text: `Unlocked: ${n.name}. ${n.effect}`, tone: 'good' });
-  log(s, 'tech', id, n.cost);
+  log(s, 'tech', id, cost);
   return true;
 }
 

@@ -1,6 +1,7 @@
 // The clock and the daily state machine (Section 4). advance() is the only
 // thing that moves time; it never touches the DOM, so it runs headless in Node.
 import { DAYS, STEPS_PER_DAY, T } from './config';
+import { unconfirmed } from './confirm';
 import { startAuction } from './auction';
 import { resolveAlert, scheduleDay, tickEvents } from './events';
 import { addTicker, effectiveSkill, fx, hasTech } from './helpers';
@@ -36,6 +37,15 @@ export function startLiveDay(s: GameState) {
   s.flags.treeHypeStart = s.treeHype;
   s.flags.treeOrgStart = s.treeOrg;
   s.flags.treeTalentStart = s.treeTalent;
+  // Waitlist Theater: on Day 6 the people still waiting give up.
+  if (s.day === 6 && hasTech(s, 'waitlist')) {
+    const left = Math.floor(unconfirmed(s) * 0.05);
+    if (left > 0) {
+      s.bonusSignups -= left;
+      s.signups -= left;
+      addTicker(s, 'BEAR BEAT', `${left} hackers left the Bear Hacks waitlist. They were #4,812. They were always #4,812.`);
+    }
+  }
   s.dayStart = { signups: s.signups, confirmed: s.confirmed, budget: s.budget, rep: s.reputation, treeRegions: treeRegionCount(s), treeSignups: s.treeSignups, tp: s.techPoints };
   scheduleDay(s);
   addTicker(s, 'BEAR BEAT', joke(s, 'headline|bear'));
@@ -112,7 +122,6 @@ export function endLiveDay(s: GameState, early: boolean) {
   let guard = 0;
   while (s.alertQueue.length && guard++ < 20) resolveAlert(s, s.alertQueue[0].defaultChoice, true);
   s.popups = [];
-  for (const b of s.bubbles) if (b.type === 'bsod') s.flags.bsod = 'haunted';
   s.bubbles = [];
   s.schedule = [];
   buildRecap(s);

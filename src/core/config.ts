@@ -60,6 +60,8 @@ export const T = {
   rubberBand: 1600,
   // Rumors (Plague Inc mutations): free random nodes per run, scheduled like world news
   maxRumors: 2,
+  /** Each node you evolve (not rumors) adds +1 TP to every later node per this many evolved. */
+  techMarkupEvery: 2,
   // Sponsors
   inviteBase: 0.2,
   invitePerCoord: 0.02,

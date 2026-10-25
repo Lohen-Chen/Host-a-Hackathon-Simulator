@@ -84,7 +84,6 @@
 [headline|breaking]   {mogul} says AI will replace {department:pl}; {department:pl#1} reply-all
 
 # Foreshadowing headlines (alerts land 5–8 s later). Alert data points at these subtags.
-[headline|fs_bsod]       BREAKING: Club laptop reports "a problem has occurred" near {place}
 [headline|fs_rust]       {member} seen opening a Rust compiler with a determined look
 [headline|fs_dns]        CAMPUS: Club website "a little slow" according to one (1) visitor
 [headline|fs_wifi]       BREAKING: Venue router seen blinking in a pattern experts call "sad"
@@ -210,7 +209,6 @@
 [bubble|idea]   A survey in {region} came back. People want {food}.
 [bubble|idea]   Insight: nobody reads emails, but everybody reads memes.
 [bubble|idea]   Tree's slide deck leaked. It's mostly synergy. Noted.
-[bubble|bsod]   Have you tried turning it off and on again? It worked. It always works.
 
 # ─────────────────────────────── TAUNTS (venue auction & Tree) ───────────────────────────────
 [taunt|tree]   {rivalceo}: "Our {codebase} is already in {language}."
@@ -421,7 +419,6 @@
 [loading]   Teaching the club dog to exist…
 [loading]   Laminating the lanyards…
 [loading]   Asking {devtool} nicely…
-[loading]   Rebooting the Blue Screen… have you tried turning it off and on again?
 [loading]   Counting extension cords… we need {number} more.
 
 # ─────────────────────────────── LINKEDIN LARP (card text & T23) ───────────────────────────────

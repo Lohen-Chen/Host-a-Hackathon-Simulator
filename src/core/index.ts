@@ -8,8 +8,8 @@ export { firePost, pickCard, affinity, partyMult, viralChance, ratioChance } fro
 export { tapBubble, resolveAlert, inviteChance, BUBBLE_ICON, spawnBubble, queueAlert } from './events';
 export { courtingReply, finishCourting, BRIBE_COST } from './courting';
 export { tickAuction, skipAuction, auctionVenue } from './auction';
-export { hackdayNext, hackdaySkip } from './hackday';
-export { buyTech, techState, bar, startRumor } from './tech';
+export { hackdayNext, hackdaySkip, hackdayChoose } from './hackday';
+export { buyTech, buildSplit, techState, techCost, techMarkup, bar, startRumor } from './tech';
 export { dismissPopup, showPopup } from './popups';
 export { confirmHackers, confirmCost, confirmBatch, canConfirm, unconfirmed } from './confirm';
 export { expectedAttendees, showRate } from './score';

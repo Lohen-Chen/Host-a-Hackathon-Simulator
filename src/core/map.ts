@@ -18,7 +18,7 @@ export function treeBase(s: GameState) {
 
 /** How much of an aware, controlled population becomes interested. Hype and a well-run club both help; every unlock helps a little. */
 export function conversionMult(s: GameState) {
-  const nodes = (hasTech(s, 'applications') ? 0.06 : 0) + (hasTech(s, 'travel') ? 0.08 : 0) - (hasTech(s, 'leetcode') ? 0.08 : 0);
+  const nodes = (hasTech(s, 'applications') ? 0.06 : 0) + (hasTech(s, 'travel') ? 0.08 : 0) + (hasTech(s, 'waitlist') ? 0.06 : 0) - (hasTech(s, 'leetcode') ? 0.08 : 0);
   return 0.45 + 0.3 * (bar(s, 'hype') / 100) + 0.3 * (bar(s, 'org') / 100) + nodes + 0.015 * s.unlockedTech.length;
 }
 

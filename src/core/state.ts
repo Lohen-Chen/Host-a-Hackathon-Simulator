@@ -79,7 +79,7 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     tickerT: 0,
     lastInteractiveAt: -99,
     firedAlerts: [],
-    flags: { equitySold: 0, founderRound: 0, wifiPain: 0, bsodDay: 0 },
+    flags: { equitySold: 0, founderRound: 0, wifiPain: 0 },
     log: [],
     jokeHistory: emptyHistory(),
     milestones: [],
@@ -97,8 +97,6 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     m.task = defaultTask(s, m.role);
     s.members.push(m);
   }
-  // Blue Screen bubble appears once per run on a random day (≤1 per run).
-  s.flags.bsodDay = randInt(s, 3, 5);
   return s;
 }
 

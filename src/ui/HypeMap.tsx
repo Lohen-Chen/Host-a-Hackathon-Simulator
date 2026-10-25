@@ -58,7 +58,9 @@ export function squareSplit(r: { signups: number; treeSignups: number }, b: { n:
 /** A very rough continental-US silhouette behind the regions, Plague Inc world-map style. */
 const US_PATH = 'M18 92 L40 64 L70 52 L120 48 L170 44 L230 46 L262 58 L300 60 L332 70 L346 92 L336 120 L344 150 L330 182 L306 210 L284 238 L262 250 L238 268 L214 262 L188 246 L150 244 L118 232 L84 222 L56 204 L30 178 L20 140 Z';
 
-export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegion?: (id: RegionId) => void; selected?: RegionId | null; pulses?: UiFx[] }) {
+/** With `arrival` (0–1), the map shows Hackathon Day check-ins instead of hype: blue dots light up as hackers walk in. */
+export function MapSvg({ s, onRegion, selected, pulses, arrival }: { s: GameState; onRegion?: (id: RegionId) => void; selected?: RegionId | null; pulses?: UiFx[]; arrival?: number }) {
+  const turnout = arrival === undefined ? 1 : (Number(s.flags.attendees ?? 0) / Math.max(1, s.signups)) * arrival;
   const pos = new Map(s.regions.map((r) => [r.id, r]));
   const edges: [RegionId, RegionId][] = [];
   for (const r of s.regions) for (const n of r.neighbors) if (r.id < n) edges.push([r.id, n]);
@@ -72,8 +74,10 @@ export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegi
       {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" />; })}
       {s.regions.map((r) => {
         const b = blockFor(r);
-        const [bear, tree] = squareSplit(r, b);
+        const [bear, tree] = arrival === undefined ? squareSplit(r, b) : [Math.min(b.n, Math.round((r.signups * turnout) / b.per)), 0];
         const color = new Array<string>(b.n).fill('sq-n');
+        // Check-in: everyone interested shows dim blue until they walk in.
+        if (arrival !== undefined) for (let k = 0; k < squareSplit(r, b)[0]; k++) color[b.order[k]] = 'sq-w';
         for (let k = 0; k < bear; k++) color[b.order[k]] = 'sq-b';
         for (let k = 0; k < tree; k++) color[b.order[b.n - 1 - k]] = 'sq-t';
         const treeOwned = isTreeControlled(r);
@@ -86,7 +90,9 @@ export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegi
             {color.map((c, i) => <circle key={i} class={`sq ${c}`} cx={b.x0 + (i % b.cols) * CELL + SQ / 2} cy={b.y0 + Math.floor(i / b.cols) * CELL + SQ / 2} r={SQ / 2} />)}
             {pulse && <rect key={pulse.id} class={`pulse ${pulse.tone === 'bad' ? 'bad' : ''}`} x={b.x0 - 4} y={b.y0 - 4} width={b.w + 8} height={b.h + 8} rx="4" />}
             <text class={`region-label ${treeOwned ? 'tree-owned' : ''}`} x={r.x} y={b.y0 - 6} text-anchor="middle">{short(r.name)}</text>
-            <text class="region-sub" x={r.x} y={b.y0 + b.h + 11} text-anchor="middle"><tspan class="rs-b">{compact(r.signups)}</tspan> <tspan class="rs-t">{compact(r.treeSignups)}</tspan></text>
+            <text class="region-sub" x={r.x} y={b.y0 + b.h + 11} text-anchor="middle">{arrival === undefined
+              ? <><tspan class="rs-b">{compact(r.signups)}</tspan> <tspan class="rs-t">{compact(r.treeSignups)}</tspan></>
+              : <tspan class="rs-b">{compact(r.signups * turnout)} here</tspan>}</text>
           </g>
         );
       })}
@@ -134,13 +140,12 @@ export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id
         {s.bubbles.map((b) => {
           const r = regionOf(b.regionId)!;
           const left = Math.max(0, b.ttl - (s.t - b.spawnedAt));
-          const hazard = b.type === 'bsod';
           const jitter = ((b.id * 37) % 30) - 15;
           return (
-            <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''} ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
+            <button key={b.id} class={`bubble ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
               onPointerDown={(e) => { e.stopPropagation(); bubbleTapAt = performance.now(); store.act((st) => tapBubble(st, b.id)); }}
               aria-label={`${b.type} bubble`}>
-              {b.type === 'bsod' ? <span class="bsod" style={{ width: '40px', height: '30px' }}><span class="bsod-face">:(</span></span> : BUBBLE_ICON[b.type]}
+              {BUBBLE_ICON[b.type]}
               <span class="ttl" style={{ animationDuration: `${left}s` }} />
             </button>
           );

@@ -8,8 +8,8 @@ import { BRANCHES, TECH } from '../src/content/techTree';
 import { BIDDERS, VENUES } from '../src/content/venues';
 import { jokeEngine } from '../src/core';
 import {
-  advance, bar, beginGame, buyTech, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
-  startLiveDay, startRumor, tickAuction, finishAuction, nextDay, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
+  advance, bar, beginGame, buyTech, techCost, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
+  startLiveDay, startRumor, tickAuction, finishAuction, nextDay, hackdayNext, hackdaySkip, hackdayChoose, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
 } from '../src/core';
 import { NEWS } from '../src/content/news';
 import { conversionMult } from '../src/core/map';
@@ -115,38 +115,57 @@ describe('simulation core', () => {
     expect(s.phase).toBe('night');
   });
 
-  it('the Blue Screen gag works end to end (bubble → flag → hackathon-day beat)', () => {
-    for (const tap of [true, false]) {
-      const s = newGame(21, 'judge');
-      beginGame(s);
-      let seen = false;
-      let guard = 0;
-      while (s.phase !== 'results' && guard++ < 20000) {
-        if (s.phase === 'morning') startLiveDay(s);
-        else if (s.phase === 'live') {
-          const b = s.bubbles.find((x) => x.type === 'bsod');
-          if (b) { seen = true; if (tap) tapBubble(s, b.id); }
-          if (s.alertQueue[0]) resolveAlert(s, s.alertQueue[0].defaultChoice);
-          while (s.popups.length) dismissPopup(s);
-          if (s.courting) s.courting = null;
-          advance(s, 0.5);
-        } else if (s.phase === 'auction') { if (s.auction!.phase === 'done') finishAuction(s); else tickAuction(s, 0.5, false); }
-        else if (s.phase === 'night') nextDay(s);
-        else if (s.phase === 'hackday') break;
-      }
-      expect(seen).toBe(true);
-      expect(s.flags.bsod).toBe(tap ? 'rebooted' : 'haunted');
-      const beat = s.hackday!.beats.find((b) => b.id === 'bsod');
-      expect(beat?.text).toMatch(tap ? /turning it off and on again/ : /sad face/);
-    }
+  it('every 2 evolved nodes make the rest cost +1 TP (rumors are free and do not count)', () => {
+    const s = newGame(5);
+    beginGame(s);
+    s.techPoints = 100;
+    expect(techCost(s, 'applications')).toBe(3);
+    buyTech(s, 'website');
+    expect(techCost(s, 'applications')).toBe(3);
+    buyTech(s, 'clubfair');
+    expect(techCost(s, 'applications')).toBe(4);
+    const before = s.techPoints;
+    buyTech(s, 'applications');
+    expect(before - s.techPoints).toBe(4);
+    startRumor(s);
+    expect(Number(s.flags.evolved)).toBe(3);
   });
 
-  it('the Blue Screen appears exactly once in every run, in every mode', () => {
-    for (const mode of ['judge', 'standard', 'full'] as const) {
-      for (let seed = 0; seed < 150; seed++) {
-        const r = playGame(seed, mode, { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
-        expect(r.state.log.filter((l) => l.kind === 'bsod').length, `${mode} seed ${seed}`).toBe(1);
-      }
+  it('Hackathon Day has three live decisions; skipping takes their defaults', () => {
+    const r = playGame(3, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+    const beats = r.state.hackday!.beats.filter((b) => b.choices);
+    expect(beats.map((b) => b.id)).toEqual(['d_wifi', 'd_demo', 'd_leland']);
+    expect(beats.every((b) => b.picked !== undefined && b.outcome)).toBe(true);
+    expect(r.state.results).not.toBeNull();
+  });
+
+  it('a live decision blocks Next until picked, then applies its effect', () => {
+    const s = playGame(4, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 }).state;
+    // Rewind to Hackathon Day with fresh beats.
+    s.phase = 'night'; s.results = null; s.day = 7;
+    for (const k of Object.keys(s.flags)) if (k.startsWith('hd_')) delete s.flags[k];
+    nextDay(s);
+    expect(s.phase).toBe('hackday');
+    const h = s.hackday!;
+    const di = h.beats.findIndex((b) => b.id === 'd_demo');
+    h.index = di;
+    hackdayNext(s);
+    expect(h.index).toBe(di);
+    hackdayChoose(s, 1); // the one that definitely works: quality +3
+    expect(s.flags.hd_quality).toBe(3);
+    hackdayNext(s);
+    expect(h.index).toBe(di + 1);
+    hackdaySkip(s);
+    expect(s.phase).toBe('results');
+    expect(h.beats.every((b) => !b.choices || b.picked !== undefined)).toBe(true);
+  });
+
+  it('the Blue Screen is gone: no alert, no bubble, no hackathon-day beat', () => {
+    expect(ALERTS.some((a) => a.id === 'bsod')).toBe(false);
+    for (let seed = 0; seed < 20; seed++) {
+      const r = playGame(seed, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+      expect(r.state.log.some((l) => l.kind.includes('bsod'))).toBe(false);
+      expect(r.state.hackday?.beats.some((b) => b.id === 'bsod') ?? false).toBe(false);
     }
   });
 
@@ -221,7 +240,7 @@ describe('simulation core', () => {
     const s = newGame(16);
     beginGame(s);
     startLiveDay(s);
-    for (const type of ['idea', 'eureka', 'bsod'] as const) {
+    for (const type of ['idea', 'eureka'] as const) {
       spawnBubble(s, type, 'uc');
       const b = s.bubbles[s.bubbles.length - 1];
       const budget = s.budget;
@@ -273,7 +292,7 @@ describe('simulation core', () => {
     expect(ALERTS.some((a) => a.id === 'sticky_password')).toBe(false);
     for (let seed = 0; seed < 40; seed++) {
       const r = playGame(seed, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
-      const scripted = ['sponsor_invite', 'tree_stumble', 'ysee_afterparty', 'balantir_call', 'bsod'];
+      const scripted = ['sponsor_invite', 'tree_stumble', 'ysee_afterparty', 'balantir_call'];
       const random = r.state.log.filter((l) => l.kind.startsWith('alert:') && !scripted.includes(l.kind.slice(6)));
       expect(random.length, `seed ${seed}`).toBeLessThanOrEqual(4);
     }
@@ -338,7 +357,7 @@ describe('content acceptance counts (Section 12)', () => {
     expect(ALERTS.length).toBeGreaterThanOrEqual(30);
     expect(ALERTS.filter((a) => a.tech).length).toBeGreaterThanOrEqual(15);
     expect(ALERTS.filter((a) => a.satire).length).toBeGreaterThanOrEqual(6);
-    for (const id of ['rust_rewrite', 'leftpad', 'its_dns', 'bsod', 'wifi_unbearable', 'linkedin_larp', 'pre_everything', 'equity_offer', 'ysee_afterparty']) {
+    for (const id of ['rust_rewrite', 'leftpad', 'its_dns', 'wifi_unbearable', 'linkedin_larp', 'pre_everything', 'equity_offer', 'ysee_afterparty']) {
       expect(ALERTS.some((a) => a.id === id), id).toBe(true);
     }
     expect(ALERTS.find((a) => a.id === 'rust_rewrite')!.title).toContain('refactored the website codebase in Rust');
