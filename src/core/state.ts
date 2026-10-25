@@ -146,6 +146,8 @@ export function prepareMorning(s: GameState) {
     m.idleSteps = 0;
   }
   s.recap = [];
+  s.recapStamp = null;
+  s.levelUps = [];
 }
 
 export function hire(s: GameState, idx: number): boolean {

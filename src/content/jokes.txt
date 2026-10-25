@@ -431,7 +431,7 @@
 [linkedin]   {larp_opener}: I {verb:past} {a:noun}. 12 lessons 👇
 
 # ─────────────────────────────── TREE TEASERS (morning) & RECAP KICKERS ───────────────────────────────
-[tease]   Tomorrow: {rival} plans something with puppies. Allegedly.
+[tease]   {rival} plans something with puppies. Allegedly.
 [tease]   Sources say {rivalceo} has "a big announcement." It's a phone case.
 [tease]   Tree University is drafting a press release about {buzzword}.
 [tease]   {rival} has been seen measuring {region} with a tape measure.

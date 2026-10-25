@@ -1,7 +1,7 @@
 // Title, intro, morning, night recap and pause screens.
 import { useEffect, useState } from 'preact/hooks';
 import { MODES, OBJECTIVE, TITLE, beginGame, burnoutChance, candidateCount, hire, hireCost, jokeEngine, startLiveDay, nextDay, type GameState, type Mode } from '../core';
-import { ROLE_INFO, TRAITS } from '../content/members';
+import { ROLE_INFO, TASK_INFO, TRAITS } from '../content/members';
 import { sfx } from '../audio/sfx';
 import { Avatar, BearMascot, TreeMascot } from './art';
 import { CrewSheet } from './sheets';
@@ -104,17 +104,71 @@ export function Morning({ s }: { s: GameState }) {
   );
 }
 
+const LINE_MS = 380;
+const CARD_MS = 700;
+
+/** The end-of-day tally: lines count up one at a time with a tick, the best stat gets stamped, then crew level-ups. */
 export function Night({ s }: { s: GameState }) {
-  useEffect(() => { store.save(); const t = setTimeout(() => store.act((st) => nextDay(st)), 4500); return () => clearTimeout(t); }, [s.day]);
+  const ups = s.levelUps ?? [];
+  const stamp = s.recapStamp;
+  // A beat per recap line, then the stamp, then one per level-up card.
+  const beats: { at: number; sound: string }[] = [];
+  for (let i = 1; i < s.recap.length; i++) beats.push({ at: i * LINE_MS, sound: 'tick' });
+  let at = s.recap.length * LINE_MS;
+  if (stamp) beats.push({ at: (at += 150), sound: 'stamp' });
+  for (let i = 0; i < ups.length; i++) beats.push({ at: (at += i ? CARD_MS : 400), sound: 'levelup' });
+  const [shown, setShown] = useState(0);
+  const [skipped, setSkipped] = useState(false);
+  const done = shown >= beats.length;
+  useEffect(() => { store.save(); sfx.play('tick'); }, [s.day]);
+  useEffect(() => {
+    if (done) { const a = setTimeout(() => store.act((st) => nextDay(st)), 4500); return () => clearTimeout(a); }
+    const timer = setTimeout(() => { sfx.play(beats[shown].sound); setShown(shown + 1); }, beats[shown].at - (beats[shown - 1]?.at ?? 0));
+    return () => clearTimeout(timer);
+  }, [shown, done, s.day]);
+  const lines = Math.min(s.recap.length, shown + 1);
+  const stamped = !!stamp && shown >= s.recap.length;
+  const cards = Math.max(0, shown - (s.recap.length - 1) - (stamp ? 1 : 0));
   return (
-    <div class="scene" style={{ justifyContent: 'center' }} onClick={() => store.act((st) => nextDay(st))}>
+    <div class="scene" style={{ justifyContent: 'center' }} onClick={() => (done ? store.act((st) => nextDay(st)) : (setSkipped(true), setShown(beats.length)))}>
       <div class="card beat">
         <h2>🌙 Night {s.day}</h2>
-        <ul class="recap small" style={{ textAlign: 'left', paddingLeft: '18px' }}>{s.recap.map((l, i) => <li key={i}>{l}</li>)}</ul>
-        <div class="tiny dim">{s.day >= 7 ? 'Tap to start HACKATHON DAY.' : 'Tap to continue.'}</div>
+        <ul class="recap small" style={{ textAlign: 'left', paddingLeft: '18px' }}>
+          {s.recap.slice(0, lines).map((l, i) => (
+            <li key={i} class="tally-line">
+              <CountUp line={l} instant={skipped} />
+              {stamped && stamp.line === i && <span class="stamp">{stamp.text}</span>}
+            </li>
+          ))}
+        </ul>
+        {ups.slice(0, cards).map((u) => (
+          <div key={u.memberId} class="levelup-card row">
+            <Avatar seed={u.avatarSeed} size={34} />
+            <div class="grow small"><b>{u.name}</b> ({ROLE_INFO[u.role].name}) got better at {TASK_INFO[u.task].name} <b class="lv">(+1)</b><div class="tiny dim">Skill {u.from} → {u.to}. Practice makes slightly less chaotic.</div></div>
+          </div>
+        ))}
+        <div class="tiny dim">{!done ? 'Tap to skip' : s.day >= 7 ? 'Tap to start HACKATHON DAY.' : 'Tap to continue.'}</div>
       </div>
     </div>
   );
+}
+
+/** A recap line whose first number counts up from zero. */
+function CountUp({ line, instant }: { line: string; instant?: boolean }) {
+  const m = /\d[\d,]*/.exec(line);
+  const target = m ? Number(m[0].replace(/,/g, '')) : 0;
+  const [p, setP] = useState(instant || !m ? 1 : 0);
+  useEffect(() => {
+    if (p >= 1) return;
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = () => { const q = Math.min(1, (performance.now() - t0) / 340); setP(q); if (q < 1) raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  if (!m) return <>{line}</>;
+  const v = Math.round(target * (1 - (1 - p) ** 3));
+  return <>{line.slice(0, m.index)}<b class="tally-num">{v.toLocaleString('en-US')}</b>{line.slice(m.index + m[0].length)}</>;
 }
 
 export function PauseMenu() {

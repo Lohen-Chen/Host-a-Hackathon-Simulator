@@ -7,7 +7,7 @@ import { resolveAlert, scheduleDay, tickEvents } from './events';
 import { addTicker, effectiveSkill, fx, hasTech } from './helpers';
 import { joke, treeRegionCount } from './jokes';
 import { stepMap } from './map';
-import { crewNight } from './crew';
+import { crewGrowth, crewNight } from './crew';
 import { startHackday } from './hackday';
 import { prepareMorning } from './state';
 import type { GameState } from './types';
@@ -125,6 +125,7 @@ export function endLiveDay(s: GameState, early: boolean) {
   s.bubbles = [];
   s.schedule = [];
   buildRecap(s);
+  s.levelUps = crewGrowth(s);
   s.recap.splice(s.recap.length - (s.day < DAYS ? 2 : 1), 0, ...crewNight(s));
   // The venue auction is the night after Balantir's call.
   if (s.day === T.balantirDay && !s.venue) startAuction(s);
@@ -150,6 +151,12 @@ function buildRecap(s: GameState) {
     `Tree controls ${tr}/8 regions${tr > d.treeRegions ? ' (up!)' : tr < d.treeRegions ? ' (down!)' : ''}`,
     joke(s, 'recap'),
   ];
+  // Stamp the day's best stat: a record interest gain beats a confirming day beats pushing Tree back.
+  const best = Number(s.flags.bestGain ?? 0);
+  if (dSign > best && dSign > 0) { s.flags.bestGain = dSign; s.recapStamp = { line: 0, text: 'RECORD DAY' }; }
+  else if (s.confirmed > d.confirmed) s.recapStamp = { line: 1, text: 'LOCKED IN' };
+  else if (tr < d.treeRegions) s.recapStamp = { line: 3, text: 'PUSHED BACK' };
+  else s.recapStamp = null;
   if (s.day < DAYS) s.recap.push(`Tomorrow: ${joke(s, 'tease')}`);
 }
 

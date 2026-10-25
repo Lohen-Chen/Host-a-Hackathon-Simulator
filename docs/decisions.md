@@ -112,3 +112,15 @@ Other choices:
 - **Election-night results.** Turnout counters count up side by side, then each judging category is revealed with Bear and Tree next to each other. Tap to skip.
 - **Build summary.** Results show your branch split (by TP of base cost) and your Hype, Organization and Talent bars next to Tree's. The share card shows the split too.
 - Balance unchanged: Balanced@70 58%, Perfect 73%, Balanced@0 37%, Random 10%.
+
+## Tactile round
+
+- **Bubbles burst and fly.** A popped 💡 bursts into sparks and a "+N 🔬" flies into the TP counter, which bumps when it lands. The old floating "+N TP" text is gone, so nothing shows twice.
+- **Confirm is a cash register.** The button squishes, coins fly from 💰 to ✅, the budget and confirmed counts roll to their new values (green up, red down), and the cha-ching rings a little higher with each batch confirmed within 2.5 s of the last. The sound and coins live in the UI; core no longer emits them.
+- **Every button presses in** 2 px with a short tick (tabs, icon buttons and Evolve nodes too). Bubbles keep their pop.
+- **Bear vs Tree is a tug-of-war.** The ✅ vs 🌲 chip has a bar split by your share of everyone interested. When the lead flips (with more than 20 people in play), the chip shakes and plays a rising or falling sting.
+- **Map dots light up one by one.** Each region's dots step toward the real count a few per frame, and each dot that lights pops.
+- **The night recap is a tally.** Lines appear one at a time with a tick, each line's first number counts up, then the best stat gets a stamp: RECORD DAY (biggest interest gain so far), else LOCKED IN (you confirmed hackers today), else PUSHED BACK (Tree lost regions). Tap skips to the end; it auto-advances 4.5 s after the tally finishes.
+- **Crew level up.** Every 3 days on a task that matches their role, a member gets +1 skill (cap 8). Burned-out or benched members don't learn. Night shows a card per level-up: "Leo from HR (Organizer) got better at Research (+1), skill 4 → 5".
+- Balance after level-ups (300 runs each): Balanced@70 beats Tree 60% (was 58%), Perfect 73%, Balanced@0 45% (was 37%), Random 12%. Level-ups every 2 days pushed Balanced@70 to 64%, so it's every 3.
+- Fixed "Tomorrow: Tomorrow:" in one tease line.

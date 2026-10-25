@@ -1,7 +1,7 @@
 // Confirming hackers: interest is free, attendance is not. Paying covers each hacker's
 // food, swag and (with the node) travel. Tech raises the interested pool; money converts it.
 import { T } from './config';
-import { fx, hasTech, log } from './helpers';
+import { hasTech, log } from './helpers';
 import type { GameState } from './types';
 
 export function confirmCost(s: GameState): number {
@@ -28,8 +28,7 @@ export function confirmHackers(s: GameState): number {
   const cost = n * confirmCost(s);
   s.budget -= cost;
   s.confirmed += n;
-  fx(s, { kind: 'pop', text: `+${n} confirmed`, tone: 'good' });
-  fx(s, { kind: 'sfx', sfx: 'cash' });
+  // The cash-register feedback (sound, coins, rolling count) lives in the UI's ConfirmButton.
   log(s, 'confirm', String(n), cost);
   if (s.tutorialStep === 2) s.tutorialStep = 3;
   return n;

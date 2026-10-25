@@ -192,7 +192,6 @@ export function tapBubble(s: GameState, id: number): boolean {
   const o: SlotOverrides = { region: regionName(s, b.regionId) };
   const tp = b.type === 'eureka' ? 3 : randInt(s, 1, 2);
   s.techPoints += tp;
-  fx(s, { kind: 'pop', regionId: b.regionId, text: `+${tp} TP`, tone: 'good' });
   fx(s, { kind: 'toast', text: joke(s, 'bubble|idea', o), tone: 'neutral' });
   fx(s, { kind: 'sfx', sfx: 'pop' });
   log(s, `bubble:${b.type}`, 'tap');

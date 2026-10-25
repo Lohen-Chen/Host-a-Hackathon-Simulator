@@ -49,7 +49,14 @@ export interface Member {
   /** burned out: works again and they quit tonight; a rest day clears it */
   burnout?: boolean;
   burnoutWorked?: boolean;
+  /** days spent working a task that matches their role; every T.levelUpDays of them is +1 skill */
+  xp?: number;
 }
+
+export interface LevelUp { memberId: number; name: string; role: Role; task: Task; from: number; to: number; avatarSeed: number }
+
+/** The rubber stamp on the night recap's best line. */
+export interface RecapStamp { line: number; text: string }
 
 export interface RegionNode {
   id: RegionId;
@@ -259,6 +266,8 @@ export interface GameState {
   milestones: string[];
   dayStart: DaySnapshot;
   recap: string[];
+  recapStamp?: RecapStamp | null;
+  levelUps?: LevelUp[];
   tutorialStep: number;
   settings: Settings;
   /** transient UI events; the UI drains this each frame, headless runs ignore it */
