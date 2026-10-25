@@ -13,6 +13,8 @@ export function deserialize(json: string): GameState | null {
     // Saves from before Tree had Organization and Talent.
     s.treeOrg ??= 50;
     s.treeTalent ??= 55;
+    // Saves from before live decisions scored Hackathon Day at the start: jump to the results they already have.
+    if (s.phase === 'hackday' && s.hackday && !s.hackday.facts) s.phase = s.results ? 'results' : 'night';
     return s;
   } catch {
     return null;

@@ -11,12 +11,12 @@ export type TraitId =
   | 'pivoted' | 'veteran' | 'replyguy' | 'sleeper' | 'arts' | 'grass' | 'memer';
 export type TechId =
   // Hype
-  | 'website' | 'promo' | 'sfbus' | 'influencers' | 'reelposts' | 'ugc' | 'ericou' | 'ricklee' | 'discord' | 'poker' | 'hackad' | 'travel' | 'swag'
+  | 'website' | 'promo' | 'sfbus' | 'influencers' | 'reelposts' | 'ugc' | 'ericou' | 'ricklee' | 'discord' | 'poker' | 'hackad' | 'travel' | 'swag' | 'waitlist'
   // Organization
   | 'clubfair' | 'design' | 'logistics' | 'snack' | 'reminders' | 'runofshow' | 'coordinator' | 'prestige1' | 'prestige2' | 'prestige3' | 'nepolist'
   | 'resumebook' | 'rep2' | 'rep3' | 'training2' | 'training3'
   // Talent
-  | 'applications' | 'highsignal' | 'leetcode' | 'mentors' | 'workshops' | 'olympiad' | 'aicredits';
+  | 'applications' | 'highsignal' | 'leetcode' | 'mentors' | 'workshops' | 'olympiad' | 'aicredits' | 'hwlab' | 'mixer';
 export type TechBranch = 'hype' | 'org' | 'talent';
 export type PostId = 'flyer' | 'meme_bear' | 'linkedin' | 'dance' | 'pizza' | 'reel' | 'influencer' | 'clapback' | 'countdown' | 'dog';
 export type BubbleType = 'idea' | 'eureka' | 'post';
@@ -146,8 +146,15 @@ export interface Auction {
   results: { venue: VenueId; winner: string; price: number }[];
 }
 
-export interface Beat { id: string; icon: string; title: string; text: string; tone: 'good' | 'bad' | 'neutral' }
-export interface HackDay { beats: Beat[]; index: number; t: number }
+export interface BeatChoice { label: string; hint?: string; disabled?: boolean }
+export interface Beat {
+  id: string; icon: string; title: string; text: string; tone: 'good' | 'bad' | 'neutral';
+  /** a live decision: the day waits until one is picked */
+  choices?: BeatChoice[]; defaultChoice?: number; picked?: number; outcome?: string;
+}
+/** facts are kept so results can be scored after the live decisions */
+export interface HackDay { beats: Beat[]; index: number; t: number; facts: EventFactsData }
+export interface EventFactsData { expected: number; attendees: number; cap: number; overflow: number; dumpster: boolean; protest: boolean; kept: number; broken: number }
 
 export interface ScoreBreakdown {
   categories: { id: string; name: string; weight: number; value: number; line: string }[];

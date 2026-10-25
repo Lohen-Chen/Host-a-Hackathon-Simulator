@@ -29,6 +29,17 @@ export function techCost(s: GameState, id: TechId): number {
   return TECH_BY_ID[id].cost + techMarkup(s);
 }
 
+/** Your build: the share of evolved nodes (by base cost) in each branch, as whole percents that sum to 100. */
+export function buildSplit(s: GameState): Record<TechBranch, number> {
+  const w: Record<TechBranch, number> = { hype: 0, org: 0, talent: 0 };
+  for (const id of s.unlockedTech) { const n = TECH_BY_ID[id]; if (n) w[n.branch] += n.cost; }
+  const total = w.hype + w.org + w.talent;
+  if (!total) return { hype: 0, org: 0, talent: 0 };
+  const hype = Math.round((100 * w.hype) / total);
+  const org = Math.round((100 * w.org) / total);
+  return { hype, org, talent: 100 - hype - org };
+}
+
 export function techState(s: GameState, id: TechId): TechState {
   const n = TECH_BY_ID[id];
   if (s.unlockedTech.includes(id)) return 'owned';

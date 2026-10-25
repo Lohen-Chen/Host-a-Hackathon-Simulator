@@ -60,6 +60,9 @@ export const TECH: TechNode[] = [
     rumor: 'A rumor says Bear Hacks pays for flights. Finance found a loophole. It sort of does now.' },
   { id: 'swag', name: 'Swag Bags', branch: 'hype', cost: 5, prereq: 'travel', bars: { hype: 10 }, effect: 'Show rate +4%, participant mood +4. Confirming a hacker costs $2 more.', joke: 'stretch',
     rumor: 'A rumor says Bear Hacks swag includes a hoodie. 2,000 hoodies were ordered in a panic.' },
+  { id: 'waitlist', name: 'Waitlist Theater', branch: 'hype', cost: 5, prereq: 'website', bars: { hype: 10 }, effect: 'More aware students become interested (+6%). On Day 6, 5% of interested hackers you haven\'t confirmed get tired of waiting and leave.', joke: 'stretch',
+    desc: '"You are #4,812 on the waitlist." There is no list.',
+    rumor: 'A rumor says the Bear Hacks waitlist is 10,000 deep. Someone made a waitlist page so it would be.' },
   // ── Organization ──
   { id: 'clubfair', name: 'Club Fair', branch: 'org', cost: 3, bars: { org: 5 }, effect: 'Unlock the Recruiter role.', joke: 'clubfair',
     rumor: 'A rumor says Bear Hacks is "the club to join this year." 40 freshmen showed up at the fair table. Recruiters unlocked.' },
@@ -117,6 +120,12 @@ export const TECH: TechNode[] = [
     rumor: 'A rumor says a 15-year-old IMO medalist is coming to Bear Hacks. Her mom is driving her.' },
   { id: 'aicredits', name: 'AI Credits', branch: 'talent', cost: 5, prereq: 'applications', bars: { talent: 6, hype: 4 }, effect: 'Free credits for every hacker. Attracts… business majors.', joke: 'stretch',
     rumor: 'A rumor says Bear Hacks gives out unlimited AI credits. Finance found some. "Unlimited" is doing a lot of work.' },
+  { id: 'hwlab', name: 'Hardware Lab', branch: 'talent', cost: 6, prereq: 'mentors', bars: { talent: 10 }, effect: 'Artistic value +8, project quality +4; Arts Majors get +1 skill.', joke: 'stretch',
+    desc: 'Forty Arduinos, one soldering iron, zero fire extinguishers.',
+    rumor: 'A rumor says Bear Hacks has a hardware lab. Someone found a box of Arduinos in a closet. It does now.' },
+  { id: 'mixer', name: 'Team Matching Mixer', branch: 'talent', cost: 5, prereq: 'workshops', bars: { talent: 8, org: 2 }, effect: 'Participant mood +4, project quality +3.', joke: 'stretch',
+    desc: 'Icebreaker: "What\'s your stack, and why is it wrong?"',
+    rumor: 'A rumor says Bear Hacks matches teams by vibe. Someone built the matching form. It asks for your star sign and your linter.' },
 ];
 
 export const TECH_BY_ID = Object.fromEntries(TECH.map((t) => [t.id, t])) as Record<TechId, TechNode>;

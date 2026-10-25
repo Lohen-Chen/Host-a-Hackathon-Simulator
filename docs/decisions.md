@@ -102,3 +102,13 @@ Other choices:
 - **The Blue Screen is gone**: the decision, the 🟦 map bubble, its hackathon-day beat, the IT Hero award and the art.
 - **You can't evolve the whole tree.** Plague Inc's rule: every 2 nodes you evolve make every other node cost +1 TP (rumor unlocks are free and don't count). The Evolve screen shows the current markup. A good player now evolves about 15 of 36 nodes (it was about 23), so picking a direction matters.
 - Balance after both changes (300 runs each): Balanced@70 beats Tree 58%, Perfect 75%, Balanced@0 38%, Random 9%. Skipping bubbles and tech now costs more than it did.
+
+## Hackathon Day round
+
+- **Three new nodes.** Waitlist Theater (Hype, after Website): +6% interest, but on Day 6 5% of the hackers you haven't confirmed leave. Hardware Lab (Talent, after Mentor Program): artistic +8, quality +4, Arts Majors +1 skill. Team Matching Mixer (Talent, after Beginner Workshops): mood +4, quality +3.
+- **Hackathon Day has three live decisions**: the WiFi dying at 3 AM (hotspot army, send a crew member, or call it an "offline track"), which demo opens the expo, and Leland Sr. livestreaming into the closing ceremony. What you evolved adds options (Mentor Program and Hardware Lab add demo choices; Run of Show guarantees the WiFi fix). The day is now scored after the decisions; Skip takes each decision's default.
+- **The map fills in at check-in.** For the first three beats the map shows who has walked in: dim blue for interested, bright blue for arrived.
+- **Beats call back to your week**: lines for LeetCode Gate, Waitlist, Swag, Travel, Olympiad, Mixer, Hardware Lab, Poker, Workshops and AI Credits; a crew moment for two of your members by trait; and a "Meanwhile at Tree Hacks" beat driven by Tree's most extreme stat.
+- **Election-night results.** Turnout counters count up side by side, then each judging category is revealed with Bear and Tree next to each other. Tap to skip.
+- **Build summary.** Results show your branch split (by TP of base cost) and your Hype, Organization and Talent bars next to Tree's. The share card shows the split too.
+- Balance unchanged: Balanced@70 58%, Perfect 73%, Balanced@0 37%, Random 10%.

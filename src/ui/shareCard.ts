@@ -1,5 +1,6 @@
 // Canvas is used only here: render the results share card as a PNG.
-import { TITLE, isTreeControlled, type GameState } from '../core';
+import { BRANCHES } from '../content/techTree';
+import { TITLE, buildSplit, isTreeControlled, type GameState } from '../core';
 
 export function drawShareCard(s: GameState): HTMLCanvasElement {
   const W = 1080;
@@ -69,12 +70,17 @@ export function drawShareCard(s: GameState): HTMLCanvasElement {
     if (isTreeControlled(reg)) { g.font = font(26); g.fillText('🌲', cx, cy + 40); }
   }
 
+  // Your build: where the tech points went.
+  const split = buildSplit(s);
+  g.fillStyle = '#ffffff';
+  g.font = font(30, 700);
+  g.fillText(`🧬 Build: ${BRANCHES.map((b) => `${split[b.id]}% ${b.name}`).join(' · ')}`, W / 2, 1200);
   g.fillStyle = '#fdb515';
-  g.font = font(34, 800);
-  g.fillText(`🏆 ${r.awards[0] ?? ''}`.slice(0, 52), W / 2, 1220);
+  g.font = font(32, 800);
+  g.fillText(`🏆 ${r.awards[0] ?? ''}`.slice(0, 52), W / 2, 1255);
   g.fillStyle = '#a9b6cc';
   g.font = font(26, 500);
-  g.fillText('Best experienced offline. We tested the venue WiFi.', W / 2, 1290);
+  g.fillText('Best experienced offline. We tested the venue WiFi.', W / 2, 1310);
   return c;
 }
 

@@ -39,6 +39,7 @@ export function effectiveSkill(s: GameState, m: Member, task: Task | null = m.ta
   if (m.trait === 'caffeinated') base += s.step < 10 ? 2 : -1;
   if (m.trait === 'survivor' && task === 'venue') base += 2;
   if (m.trait === 'arts' && (task === 'website' || task === 'venue')) base += 2;
+  if (m.trait === 'arts' && hasTech(s, 'hwlab')) base += 1;
   let skill = Math.min(15, Math.max(0.5, base) * s.trainingMult);
   const match = TASK_ROLES[task].includes(m.role) || m.trenchTask === task;
   if (!match) skill *= 0.3;

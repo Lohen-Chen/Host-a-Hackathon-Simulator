@@ -9,7 +9,7 @@ import { BIDDERS, VENUES } from '../src/content/venues';
 import { jokeEngine } from '../src/core';
 import {
   advance, bar, beginGame, buyTech, techCost, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
-  startLiveDay, startRumor, tickAuction, finishAuction, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
+  startLiveDay, startRumor, tickAuction, finishAuction, nextDay, hackdayNext, hackdaySkip, hackdayChoose, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
 } from '../src/core';
 import { NEWS } from '../src/content/news';
 import { conversionMult } from '../src/core/map';
@@ -129,6 +129,35 @@ describe('simulation core', () => {
     expect(before - s.techPoints).toBe(4);
     startRumor(s);
     expect(Number(s.flags.evolved)).toBe(3);
+  });
+
+  it('Hackathon Day has three live decisions; skipping takes their defaults', () => {
+    const r = playGame(3, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 });
+    const beats = r.state.hackday!.beats.filter((b) => b.choices);
+    expect(beats.map((b) => b.id)).toEqual(['d_wifi', 'd_demo', 'd_leland']);
+    expect(beats.every((b) => b.picked !== undefined && b.outcome)).toBe(true);
+    expect(r.state.results).not.toBeNull();
+  });
+
+  it('a live decision blocks Next until picked, then applies its effect', () => {
+    const s = playGame(4, 'standard', { style: 'balanced', bubbleRate: 0.7, alertRate: 0.9 }).state;
+    // Rewind to Hackathon Day with fresh beats.
+    s.phase = 'night'; s.results = null; s.day = 7;
+    for (const k of Object.keys(s.flags)) if (k.startsWith('hd_')) delete s.flags[k];
+    nextDay(s);
+    expect(s.phase).toBe('hackday');
+    const h = s.hackday!;
+    const di = h.beats.findIndex((b) => b.id === 'd_demo');
+    h.index = di;
+    hackdayNext(s);
+    expect(h.index).toBe(di);
+    hackdayChoose(s, 1); // the one that definitely works: quality +3
+    expect(s.flags.hd_quality).toBe(3);
+    hackdayNext(s);
+    expect(h.index).toBe(di + 1);
+    hackdaySkip(s);
+    expect(s.phase).toBe('results');
+    expect(h.beats.every((b) => !b.choices || b.picked !== undefined)).toBe(true);
   });
 
   it('the Blue Screen is gone: no alert, no bubble, no hackathon-day beat', () => {
