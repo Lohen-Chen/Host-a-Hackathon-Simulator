@@ -117,7 +117,8 @@ export function endLiveDay(s: GameState, early: boolean) {
   s.schedule = [];
   buildRecap(s);
   s.recap.splice(s.recap.length - (s.day < DAYS ? 2 : 1), 0, ...crewNight(s));
-  if (s.day === 3 && !s.venue) startAuction(s);
+  // The venue auction is the night after Balantir's call.
+  if (s.day === T.balantirDay && !s.venue) startAuction(s);
   else s.phase = 'night';
 }
 

@@ -68,7 +68,7 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .vs { font-weight: 800; }
 .vs .b { color: var(--bear-hi); }
 .vs .t { color: var(--tree-hi); }
-.objective { padding: 3px 8px; font-size: 12px; background: #13213a; color: var(--gold); display: flex; justify-content: space-between; gap: 6px; }
+.objective { padding: 3px 8px; font-size: 11px; white-space: nowrap; overflow: hidden; background: #13213a; color: var(--gold); display: flex; justify-content: space-between; gap: 6px; }
 .icon-btn { min-width: 44px; min-height: 44px; padding: 2px 6px; border-radius: 8px; border: 1px solid #000; background: var(--panel-2); }
 
 /* ── Ticker ── */
@@ -76,9 +76,10 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .ticker-item { position: absolute; left: 0; top: 4px; display: flex; gap: 6px; animation: tick-in 0.35s ease-out; padding: 0 8px; will-change: transform; }
 .ticker-track { position: absolute; inset: 0; overflow: hidden; }
 .ticker-btn { display: block; width: 100%; flex-shrink: 0; padding: 0; text-align: left; color: inherit; font: inherit; border-left: none; border-right: none; border-top: none; border-radius: 0; cursor: pointer; }
-.ticker-btn .ticker-track { right: 118px; }
-.ticker-more { position: absolute; right: 0; top: 0; bottom: 0; width: 118px; display: grid; place-items: center; background: #111a2b; border-left: 2px solid #222; color: var(--gold); font-weight: 800; font-size: 11px; }
-.ticker-btn:hover .ticker-more { background: #1b2740; }
+.ticker-btn .ticker-track { right: 18px; }
+.ticker-more { position: absolute; right: 0; top: 0; bottom: 0; width: 18px; display: grid; place-items: center; color: var(--ink-dim); font-weight: 800; font-size: 14px; }
+.ticker-btn:hover { background: #0b111c; }
+.ticker-btn:hover .ticker-more { color: var(--gold); }
 .ticker-scroll { animation: tick-scroll var(--dur, 8s) linear forwards; }
 .ticker-cat { font-weight: 800; padding: 0 4px; border-radius: 3px; }
 .cat-BEAR { background: var(--bear); }
@@ -370,13 +371,10 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .region-label.tree-owned { fill: #ffb3b3; }
 .sheet-head { flex-wrap: wrap; }
 /* Tree University performance (the rival's "cure bar") */
-.tree-perf { display: grid; grid-template-columns: auto 1fr auto; column-gap: 6px; row-gap: 2px; align-items: center; }
-.tree-perf-row { display: contents; }
-.tree-perf-label { color: var(--ink-dim); white-space: nowrap; }
-.tree-perf-row b { color: var(--tree-hi); text-align: right; white-space: nowrap; min-width: 4.2em; }
-.tree-perf-head { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
+.tree-perf { display: flex; flex-direction: column; gap: 3px; }
+.tree-perf-head { display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
 .tree-perf-head b { color: var(--tree-hi); }
-.tree-perf-bar { height: 7px; border: 2px solid #000; border-radius: 99px; background: #2a1d24; overflow: hidden; }
+.tree-perf-bar { height: 8px; border: 2px solid #000; border-radius: 99px; background: #2a1d24; overflow: hidden; }
 .tree-perf-bar span { display: block; height: 100%; background: repeating-linear-gradient(45deg, var(--tree-hi) 0 8px, #d94848 8px 16px); transition: width 0.6s ease-out; }
 /* The full news feed opens as a side menu from the right, in every orientation. */
 .sheet.side { left: auto; top: 0; bottom: 0; width: min(88%, 380px); max-height: none; border-radius: 0; border-top: none; border-left: 2px solid #000; box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5); animation: side-in 0.2s ease-out; }

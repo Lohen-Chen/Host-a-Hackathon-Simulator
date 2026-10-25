@@ -83,10 +83,13 @@ export function stepMap(s: GameState) {
 function regionFlipped(s: GameState, id: RegionId, toTree: boolean) {
   const r = s.regions.find((x) => x.id === id)!;
   if (toTree) {
-    addTicker(s, 'TREE TIMES', `Tree University captures ${r.name}; ${joke(s, 'taunt|tree')}`.slice(0, 100));
+    // The taunt is the punchline: keep it whole, and only add it if the line still fits.
+    const head = `Tree University captures ${r.name}`;
+    const taunt = joke(s, 'taunt|tree');
+    addTicker(s, 'TREE TIMES', head.length + taunt.length + 2 <= 110 ? `${head}; ${taunt}` : `${head}.`);
     milestone(s, 'treeCaptures', `Tree captured ${r.name}!`, 'bad');
   } else {
-    addTicker(s, 'BEAR BEAT', `Bear U takes ${r.name} from Tree University; ${r.name} "never liked synergy anyway"`.slice(0, 100));
+    addTicker(s, 'BEAR BEAT', `Bear U takes ${r.name} from Tree; locals "never liked synergy anyway"`);
     milestone(s, 'firstCapture', `You took ${r.name} from Tree!`, 'good');
   }
   log(s, toTree ? 'treeCapture' : 'bearCapture', r.name);

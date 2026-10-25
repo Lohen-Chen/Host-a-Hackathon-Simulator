@@ -1,4 +1,4 @@
-// Day 3 venue auction: hold BID to stay in, release to fold (Section 6.9).
+// Day 4 venue auction (after Balantir's call): hold BID to stay in, release to fold (Section 6.9).
 import { BIDDERS, BIDDER_BY_ID, VENUE_BY_ID } from '../content/venues';
 import { MODES } from './config';
 import { addTicker, fx, log } from './helpers';

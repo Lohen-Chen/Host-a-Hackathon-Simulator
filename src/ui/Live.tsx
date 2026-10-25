@@ -50,11 +50,11 @@ export function MuteButton() {
 
 export function Objective({ s }: { s: GameState }) {
   return (
-    <div class="objective"><span>🎯 {OBJECTIVE}</span><span class="dim">Tree controls {treeRegionCount(s)}/8</span></div>
+    <div class="objective" title={OBJECTIVE}><span>🎯 Get more hackers than Tree</span><span class="dim">🌲 holds {treeRegionCount(s)}/8 regions</span></div>
   );
 }
 
-/** The news feed at the top. With onOpen, tapping it opens the full feed as a side menu. */
+/** The news feed at the top. With onOpen, the whole bar is the button that opens the full feed as a side menu. */
 export function Ticker({ items, onOpen }: { items: TickerItem[]; onOpen?: () => void }) {
   const last = items[items.length - 1];
   const ref = useRef<HTMLDivElement>(null);
@@ -75,7 +75,7 @@ export function Ticker({ items, onOpen }: { items: TickerItem[]; onOpen?: () => 
   if (!onOpen) return <div class="ticker" aria-live="polite">{body}</div>;
   return (
     <button class="ticker ticker-btn" aria-live="polite" aria-label="Open the news feed" onClick={onOpen}>
-      {body}<span class="ticker-more">📰 All news ›</span>
+      {body}<span class="ticker-more" aria-hidden="true">›</span>
     </button>
   );
 }
@@ -201,29 +201,20 @@ export function WorldBar({ s }: { s: GameState }) {
   );
 }
 
-const TREE_STATS = [
-  { key: 'treeHype', start: 'treeHypeStart', icon: '📣', label: 'Hype', tip: 'how fast it spreads and how many of its signups show up' },
-  { key: 'treeOrg', start: 'treeOrgStart', icon: '🗂', label: 'Organization', tip: 'its amenities, promises kept and sponsor mood' },
-  { key: 'treeTalent', start: 'treeTalentStart', icon: '🧠', label: 'Talent', tip: 'the quality of its projects' },
-] as const;
+/** Tree's overall performance: the average of its Hype, Organization and Talent. */
+function treePerf(s: GameState, start = false) {
+  const v = (k: 'treeHype' | 'treeOrg' | 'treeTalent') => (start ? Number(s.flags[`${k}Start`] ?? s[k]) : s[k]);
+  return (v('treeHype') + v('treeOrg') + v('treeTalent')) / 3;
+}
 
-/** Plague Inc's cure bar, but it's Tree University, on its own three branches: Hype, Organization, Talent. */
+/** Plague Inc's cure bar, but it's Tree University: one bar for its Hype, Organization and Talent together. */
 export function TreeBar({ s }: { s: GameState }) {
+  const v = Math.round(treePerf(s));
+  const d = Math.round(treePerf(s) - treePerf(s, true));
   return (
-    <div class="tree-perf" title={`Tree University's performance. ${TREE_STATS.map((t) => `${t.label}: ${t.tip}.`).join(' ')}`}>
-      <div class="tree-perf-head tiny"><span>🌲 Tree U performance</span></div>
-      {TREE_STATS.map((t) => {
-        const now = s[t.key];
-        const v = Math.round(now);
-        const d = Math.round(now - Number(s.flags[t.start] ?? now));
-        return (
-          <div key={t.key} class="tree-perf-row tiny">
-            <span class="tree-perf-label">{t.icon} {t.label}</span>
-            <div class="tree-perf-bar" aria-hidden="true"><span style={{ width: `${v}%` }} /></div>
-            <b>{v}%{d ? <span class={d > 0 ? 'bad' : 'good'}> {d > 0 ? '▲' : '▼'}{Math.abs(d)}</span> : null}</b>
-          </div>
-        );
-      })}
+    <div class="tree-perf" title={`Tree University's performance: 📣 Hype ${Math.round(s.treeHype)}% · 🗂 Organization ${Math.round(s.treeOrg)}% · 🧠 Talent ${Math.round(s.treeTalent)}%`}>
+      <div class="tree-perf-head tiny"><span>🌲 Tree performance</span><b>{v}%{d ? <span class={d > 0 ? 'bad' : 'good'}> {d > 0 ? '▲' : '▼'}{Math.abs(d)}</span> : null}</b></div>
+      <div class="tree-perf-bar" aria-hidden="true"><span style={{ width: `${v}%` }} /></div>
     </div>
   );
 }

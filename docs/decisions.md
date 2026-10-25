@@ -88,8 +88,10 @@ Other choices:
 - **The reply-all event is gone.** The comeback slot it used (when Bear is far behind, and Tree's final-day stumble) is now Leland Sr. letting an AI agent run Tree Hacks.
 - **"Retweet," not "quote-tweet."** Decision choices that share a post say "Retweet it."
 
-## Tree performance bars
+## UI cleanup round
 
-- **Tree's bar is three bars, matching your tech tree:** 📣 Hype, 🗂 Organization and 🧠 Talent, each with today's change. Hype works as before (spread, show rate, mood, sponsor score). Organization moves Tree's amenities, promises and sponsor mood. Talent moves its project quality.
-- **What moves them:** each grows by 1 a day. Puppy Campaign and the Billionaire Keynote add Talent; Sponsor Poaching, a sponsor you let go and the Final Surge add Organization. Tree's final-day stumble (and offering its AI agent a job) cuts Organization; the 21 (2008) casino story cuts Talent.
-- The scoring is centered on Tree's usual week, so balance is unchanged (Balanced@70 still beats Tree 57%, Random 15%). Old saves get Organization 50 and Talent 55.
+- **One Tree performance bar.** Three bars felt cluttered on phones. Tree still has 📣 Hype, 🗂 Organization and 🧠 Talent under the hood (Organization moves its amenities, promises and sponsor mood; Talent moves its project quality), and the one red bar shows their average, with today's change. Hover it for the breakdown. Each stat grows by 1 a day; Tree's moves and events nudge them (Puppy Campaign and the Keynote add Talent, Sponsor Poaching and the Final Surge add Organization, the stumble cuts Organization, the 21 (2008) story cuts Talent). Old saves get Organization 50 and Talent 55.
+- **The news bar is the button.** The "All news" button is gone; tap anywhere on the news bar for the full feed.
+- **Bubbles win over regions.** A tap on or just next to a bubble (12 px) pops the bubble and never also opens the region under it.
+- **The venue auction is the night of Day 4**, after Balantir's scripted call, so the Balantir decision (and its money) comes first. The sim bot keeps its auction reserve until then; Balanced@70 still beats Tree 57%.
+- Smaller fixes: the goal strip fits on one line on phones ("🎯 Get more hackers than Tree · 🌲 holds 7/8 regions"), and BREAKING headlines no longer say "BREAKING BREAKING:".
