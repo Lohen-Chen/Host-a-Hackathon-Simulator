@@ -389,7 +389,7 @@ export const ALERTS: AlertDef[] = [
     id: 'tree_stumble', icon: '🌲', title: '{rivalceo} let an AI agent run Tree Hacks', weight: 0, max: 2,
     body: 'It booked the venue for 2031, emailed every applicant a coupon for "one (1) GPU," and named itself Head of Synergy. Opportunity?', defaultChoice: 0,
     choices: [
-      { label: 'Quote-tweet it (politely)', out: { text: 'You just added "oof." It did numbers. Tree hype dropped.', treeHype: -8, rep: 1 } },
+      { label: 'Retweet it', out: { text: 'You retweeted it. No comment needed. It did numbers. Tree hype dropped.', treeHype: -8, rep: 1 } },
       { label: 'Offer the agent a job', out: { text: 'The agent accepted. It now runs your snack spreadsheet. Tree fans switched sides out of pity.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
     ]
   },
@@ -423,7 +423,7 @@ export const ALERTS: AlertDef[] = [
     id: 'ai_replaces_juniors', icon: '🤖', title: 'An AI CEO says AI will replace every junior engineer', weight: 1.8, max: 1, satire: true, tech: true,
     body: 'He said it at a conference. To junior engineers. Who paid $1,200 for the ticket.', defaultChoice: 1,
     choices: [
-      { label: 'Repost: "so true king"', out: { text: 'Sponsors liked it. Your hackers did the math on their student loans.', inviteBonus: 0.06, mood: -3 } },
+      { label: 'Retweet it', out: { text: 'Sponsors liked it. Your hackers did the math on their student loans.', inviteBonus: 0.06, mood: -3 } },
       { label: 'Host a "Humans Still Code" workshop', cost: 300, out: { text: 'Packed room. Someone wrote a for-loop by hand and got a standing ovation.', mood: 3, quality: 2, rep: 1 } },
     ],
   },
@@ -431,7 +431,7 @@ export const ALERTS: AlertDef[] = [
     id: 'agi_internally', icon: '🌀', title: 'An AI lab tweets "AGI achieved internally" again', weight: 1.5, max: 1, satire: true, tech: true,
     body: 'Fourth time this month. Everyone on Twitter/X is "feeling the AGI." Nobody has seen it.', defaultChoice: 1,
     choices: [
-      { label: 'Retweet it with "🤯"', out: { text: 'Engagement up. Three hackers now think the judges are AGI. They are grad students.', impulse: { target: 'twitter', amount: 0.1 }, quality: -1 } },
+      { label: 'Retweet it', out: { text: 'Engagement up. Three hackers now think the judges are AGI. They are grad students.', impulse: { target: 'twitter', amount: 0.1 }, quality: -1 } },
       { label: 'Ask for a demo', out: { text: 'The demo was a waitlist. Hackers loved that you asked.', rep: 2, mood: 1 } },
     ],
   },
