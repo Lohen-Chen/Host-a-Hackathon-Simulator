@@ -122,11 +122,11 @@ export function scoreTree(s: GameState): ScoreBreakdown {
     attendance: attendanceScore(t.attendees, t.expected, t.cap),
     mood: clamp(50 + s.treeHype * 0.12 + randRange(s, -8, 8) + stumble, 0, 100),
     sponsor: clamp(50 + s.treeHype * 0.25, 0, 100),
-    sponsormood: clamp(52 + randRange(s, -10, 10), 0, 100),
-    amenities: clamp(58 + randRange(s, -8, 8), 0, 100),
-    promises: clamp(62 + randRange(s, -12, 12), 0, 100),
+    sponsormood: clamp(52 + (s.treeOrg - 55) * 0.25 + randRange(s, -10, 10), 0, 100),
+    amenities: clamp(58 + (s.treeOrg - 55) * 0.4 + randRange(s, -8, 8), 0, 100),
+    promises: clamp(62 + (s.treeOrg - 55) * 0.4 + randRange(s, -12, 12), 0, 100),
     artistic: clamp(36 + amb * 4 + randRange(s, -6, 6), 0, 100),
-    quality: clamp(54 + randRange(s, -10, 10) + stumble, 0, 100),
+    quality: clamp(54 + (s.treeTalent - 60) * 0.5 + randRange(s, -10, 10) + stumble, 0, 100),
   };
   const TREE_LINES: Record<string, string> = {
     attendance: 'Tree U filled the room. Half of it was a private equity firm "exploring the space."',

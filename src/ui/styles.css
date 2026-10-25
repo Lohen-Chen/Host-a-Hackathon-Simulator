@@ -370,10 +370,13 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .region-label.tree-owned { fill: #ffb3b3; }
 .sheet-head { flex-wrap: wrap; }
 /* Tree University performance (the rival's "cure bar") */
-.tree-perf { display: flex; flex-direction: column; gap: 3px; }
-.tree-perf-head { display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
+.tree-perf { display: grid; grid-template-columns: auto 1fr auto; column-gap: 6px; row-gap: 2px; align-items: center; }
+.tree-perf-row { display: contents; }
+.tree-perf-label { color: var(--ink-dim); white-space: nowrap; }
+.tree-perf-row b { color: var(--tree-hi); text-align: right; white-space: nowrap; min-width: 4.2em; }
+.tree-perf-head { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
 .tree-perf-head b { color: var(--tree-hi); }
-.tree-perf-bar { height: 8px; border: 2px solid #000; border-radius: 99px; background: #2a1d24; overflow: hidden; }
+.tree-perf-bar { height: 7px; border: 2px solid #000; border-radius: 99px; background: #2a1d24; overflow: hidden; }
 .tree-perf-bar span { display: block; height: 100%; background: repeating-linear-gradient(45deg, var(--tree-hi) 0 8px, #d94848 8px 16px); transition: width 0.6s ease-out; }
 /* The full news feed opens as a side menu from the right, in every orientation. */
 .sheet.side { left: auto; top: 0; bottom: 0; width: min(88%, 380px); max-height: none; border-radius: 0; border-top: none; border-left: 2px solid #000; box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5); animation: side-in 0.2s ease-out; }

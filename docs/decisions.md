@@ -86,3 +86,10 @@ Other choices:
 - **Symmetrical dot blocks.** Each region is a full rectangle of dots (e.g. UC 6×6, B1G 8×5), so a dot is about 50 students but varies slightly by region (47.5 to 52). Dots fill in rings from the center.
 - **Decision events are about tech leaders and AI.** Cut the generic ones (typo flyer, mom's share, lost receipts, fire marshal, pizza strike, smelly suit, boba, payroll hoodie, misquote, Tammy's email, flyer merge conflict, club dog) and ten food-gag headlines (nacho cheese is gone from the word bank). New decisions: Petros Thiel's doom tweet (Repost / Post a story condemning it), Alex Carp's "lethality" and his speaker rider, Mario A. Model's manifesto, an AI CEO replacing junior engineers, "AGI achieved internally," a private equity buyout offer and a $100k drop-out offer.
 - **The reply-all event is gone.** The comeback slot it used (when Bear is far behind, and Tree's final-day stumble) is now Leland Sr. letting an AI agent run Tree Hacks.
+- **"Retweet," not "quote-tweet."** Decision choices that share a post say "Retweet it."
+
+## Tree performance bars
+
+- **Tree's bar is three bars, matching your tech tree:** 📣 Hype, 🗂 Organization and 🧠 Talent, each with today's change. Hype works as before (spread, show rate, mood, sponsor score). Organization moves Tree's amenities, promises and sponsor mood. Talent moves its project quality.
+- **What moves them:** each grows by 1 a day. Puppy Campaign and the Billionaire Keynote add Talent; Sponsor Poaching, a sponsor you let go and the Final Surge add Organization. Tree's final-day stumble (and offering its AI agent a job) cuts Organization; the 21 (2008) casino story cuts Talent.
+- The scoring is centered on Tree's usual week, so balance is unchanged (Balanced@70 still beats Tree 57%, Random 15%). Old saves get Organization 50 and Talent 55.

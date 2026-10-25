@@ -26,7 +26,7 @@ export const ALERTS: AlertDef[] = [
         odds: { p: 0.55, win: { text: 'The clapback went viral. {sponsor} is too embarrassed to leave.', treeHype: -4, rep: 2 },
           lose: { text: "The clapback flopped. {sponsor} left a 'thanks for the memories' email." } },
         run: (s, c) => { if (s.flags._lastOdds === 'lose' && c.sponsorId) removeSponsor(s, c.sponsorId); } },
-      { label: 'Let them go', out: { text: '{sponsor} is now a Tree sponsor. Their banner already says "synergy."', treeHype: 6 },
+      { label: 'Let them go', out: { text: '{sponsor} is now a Tree sponsor. Their banner already says "synergy."', treeHype: 6, treeOrg: 3 },
         run: (s, c) => { if (c.sponsorId) removeSponsor(s, c.sponsorId); } },
     ],
   },
@@ -390,7 +390,7 @@ export const ALERTS: AlertDef[] = [
     body: 'It booked the venue for 2031, emailed every applicant a coupon for "one (1) GPU," and named itself Head of Synergy. Opportunity?', defaultChoice: 0,
     choices: [
       { label: 'Retweet it', out: { text: 'You retweeted it. No comment needed. It did numbers. Tree hype dropped.', treeHype: -8, rep: 1 } },
-      { label: 'Offer the agent a job', out: { text: 'The agent accepted. It now runs your snack spreadsheet. Tree fans switched sides out of pity.', treeHype: -4, impulse: { target: 'uc', amount: 0.15 } } },
+      { label: 'Offer the agent a job', out: { text: 'The agent accepted. It now runs your snack spreadsheet. Tree fans switched sides out of pity. Tree Hacks now has no one running it.', treeHype: -4, treeOrg: -5, impulse: { target: 'uc', amount: 0.15 } } },
     ]
   },
 

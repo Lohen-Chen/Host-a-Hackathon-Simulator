@@ -34,6 +34,8 @@ export function newGame(seed: number, mode: Mode = 'standard', relaxed = false):
     repCap: 100,
     regions: REGIONS.map((r) => ({ ...r, neighbors: nb[r.id], bear: INITIAL_AWARENESS[r.id].bear, tree: INITIAL_AWARENESS[r.id].tree, signups: 0, treeSignups: 0 })),
     treeHype: T.treeHypeStart,
+    treeOrg: T.treeOrgStart,
+    treeTalent: T.treeTalentStart,
     signups: 0,
     confirmed: 0,
     treeSignups: 0,

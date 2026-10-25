@@ -201,14 +201,29 @@ export function WorldBar({ s }: { s: GameState }) {
   );
 }
 
-/** Plague Inc's cure bar, but it's Tree University: its hype drives its spread, turnout and judging. */
+const TREE_STATS = [
+  { key: 'treeHype', start: 'treeHypeStart', icon: '📣', label: 'Hype', tip: 'how fast it spreads and how many of its signups show up' },
+  { key: 'treeOrg', start: 'treeOrgStart', icon: '🗂', label: 'Organization', tip: 'its amenities, promises kept and sponsor mood' },
+  { key: 'treeTalent', start: 'treeTalentStart', icon: '🧠', label: 'Talent', tip: 'the quality of its projects' },
+] as const;
+
+/** Plague Inc's cure bar, but it's Tree University, on its own three branches: Hype, Organization, Talent. */
 export function TreeBar({ s }: { s: GameState }) {
-  const v = Math.round(s.treeHype);
-  const d = Math.round(s.treeHype - Number(s.flags.treeHypeStart ?? s.treeHype));
   return (
-    <div class="tree-perf" title="Tree University's performance: how fast it spreads, how many of its signups show up, and how judges rate it.">
-      <div class="tree-perf-head tiny"><span>🌲 Tree University performance</span><b>{v}%{d ? <span class={d > 0 ? 'bad' : 'good'}> {d > 0 ? '▲' : '▼'}{Math.abs(d)}</span> : null}</b></div>
-      <div class="tree-perf-bar" aria-hidden="true"><span style={{ width: `${v}%` }} /></div>
+    <div class="tree-perf" title={`Tree University's performance. ${TREE_STATS.map((t) => `${t.label}: ${t.tip}.`).join(' ')}`}>
+      <div class="tree-perf-head tiny"><span>🌲 Tree U performance</span></div>
+      {TREE_STATS.map((t) => {
+        const now = s[t.key];
+        const v = Math.round(now);
+        const d = Math.round(now - Number(s.flags[t.start] ?? now));
+        return (
+          <div key={t.key} class="tree-perf-row tiny">
+            <span class="tree-perf-label">{t.icon} {t.label}</span>
+            <div class="tree-perf-bar" aria-hidden="true"><span style={{ width: `${v}%` }} /></div>
+            <b>{v}%{d ? <span class={d > 0 ? 'bad' : 'good'}> {d > 0 ? '▲' : '▼'}{Math.abs(d)}</span> : null}</b>
+          </div>
+        );
+      })}
     </div>
   );
 }

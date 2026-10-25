@@ -44,6 +44,11 @@ export const T = {
   treePostPower: 0.11,
   treeHypeStart: 45,
   treeHypeDaily: 1.5,
+  /** Tree's Organization and Talent (its own tech tree, shown on its performance bar) */
+  treeOrgStart: 50,
+  treeOrgDaily: 1,
+  treeTalentStart: 55,
+  treeTalentDaily: 1,
   // Posts
   spillFactor: 0.5,
   // Bubbles
