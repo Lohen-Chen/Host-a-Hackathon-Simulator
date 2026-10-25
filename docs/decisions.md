@@ -115,7 +115,7 @@ Other choices:
 
 ## Tactile round
 
-- **Bubbles burst and fly.** A popped 💡 bursts into sparks and a "+N 🔬" flies into the TP counter, which bumps when it lands. The old floating "+N TP" text is gone, so nothing shows twice.
+- **Bubbles burst.** A popped 💡 bursts into sparks and shows the floating "+N TP" at its region, as before. (A fly-to-counter "+N 🔬" was tried and dropped at lohen's request.)
 - **Confirm is a cash register.** The button squishes, coins fly from 💰 to ✅, the budget and confirmed counts roll to their new values (green up, red down), and the cha-ching rings a little higher with each batch confirmed within 2.5 s of the last. The sound and coins live in the UI; core no longer emits them.
 - **Every button presses in** 2 px with a short tick (tabs, icon buttons and Evolve nodes too). Bubbles keep their pop.
 - **Bear vs Tree is a tug-of-war.** The ✅ vs 🌲 chip has a bar split by your share of everyone interested. When the lead flips (with more than 20 people in play), the chip shakes and plays a rising or falling sting.
