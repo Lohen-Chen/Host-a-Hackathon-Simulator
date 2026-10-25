@@ -231,7 +231,7 @@ function addDecision(beats: Beat[], s: GameState, id: string, icon: string, titl
 }
 
 function decisionWifi(s: GameState, beats: Beat[]) {
-  addDecision(beats, s, 'd_wifi', '📡', '3:07 AM: the WiFi dies', '2,000 laptops lose the internet at once. Someone is already writing a Medium post about it. What do you do?', s.members.length ? 1 : 2);
+  addDecision(beats, s, 'd_wifi', '📡', '3:07 AM: the WiFi dies', `${Number(s.flags.attendees ?? 0).toLocaleString('en-US')} laptops lose the internet at once. Someone is already writing a Medium post about it. What do you do?`, s.members.length ? 1 : 2);
 }
 
 function decisionDemo(s: GameState, beats: Beat[]) {
