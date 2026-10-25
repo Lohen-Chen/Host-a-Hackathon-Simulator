@@ -13,7 +13,7 @@ export const TASK_INFO: Record<Task, { name: string; icon: string; blurb: string
   research: { name: 'Research', icon: '🔬', blurb: 'Tech Points. Organizers are best at it.' },
   social: { name: 'Social', icon: '📣', blurb: '+1 📱 post bubble a day per Social Media member, virality up.' },
   website: { name: 'Website', icon: '🌐', blurb: 'Website score (needs the Website node).' },
-  venue: { name: 'Venue', icon: '🏟️', blurb: 'Before Day 3: scout the auction. After: venue prep.' },
+  venue: { name: 'Venue', icon: '🏟️', blurb: 'Before the Day 4 auction: scout it. After: venue prep.' },
   sponsors: { name: 'Sponsors', icon: '💼', blurb: 'Raises sponsor invite chance and quality.' },
   recruit: { name: 'Recruit', icon: '🎯', blurb: "Bigger, better candidate pool tomorrow." },
 };

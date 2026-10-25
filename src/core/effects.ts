@@ -8,6 +8,8 @@ export interface Effects {
   mood?: number;
   tp?: number;
   treeHype?: number;
+  treeOrg?: number;
+  treeTalent?: number;
   website?: number;
   quality?: number;
   sponsorMood?: number;

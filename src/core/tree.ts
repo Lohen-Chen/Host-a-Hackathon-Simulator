@@ -29,6 +29,7 @@ export function scheduleTreeMoves(s: GameState): ScheduledEvent[] {
   // Ex-Tree Mole: 10% a day to leak your plans back.
   if (s.members.some((m) => m.trait === 'mole') && chance(s, 0.1)) {
     s.treeHype += 3;
+    s.treeOrg = Math.min(100, s.treeOrg + 2);
     addTicker(s, 'TREE TIMES', 'LEAK: Tree University obtained the Bear U group chat. It is mostly pizza polls.');
   }
   return out;
@@ -43,6 +44,7 @@ export function startTreeMove(s: GameState, id: string) {
   // D7: stumble or surge.
   if (id === 'surge' && chance(s, 0.5)) {
     s.treeHype = Math.max(0, s.treeHype - 10);
+    s.treeOrg = Math.max(0, s.treeOrg - 8);
     addTicker(s, 'TREE TIMES', 'Tree University stumbles on the final day: livestream audio was just "synergy" on loop');
     queueAlert(s, 'tree_stumble');
     log(s, 'treeStumble', 'Tree stumbled');
@@ -53,6 +55,8 @@ export function startTreeMove(s: GameState, id: string) {
     fx(s, { kind: 'pulse', regionId: r, tone: 'bad' });
   }
   s.treeHype = Math.min(100, s.treeHype + def.treeHype);
+  if (def.treeOrg) s.treeOrg = Math.min(100, s.treeOrg + def.treeOrg);
+  if (def.treeTalent) s.treeTalent = Math.min(100, s.treeTalent + def.treeTalent);
   const where = def.global ? 'everywhere' : targets.map((r) => regionName(s, r)).join(' and ');
   showPopup(s, {
     kind: 'tree', icon: '🌲', title: `Tree University: ${def.name}`, body: fill(s, def.text),

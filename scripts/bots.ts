@@ -11,6 +11,7 @@ import {
   startLiveDay, tapBubble, techState, tickAuction, type GameState, type Mode, type Task, type TechId,
 } from '../src/core';
 import { rand } from '../src/core/rng';
+import { T } from '../src/core/config';
 
 export type Style = 'random' | 'money' | 'hype' | 'balanced' | 'perfect';
 export interface BotCfg { style: Style; bubbleRate: number; alertRate: number }
@@ -155,7 +156,7 @@ function auctionHold(s: GameState, style: Style, willing: Record<string, number>
 function confirmStep(s: GameState, style: Style, rng: BotRng) {
   if (!canConfirm(s)) return;
   if (style === 'random') { if (rng.next() < 0.02) confirmHackers(s); return; }
-  const auctionReserve = !s.venue && s.day <= 3 ? (style === 'money' ? 10000 : 18000) : 0;
+  const auctionReserve = !s.venue && s.day <= T.balantirDay ? (style === 'money' ? 10000 : 18000) : 0;
   const reserve = auctionReserve + 800;
   // Money bot waits for the last two days; everyone else confirms as interest grows.
   if (style === 'money' && s.day < 6) return;

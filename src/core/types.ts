@@ -189,6 +189,10 @@ export interface GameState {
   repCap: number;
   regions: RegionNode[];
   treeHype: number;
+  /** Tree University's Organization (logistics; drives its amenities, promises, sponsor mood) */
+  treeOrg: number;
+  /** Tree University's Talent (who it attracts; drives its project quality) */
+  treeTalent: number;
   /** interested hackers (the potential pool; tech raises it) */
   signups: number;
   /** hackers you paid to confirm (food, swag, travel); these are who show up */

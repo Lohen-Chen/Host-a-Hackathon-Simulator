@@ -1,4 +1,4 @@
-// Day 3 venue auction (plain DOM): price counter, speech bubbles, hold-to-bid.
+// Day 4 venue auction (after Balantir's call) (plain DOM): price counter, speech bubbles, hold-to-bid.
 import { BIDDER_BY_ID, VENUE_BY_ID } from '../content/venues';
 import { finishAuction, skipAuction, type GameState } from '../core';
 import { store } from '../ui/store';

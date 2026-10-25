@@ -336,6 +336,8 @@ export function applyEffects(s: GameState, e: Effects, ctx: AlertCtx) {
   if (e.mood) s.moodBank += e.mood;
   if (e.tp) s.techPoints = Math.max(0, s.techPoints + e.tp);
   if (e.treeHype) s.treeHype = clamp(s.treeHype + e.treeHype, 0, 100);
+  if (e.treeOrg) s.treeOrg = clamp(s.treeOrg + e.treeOrg, 0, 100);
+  if (e.treeTalent) s.treeTalent = clamp(s.treeTalent + e.treeTalent, 0, 100);
   if (e.website) s.websiteScore = clamp(s.websiteScore + e.website, 0, 100);
   if (e.quality) s.qualityBonus += e.quality;
   if (e.sponsorMood) { s.sponsorMoodDelta += e.sponsorMood; for (const sp of s.sponsors) sp.mood += e.sponsorMood; }

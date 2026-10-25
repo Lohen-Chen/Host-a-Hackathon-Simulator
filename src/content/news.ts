@@ -60,8 +60,8 @@ export const NEWS: NewsDef[] = [
   {
     id: 'tree_21', icon: '🃏', title: 'Tree U students try to recreate 21 (2008)',
     body: 'A group of Tree University students tried to recreate the movie 21 at a casino. They were caught immediately. Their pitch deck called it "a liquidity event."',
-    effect: 'Tree hype −4',
-    fx: { treeHype: -4 },
+    effect: 'Tree hype −4, Tree talent −4',
+    fx: { treeHype: -4, treeTalent: -4 },
   },
   {
     id: 'thiel_underclass', icon: '🏚️', title: 'Petros Thiel warns of a "permanent underclass"',

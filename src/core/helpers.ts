@@ -22,6 +22,8 @@ export function log(s: GameState, kind: string, text: string, value?: number) {
 }
 
 export function addTicker(s: GameState, cat: TickerCat, text: string) {
+  // The category tag already says BREAKING; don't say it twice.
+  if (cat === 'BREAKING') text = text.replace(/^BREAKING:\s*/, '');
   s.ticker.push({ id: ++s.uid, cat, text });
   if (s.ticker.length > 30) s.ticker.splice(0, s.ticker.length - 30);
 }

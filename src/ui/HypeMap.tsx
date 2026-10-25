@@ -80,7 +80,7 @@ export function MapSvg({ s, onRegion, selected, pulses }: { s: GameState; onRegi
         const pulse = pulses?.find((p) => p.regionId === r.id);
         const sel = selected === r.id;
         return (
-          <g key={r.id} class={`region-hit ${sel ? 'sel' : ''}`} onClick={() => onRegion?.(r.id)} role="button"
+          <g key={r.id} class={`region-hit ${sel ? 'sel' : ''}`} onClick={(e) => { if (!bubbleFirst(e)) onRegion?.(r.id); }} role="button"
             aria-label={`${r.name}: ${Math.round(r.signups)} for Bear, ${Math.round(r.treeSignups)} for Tree, of ${r.pop}`}>
             <rect class="block-bg" x={b.x0 - 3} y={b.y0 - 3} width={b.w + 6} height={b.h + 6} rx="6" />
             {color.map((c, i) => <circle key={i} class={`sq ${c}`} cx={b.x0 + (i % b.cols) * CELL + SQ / 2} cy={b.y0 + Math.floor(i / b.cols) * CELL + SQ / 2} r={SQ / 2} />)}
@@ -103,6 +103,22 @@ function compact(v: number) {
   return a >= 1000 ? `${(a / 1000).toFixed(1)}k` : String(a);
 }
 
+/** Bubbles win over regions. A bubble pops on pointer-down, so the click that follows can land on the
+ * region under it; and a tap just off a bobbing bubble's edge should still pop the bubble. */
+let bubbleTapAt = -Infinity;
+function bubbleFirst(e: MouseEvent): boolean {
+  if (performance.now() - bubbleTapAt < 600) return true;
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>('.map .bubble'))) {
+    const r = el.getBoundingClientRect();
+    const pad = 12;
+    if (e.clientX >= r.left - pad && e.clientX <= r.right + pad && e.clientY >= r.top - pad && e.clientY <= r.bottom + pad) {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      return true;
+    }
+  }
+  return false;
+}
+
 export function pct(r: { x: number; y: number }) {
   return { left: `${(r.x / W) * 100}%`, top: `${(r.y / H) * 100}%` };
 }
@@ -122,7 +138,7 @@ export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id
           const jitter = ((b.id * 37) % 30) - 15;
           return (
             <button key={b.id} class={`bubble ${hazard ? 'hazard' : ''} ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
-              onPointerDown={(e) => { e.stopPropagation(); store.act((st) => tapBubble(st, b.id)); }}
+              onPointerDown={(e) => { e.stopPropagation(); bubbleTapAt = performance.now(); store.act((st) => tapBubble(st, b.id)); }}
               aria-label={`${b.type} bubble`}>
               {b.type === 'bsod' ? <span class="bsod" style={{ width: '40px', height: '30px' }}><span class="bsod-face">:(</span></span> : BUBBLE_ICON[b.type]}
               <span class="ttl" style={{ animationDuration: `${left}s` }} />
