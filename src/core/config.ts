@@ -25,6 +25,8 @@ export const T = {
   hireStep: 150, // each hire beyond hireFree members costs this much more
   hireFree: 4,
   burnoutFree: 3, // crews this size or smaller never burn out
+  levelUpDays: 3, // days on a matching task per +1 skill
+  skillCap: 8,
   burnoutPerMember: 0.07,
   burnoutMax: 0.6,
   // Tech points

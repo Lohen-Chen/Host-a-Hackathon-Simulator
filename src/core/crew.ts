@@ -1,9 +1,9 @@
 // Burnout: the bigger the crew, the likelier someone burns out. A burned-out member
 // who works the next day quits that night; a rest day (no task) brings them back.
 import { DAYS, T } from './config';
-import { addTicker, log } from './helpers';
+import { addTicker, isMatch, log } from './helpers';
 import { chance, pick } from './rng';
-import type { GameState } from './types';
+import type { GameState, LevelUp } from './types';
 
 const QUIT_LINES = [
   'said it\'s not you, it\'s the group chat pings',
@@ -13,6 +13,21 @@ const QUIT_LINES = [
 ];
 
 export const burnoutChance = (s: GameState) => Math.min(T.burnoutMax, Math.max(0, s.members.length - T.burnoutFree) * T.burnoutPerMember);
+
+/** Night: everyone who spent the day on a task that fits their role gets better at it, a skill point every few days. */
+export function crewGrowth(s: GameState): LevelUp[] {
+  const ups: LevelUp[] = [];
+  for (const m of s.members) {
+    if (!m.task || m.burnout || m.benchedDays > 0 || !isMatch(m, m.task)) continue;
+    m.xp = (m.xp ?? 0) + 1;
+    if (m.xp < T.levelUpDays || m.baseSkill >= T.skillCap) continue;
+    m.xp = 0;
+    ups.push({ memberId: m.id, name: m.name, role: m.role, task: m.task, from: m.baseSkill, to: m.baseSkill + 1, avatarSeed: m.avatarSeed });
+    m.baseSkill++;
+    log(s, 'levelup', m.name, m.baseSkill);
+  }
+  return ups;
+}
 
 /** Night: burned-out members who worked today quit; rested ones recover; maybe someone new burns out. */
 export function crewNight(s: GameState): string[] {

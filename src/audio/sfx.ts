@@ -16,6 +16,9 @@ type Voice = { f: number; t: number; d: number; type?: OscillatorType; slide?: n
 
 const PATCHES: Record<string, Voice[]> = {
   tap: [{ f: 660, t: 0, d: 0.05, type: 'square', vol: 0.12 }],
+  tick: [{ f: 1400, t: 0, d: 0.025, type: 'square', vol: 0.05 }],
+  stamp: [{ f: 110, t: 0, d: 0.09, type: 'square', vol: 0.22 }, { f: 70, t: 0.03, d: 0.12, type: 'triangle', vol: 0.2 }],
+  coin: [{ f: 1568, t: 0, d: 0.05, type: 'square', vol: 0.06 }, { f: 2093, t: 0.04, d: 0.08, type: 'square', vol: 0.06 }],
   pop: [{ f: 520, t: 0, d: 0.06, type: 'triangle', slide: 1.8 }, { f: 980, t: 0.05, d: 0.05, type: 'triangle' }],
   cash: [{ f: 988, t: 0, d: 0.07, type: 'square', vol: 0.12 }, { f: 1319, t: 0.07, d: 0.16, type: 'square', vol: 0.12 }],
   flop: [{ f: 220, t: 0, d: 0.25, type: 'sawtooth', slide: 0.5, vol: 0.12 }],
@@ -77,13 +80,14 @@ class Sfx {
     this.syncMusic();
   }
 
-  play(name: string) {
+  /** pitch multiplies every voice's frequency (a streak can climb). */
+  play(name: string, pitch = 1) {
     const ctx = this.ctx;
     if (!ctx || !this.master || this.muted) return;
     const patch = PATCHES[name];
     if (!patch) return;
     const now = ctx.currentTime;
-    for (const v of patch) this.voice(v, now);
+    for (const v of patch) this.voice(pitch === 1 ? v : { ...v, f: v.f * pitch }, now);
   }
 
   private voice(v: Voice, now: number) {

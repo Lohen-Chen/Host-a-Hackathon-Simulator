@@ -7,6 +7,8 @@ import {
 } from '../core';
 import { BearMascot } from './art';
 import { HypeMap } from './HypeMap';
+import { Rolling, bump, burst, counterEl, flyTo } from './juice';
+import { sfx } from '../audio/sfx';
 import { CrewSheet, SponsorsSheet, TechSheet } from './sheets';
 import { store } from './store';
 
@@ -20,16 +22,38 @@ export function TopBar({ s }: { s: GameState }) {
       <span class="clock" style={{ background: `conic-gradient(var(--gold) ${frac * 360}deg, #24324a 0)` }} aria-label={`Day ${Math.round(frac * 100)}% done`}>
         <span style={{ background: '#0b1220', borderRadius: '50%', width: '20px', height: '20px', display: 'grid', placeItems: 'center' }}>{s.step}</span>
       </span>
-      <span class="stat">💰 {money(s.budget)}</span>
-      <span class="stat">🔬 {s.techPoints}</span>
+      <span class="stat" data-counter="budget">💰 <Rolling value={s.budget} format={money} /></span>
+      <span class="stat" data-counter="tp">🔬 <Rolling value={s.techPoints} format={(v) => String(Math.round(v))} ms={300} /></span>
       <span class="stat">⭐ {Math.round(s.reputation)}</span>
-      <span class="stat vs" title="Interested · confirmed vs Tree"><span class="b">🙋 {num(s.signups)} · ✅ {num(s.confirmed)}</span><span class="vs-sep">vs</span><span class="t">🌲 {num(s.treeSignups)}</span></span>
+      <LeadMeter s={s} />
       <span class="grow" />
       <MuteButton />
       <button class="icon-btn" aria-label="Pause" onClick={() => { store.paused = true; store.emit(); }}>⏸</button>
     </div>
   );
 }
+
+/** Bear vs Tree as a tug-of-war: the bar's split is the share of interested hackers, and it shakes when the lead flips. */
+function LeadMeter({ s }: { s: GameState }) {
+  const total = s.signups + s.treeSignups;
+  const share = total > 0 ? s.signups / total : 0.5;
+  const leader = s.signups >= s.treeSignups ? 'b' : 't';
+  const prev = useRef(leader);
+  const [flips, setFlips] = useState(0);
+  useEffect(() => {
+    if (prev.current === leader) return;
+    prev.current = leader;
+    if (total > 20) { setFlips((v) => v + 1); sfx.play(leader === 'b' ? 'levelup' : 'error'); }
+  }, [leader]);
+  return (
+    <span class={`stat vs ${flips ? 'flip' : ''}`} key={flips} title="Interested · confirmed vs Tree. The bar is your share of everyone interested.">
+      <span class="vs-nums"><span class="b">🙋 {num(s.signups)} · ✅ <span data-counter="confirmed"><Rolling value={s.confirmed} format={num} /></span></span><span class="vs-sep">vs</span><span class="t">🌲 {num(s.treeSignups)}</span></span>
+      <span class="tug" aria-hidden="true"><span class="tug-b" style={{ width: `${share * 100}%` }} /><span class="tug-knot" style={{ left: `${share * 100}%` }} /></span>
+    </span>
+  );
+}
+
+let confirmStreak = { n: 0, at: -Infinity };
 
 export function money(v: number) {
   const a = Math.abs(v);
@@ -128,7 +152,20 @@ export function ConfirmButton({ s, inline }: { s: GameState; inline?: boolean })
   const left = unconfirmed(s);
   const label = left <= 0 ? 'Everyone interested is confirmed' : n <= 0 ? `Need $${confirmCost(s)}/hacker` : `✅ Confirm ${num(n)} · $${(n * confirmCost(s)).toLocaleString('en-US')}`;
   return (
-    <button class={`btn btn-blue confirm-btn ${inline ? 'inline' : ''}`} disabled={!canConfirm(s)} onClick={() => store.act((st) => confirmHackers(st))}
+    <button class={`btn btn-blue confirm-btn ${inline ? 'inline' : ''}`} disabled={!canConfirm(s)} onClick={(e) => {
+      const btn = e.currentTarget as HTMLElement;
+      let got = 0;
+      store.act((st) => { got = confirmHackers(st); });
+      if (!got) return;
+      // Cash register: the button squishes, coins leave the budget, the count rolls up and each batch in a streak rings higher.
+      const now = performance.now();
+      confirmStreak = { n: now - confirmStreak.at < 2500 ? Math.min(confirmStreak.n + 1, 8) : 0, at: now };
+      sfx.play('cash', 1 + confirmStreak.n * 0.06);
+      bump(btn);
+      const budget = counterEl('budget');
+      if (budget) flyTo(budget, 'confirmed', '🪙', { count: Math.min(6, 2 + confirmStreak.n), cls: 'coin', spread: 16 });
+      else { const r = btn.getBoundingClientRect(); burst({ x: r.left + r.width / 2, y: r.top }, 6); }
+    }}
       title={`${num(left)} interested but unconfirmed · $${confirmCost(s)} each covers food, swag and travel`}>
       {label}<span class="tiny">{num(left)} waiting · ${confirmCost(s)}/hacker</span>
     </button>

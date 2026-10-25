@@ -9,6 +9,7 @@ import { Intro, Morning, Night, PauseMenu, Title } from './screens';
 import { store, useStore } from './store';
 import { offlineReady, onOfflineReady } from './sw';
 import { sfx } from '../audio/sfx';
+import { Flyers, useButtonTicks } from './juice';
 
 export function App() {
   const st = useStore();
@@ -20,6 +21,7 @@ export function App() {
     window.addEventListener('pointerdown', go);
     return () => window.removeEventListener('pointerdown', go);
   }, []);
+  useButtonTicks();
   const s = st.state;
   sfx.setTrack(!s || s.phase === 'intro' ? 'menu' : 'game');
   let screen;
@@ -41,6 +43,7 @@ export function App() {
       {s && s.phase !== 'live' && <Toasts />}
       {s?.courting && <Courting s={s} />}
       {s && store.paused && <PauseMenu />}
+      <Flyers />
     </div>
   );
 }

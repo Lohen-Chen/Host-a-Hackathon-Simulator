@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import './setup';
 import { ALERTS } from '../src/content/alerts';
-import { TRAITS } from '../src/content/members';
+import { TASK_ROLES, TRAITS } from '../src/content/members';
 import { POSTS } from '../src/content/posts';
 import { SPONSORS } from '../src/content/sponsors';
 import { BRANCHES, TECH } from '../src/content/techTree';
 import { BIDDERS, VENUES } from '../src/content/venues';
 import { jokeEngine } from '../src/core';
 import {
-  advance, bar, beginGame, buyTech, techCost, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
+  advance, bar, beginGame, crewGrowth, buyTech, techCost, candidateCount, confirmCost, confirmHackers, dismissPopup, endLiveDay, newGame, serialize, showPopup, spawnBubble,
   startLiveDay, startRumor, tickAuction, finishAuction, nextDay, hackdayNext, hackdaySkip, hackdayChoose, resolveAlert, queueAlert, STEPS_PER_DAY, T, tapBubble, hireCost,
 } from '../src/core';
 import { NEWS } from '../src/content/news';
@@ -368,5 +368,20 @@ describe('content acceptance counts (Section 12)', () => {
     expect(VENUES).toHaveLength(5);
     for (const b of BIDDERS) expect(jokeEngine()!.templatesFor(`taunt|${b.id}`).length, b.id).toBeGreaterThanOrEqual(4);
     expect(jokeEngine()!.templates.length).toBeGreaterThanOrEqual(80);
+  });
+
+  it('crew level up after enough days on a matching task, capped at the skill cap', () => {
+    const s = beginAndStart(7);
+    const m = s.members[0];
+    m.task = (Object.keys(TASK_ROLES) as (keyof typeof TASK_ROLES)[]).find((k) => TASK_ROLES[k].includes(m.role))!;
+    m.baseSkill = 7;
+    const skill = m.baseSkill;
+    expect(crewGrowth(s)).toHaveLength(0);
+    expect(crewGrowth(s)).toHaveLength(0);
+    const ups = crewGrowth(s);
+    expect(ups.map((u) => u.memberId)).toContain(m.id);
+    expect(m.baseSkill).toBe(skill + 1);
+    for (let i = 0; i < 6; i++) crewGrowth(s);
+    expect(m.baseSkill).toBe(8);
   });
 });

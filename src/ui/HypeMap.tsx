@@ -1,7 +1,9 @@
 // SVG hype map: each region is a block of dots (one per 50 students) colored Bear / Tree / neutral,
 // plus a DOM overlay for bubbles, floaters and the Tree move icon.
 import { BUBBLE_ICON, isTreeControlled, tapBubble, type GameState, type RegionId } from '../core';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { store, type UiFx } from './store';
+import { burst, flyTo } from './juice';
 
 const W = 360;
 const H = 300;
@@ -61,6 +63,23 @@ const US_PATH = 'M18 92 L40 64 L70 52 L120 48 L170 44 L230 46 L262 58 L300 60 L3
 export function MapSvg({ s, onRegion, selected, pulses, arrival }: { s: GameState; onRegion?: (id: RegionId) => void; selected?: RegionId | null; pulses?: UiFx[]; arrival?: number }) {
   const turnout = arrival === undefined ? 1 : (Number(s.flags.attendees ?? 0) / Math.max(1, s.signups)) * arrival;
   const pos = new Map(s.regions.map((r) => [r.id, r]));
+  // Dots light up one at a time: the shown counts step toward the real ones a few per frame, and a dot that just lit pops.
+  const shown = useRef(new Map<RegionId, { bear: number; tree: number; prev: string[]; litAt: number[] }>());
+  const [, redraw] = useState(0);
+  const now = performance.now();
+  let moving = false;
+  let lit = false;
+  const step = (from: number, to: number) => {
+    if (from === to) return to;
+    moving = true;
+    const d = Math.max(1, Math.floor(Math.abs(to - from) / 10));
+    return from < to ? Math.min(to, from + d) : Math.max(to, from - d);
+  };
+  useEffect(() => {
+    if (!moving && !lit) return;
+    const raf = requestAnimationFrame(() => redraw((v) => v + 1));
+    return () => cancelAnimationFrame(raf);
+  });
   const edges: [RegionId, RegionId][] = [];
   for (const r of s.regions) for (const n of r.neighbors) if (r.id < n) edges.push([r.id, n]);
   return (
@@ -73,13 +92,22 @@ export function MapSvg({ s, onRegion, selected, pulses, arrival }: { s: GameStat
       {edges.map(([a, b]) => { const A = pos.get(a)!; const B = pos.get(b)!; return <line key={a + b} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#3a4d70" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" />; })}
       {s.regions.map((r) => {
         const b = blockFor(r);
-        const [bear, tree] = arrival === undefined ? squareSplit(r, b) : [Math.min(b.n, Math.round((r.signups * turnout) / b.per)), 0];
+        const [bearTo, treeTo] = arrival === undefined ? squareSplit(r, b) : [Math.min(b.n, Math.round((r.signups * turnout) / b.per)), 0];
+        let mem = shown.current.get(r.id);
+        if (!mem) { mem = { bear: bearTo, tree: treeTo, prev: [], litAt: [] }; shown.current.set(r.id, mem); }
+        const bear = (mem.bear = step(mem.bear, bearTo));
+        const tree = (mem.tree = step(mem.tree, treeTo));
         const color = new Array<string>(b.n).fill('sq-n');
         // Check-in: everyone interested shows dim blue until they walk in.
         if (arrival !== undefined) for (let k = 0; k < squareSplit(r, b)[0]; k++) color[b.order[k]] = 'sq-w';
         for (let k = 0; k < bear; k++) color[b.order[k]] = 'sq-b';
         // Tree mirrors Bear's order through the center (bottom-right corner first), stepping around Bear's dots.
         for (let k = 0, placed = 0; k < b.n && placed < tree; k++) { const c = b.n - 1 - b.order[k]; if (color[c] === 'sq-n') { color[c] = 'sq-t'; placed++; } }
+        for (let i = 0; i < b.n; i++) {
+          if (mem.prev.length && mem.prev[i] !== color[i] && (color[i] === 'sq-b' || color[i] === 'sq-t')) mem.litAt[i] = now;
+          if (now - (mem.litAt[i] ?? -1e9) < 320) lit = true;
+        }
+        mem.prev = color;
         const treeOwned = isTreeControlled(r);
         const pulse = pulses?.find((p) => p.regionId === r.id);
         const sel = selected === r.id;
@@ -87,7 +115,7 @@ export function MapSvg({ s, onRegion, selected, pulses, arrival }: { s: GameStat
           <g key={r.id} class={`region-hit ${sel ? 'sel' : ''}`} onClick={(e) => { if (!bubbleFirst(e)) onRegion?.(r.id); }} role="button"
             aria-label={`${r.name}: ${Math.round(r.signups)} for Bear, ${Math.round(r.treeSignups)} for Tree, of ${r.pop}`}>
             <rect class="block-bg" x={b.x0 - 3} y={b.y0 - 3} width={b.w + 6} height={b.h + 6} rx="6" />
-            {color.map((c, i) => <circle key={i} class={`sq ${c}`} cx={b.x0 + (i % b.cols) * CELL + SQ / 2} cy={b.y0 + Math.floor(i / b.cols) * CELL + SQ / 2} r={SQ / 2} />)}
+            {color.map((c, i) => <circle key={i} class={`sq ${c} ${now - (mem.litAt[i] ?? -1e9) < 320 ? 'lit' : ''}`} cx={b.x0 + (i % b.cols) * CELL + SQ / 2} cy={b.y0 + Math.floor(i / b.cols) * CELL + SQ / 2} r={SQ / 2} />)}
             {pulse && <rect key={pulse.id} class={`pulse ${pulse.tone === 'bad' ? 'bad' : ''}`} x={b.x0 - 4} y={b.y0 - 4} width={b.w + 8} height={b.h + 8} rx="4" />}
             <text class={`region-label ${treeOwned ? 'tree-owned' : ''}`} x={r.x} y={b.y0 - 6} text-anchor="middle">{short(r.name)}</text>
             <text class="region-sub" x={r.x} y={b.y0 + b.h + 11} text-anchor="middle">{arrival === undefined
@@ -143,7 +171,16 @@ export function HypeMap({ s, onRegion, selected }: { s: GameState; onRegion: (id
           const jitter = ((b.id * 37) % 30) - 15;
           return (
             <button key={b.id} class={`bubble ${b.type === 'post' ? 'post' : ''}`} style={{ left: `calc(${pct(r).left} + ${jitter}px)`, top: pct(r).top }}
-              onPointerDown={(e) => { e.stopPropagation(); bubbleTapAt = performance.now(); store.act((st) => tapBubble(st, b.id)); }}
+              onPointerDown={(e) => {
+                e.stopPropagation(); bubbleTapAt = performance.now();
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                const at = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                const before = store.state?.techPoints ?? 0;
+                store.act((st) => tapBubble(st, b.id));
+                const gained = (store.state?.techPoints ?? 0) - before;
+                burst(at, b.type === 'eureka' ? 11 : 7);
+                if (gained > 0) flyTo(at, 'tp', `+${gained} 🔬`);
+              }}
               aria-label={`${b.type} bubble`}>
               {BUBBLE_ICON[b.type]}
               <span class="ttl" style={{ animationDuration: `${left}s` }} />
